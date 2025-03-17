@@ -87,7 +87,7 @@ if (!$conn) {
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link active" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link active" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bxs-folder-open'></i> Documentos</span>
                 <i class="bx bx-chevron-down"></i>

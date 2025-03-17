@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($usuario['rol'] === 'administrador') {
                 header("Location: ../admin/inicio-administrador.php"); 
             } elseif ($usuario['rol'] === 'docente') {
-                header("Location: ../docente/docente-inicio.php"); 
+                header("Location: ../estudiante/inicio-estudiante.php"); 
             } else {
                 header("Location: ../estudiante/inicio-estudiante.php"); 
             }

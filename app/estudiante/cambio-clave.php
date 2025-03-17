@@ -95,7 +95,7 @@ if (isset($_SESSION['mensaje'])) {
       <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+      <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
       <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Anteproyecto</span>

@@ -108,7 +108,7 @@ if (!$conn) {
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bxs-folder-open'></i> Documentos</span>
                 <i class="bx bx-chevron-down"></i>
@@ -276,7 +276,7 @@ if (!$conn) {
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
-                        <form action="../docente/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                        <form action="../estudiante/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h2 class="card-title text-center">Datos académicos</h2>
