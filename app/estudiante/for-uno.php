@@ -273,7 +273,6 @@ if (!$conn) {
             <h1 class="mb-2 text-center fw-bold">Enviar Datos</h1>
 
             <?php if (empty($estado)  || $estado === 'Corregir'): ?>
-
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
                         <form action="../estudiante/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
