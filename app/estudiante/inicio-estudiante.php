@@ -80,12 +80,12 @@ if (!$conn) {
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link active" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
-            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-                <span><i class='bx bxs-folder-open'></i> Documentos</span>
+            <a class="nav-link active" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase1" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bxs-folder-open'></i> Fase 1</span>
                 <i class="bx bx-chevron-down"></i>
             </a>
-            <div class="collapse" id="submenuAnteproyecto">
+            <div class="collapse" id="submenuFase1">
                 <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active bg-secondary' : ''; ?>" href="for-uno.php">
@@ -127,6 +127,16 @@ if (!$conn) {
                             <i class="bx bx-file"></i> For 8
                         </a>
                     </li>
+                    
+                </ul>
+            </div>
+
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase2" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bxs-folder-open'></i> Fase 2</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuFase2">
+                <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active bg-secondary' : ''; ?>" href="for-nueve.php">
                             <i class="bx bx-file"></i> For 9
@@ -163,10 +173,11 @@ if (!$conn) {
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dieciseis.php' ? 'active bg-secondary' : ''; ?>" href="for-dieciseis.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diecis.php' ? 'active bg-secondary' : ''; ?>" href="for-diecis.php">
                             <i class="bx bx-file"></i> For 16
                         </a>
                     </li>
+                    
                 </ul>
             </div>
         </nav>
