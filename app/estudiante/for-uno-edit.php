@@ -114,7 +114,7 @@ $stmt_exp->close();
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bxs-folder-open'></i> Documentos</span>
                 <i class="bx bx-chevron-down"></i>
@@ -280,7 +280,7 @@ $stmt_exp->close();
 
             <div class="card shadow-lg container-fluid">
                 <div class="card-body">
-                    <form action="../docente/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
+                    <form action="../estudiante/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
 
                         <!-- Campo oculto para el ID del documento -->
                         <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_id); ?>">

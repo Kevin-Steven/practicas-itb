@@ -2,7 +2,7 @@
     $host = 'localhost';
     $usuario = 'root';
     $clave = '';
-    $baseDeDatos = 'prueba';
+    $baseDeDatos = 'itb_practicas';
     $puerto = '3308';
 
     $conn = new mysqli($host, $usuario ,$clave, $baseDeDatos, $puerto);

@@ -108,7 +108,7 @@ if (!$conn) {
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bxs-folder-open'></i> Documentos</span>
                 <i class="bx bx-chevron-down"></i>
@@ -276,7 +276,7 @@ if (!$conn) {
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
-                        <form action="../docente/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                        <form action="../estudiante/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h2 class="card-title text-center">Datos académicos</h2>
@@ -373,8 +373,32 @@ if (!$conn) {
                                                     <button type="button" class="btn btn-warning" onclick="window.location.href='for-uno-edit.php?id=<?php echo $id; ?>'">
                                                         <i class='bx bx-edit-alt'></i>
                                                     </button>
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
+                                                        <i class='bx bxs-file-pdf'></i>
+                                                    </button>
                                                 </div>
                                             </td>
+
+                                            <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <form action="doc-uno-pdf.php" method="GET" target="_blank">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">Desea generar el siguiente documento?</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>Se generará un documento en formato PDF</p>
+                                                                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                <button type="submit" class="btn btn-primary">Aceptar</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </tr>
                                     <?php else: ?>
                                         <!-- ✅ Registros de experiencia adicionales -->

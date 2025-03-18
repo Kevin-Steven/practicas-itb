@@ -7,21 +7,24 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
+// Forzar el charset
+$conn->set_charset("utf8mb4");
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_SESSION['usuario_id'])) {
         die("Error: Usuario no autenticado.");
     }
     $usuario_id = $_SESSION['usuario_id'];
 
-    // Recibir y validar los datos académicos
-    $paralelo = filter_input(INPUT_POST, 'paralelo', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $promedio = filter_input(INPUT_POST, 'promedio', FILTER_VALIDATE_FLOAT);
+    // Recibir los datos académicos sin convertir caracteres especiales
+    $paralelo = trim($conn->real_escape_string($_POST['paralelo']));
+    $promedio = floatval($_POST['promedio']);
 
     if (empty($paralelo) || $promedio === false) {
         die("Error: Los campos de datos académicos son obligatorios y el promedio debe ser un número válido.");
     }
 
-    // Insertar en la tabla documento_uno
+    // Insertar en documento_uno
     $sql_documento = "INSERT INTO documento_uno (usuario_id, paralelo, promedio_notas) VALUES (?, ?, ?)";
     $stmt_documento = $conn->prepare($sql_documento);
     $stmt_documento->bind_param("isd", $usuario_id, $paralelo, $promedio);
@@ -29,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt_documento->execute()) {
         $documento_uno_id = $stmt_documento->insert_id;
 
-        // Verificar si existen datos de experiencia laboral
+        // Experiencia laboral
         if (!empty($_POST['lugar_laborado']) && is_array($_POST['lugar_laborado'])) {
             $lugares_laborados = $_POST['lugar_laborado'];
             $periodos_tiempo = $_POST['periodo_tiempo'];
@@ -39,21 +42,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_experiencia = $conn->prepare($sql_experiencia);
 
             for ($i = 0; $i < count($lugares_laborados); $i++) {
-                // Sanear y extraer solo los números del periodo
-                $lugar = filter_var($lugares_laborados[$i], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $periodo = filter_var($periodos_tiempo[$i], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $funciones = filter_var($funciones_realizadas_array[$i], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $lugar = trim($conn->real_escape_string($lugares_laborados[$i]));
+                $periodo = trim($conn->real_escape_string($periodos_tiempo[$i]));
+                $funciones = trim($conn->real_escape_string($funciones_realizadas_array[$i]));
 
                 if (empty($lugar) || empty($periodo) || empty($funciones)) {
-                    echo "Error en la entrada " . ($i + 1) . ": Datos inválidos.<br>";
                     continue;
                 }
 
-                // Insertar experiencia laboral
                 $stmt_experiencia->bind_param("isss", $documento_uno_id, $lugar, $periodo, $funciones);
-                if (!$stmt_experiencia->execute()) {
-                    echo "Error al guardar la experiencia laboral: " . $stmt_experiencia->error . "<br>";
-                }
+                $stmt_experiencia->execute();
             }
         }
 
@@ -69,4 +67,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $conn->close();
+
 ?>

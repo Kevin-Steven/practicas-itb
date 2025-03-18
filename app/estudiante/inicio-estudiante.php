@@ -39,13 +39,6 @@ if (!$conn) {
             <i class='bx bx-menu'></i>
         </div>
         <div class="topbar-right">
-            <div class="input-group search-bar">
-                <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-                <input type="text" id="search" class="form-control" placeholder="Search">
-            </div>
-            <!-- Iconos adicionales a la derecha -->
-            <i class='bx bx-envelope'></i>
-            <i class='bx bx-bell'></i>
             <!-- Menú desplegable para el usuario -->
             <div class="user-profile dropdown">
                 <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
@@ -181,54 +174,64 @@ if (!$conn) {
 
     <!-- Content -->
     <div class="content" id="content">
-        <div class="container-fluid py-3">
+        <div class="container-fluid py-2">
             <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h1 class="display-4 mb-3 fw-bold">Bienvenido a tu panel de Practicante</h1>
-                    <p id="lead" class="lead mb-5">Desde este panel podrás revisar anteproyectos y tesis, así como gestionar las revisiones pendientes de los estudiantes.</p>
+                <div class="col-md-10 text-center">
+                    <!-- Título y mensaje principal -->
+                    <h1 class="display-4 fw-bold mb-4">¡Bienvenido/a, Practicante!</h1>
+                    <p class="lead mb-4">Este es tu panel informativo del <strong>Instituto Superior Tecnológico Bolivariano de Tecnología</strong>.</p>
+                    <p class="mb-5">Aquí puedes consultar el estado de tus prácticas profesionales y mantenerte al tanto de tu progreso.</p>
 
-                    <!-- Cards con acciones rápidas -->
+                    <!-- Cards informativas -->
                     <div class="row justify-content-center">
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-principal h-100 shadow">
+                        <!-- Estado del proceso -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow border-0">
                                 <div class="card-body text-center">
-                                    <i class='bx bx-book bx-lg mb-3'></i>
-                                    <h5 class="card-title">Anteproyectos</h5>
-                                    <p class="card-text">Accede a los anteproyectos pendientes de revisión.</p>
-                                    <a href="revisar-anteproyecto.php" class="btn">Acceder</a>
+                                    <i class='bx bx-task bx-lg mb-3'></i>
+                                    <h5 class="card-title mb-3">Estado del Proceso</h5>
+                                    <p class="card-text text-muted">
+                                        Actualmente estás en la etapa de <strong>Seguimiento de Actividades</strong>. Sigue las indicaciones de tu tutor.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-principal h-100 shadow">
+                        <!-- Documentos entregados -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow border-0">
                                 <div class="card-body text-center">
-                                    <i class='bx bx-file bx-lg mb-3'></i>
-                                    <h5 class="card-title">Revisar Tesis</h5>
-                                    <p class="card-text">Accede a las tesis pendientes de revisión.</p>
-                                    <a href="revisar-tesis.php" class="btn">Acceder</a>
+                                    <i class='bx bx-folder-open bx-lg mb-3'></i>
+                                    <h5 class="card-title mb-3">Documentos Entregados</h5>
+                                    <p class="card-text text-muted">
+                                        Has entregado <strong>4 de 6</strong> documentos requeridos. Revisa tus pendientes en el apartado de documentos.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-principal h-100 shadow">
+                        <!-- Horas completadas -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow border-0">
                                 <div class="card-body text-center">
-                                    <i class='bx bx-user bx-lg mb-3'></i>
-                                    <h5 class="card-title">Postulantes</h5>
-                                    <p class="card-text">Listado de postulantes asignados.</p>
-                                    <a href="listado-postulantes.php" class="btn">Acceder</a>
+                                    <i class='bx bx-time-five bx-lg mb-3'></i>
+                                    <h5 class="card-title mb-3">Horas Completadas</h5>
+                                    <p class="card-text text-muted">
+                                        Llevas acumuladas <strong>120 de 240</strong> horas de prácticas profesionales. ¡Sigue así!
+                                    </p>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
+                    <!-- Mensaje motivacional -->
+                    <div class="mt-2">
+                        <p class="text-muted fst-italic">"El futuro pertenece a quienes se preparan hoy".</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 
 
     <!-- Footer -->
