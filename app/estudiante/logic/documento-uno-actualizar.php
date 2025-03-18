@@ -89,6 +89,6 @@ for ($i = 0; $i < count($lugares); $i++) {
 $stmt_insert_exp->close();
 
 // 8. Redirigir al listado con éxito
-header("Location: ../for-uno.php?status=update");
+header("Location: ../for-uno.php?status=updated");
 exit();
 ?>

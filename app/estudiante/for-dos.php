@@ -7,60 +7,50 @@ if (!isset($_SESSION['usuario_id'])) {
     exit();
 }
 
-$foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
+
+$foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
+
 $usuario_id = $_SESSION['usuario_id'];
 
-// Aquí recibimos el ID desde la URL
-$documento_id = $_GET['id'] ?? null;
+$sql_doc_dos = "SELECT 
+       d2.id,
+       d2.estado, 
+       d2.fecha_inicio,
+       d2.hora_inicio,
+       d2.fecha_fin,
+       d2.hora_fin,
+       d2.documento_eva_s,
+       d2.hora_practicas,
+       d2.nota_eva_s
+FROM documento_dos d2
+WHERE d2.usuario_id = ?
+ORDER BY d2.id DESC";
 
-if (!$documento_id) {
-    header("Location: for-uno.php?status=not_found");
-    exit();
+$stmt_doc_dos = $conn->prepare($sql_doc_dos);
+$stmt_doc_dos->bind_param("i", $usuario_id);
+$stmt_doc_dos->execute();
+$result_tema = $stmt_doc_dos->get_result();
+
+while ($row = $result_tema->fetch_assoc()) {
+    $id = $row['id'] ?? null;
+    $estado = $row['estado'] ?? null;
+    $fecha_inicio = $row['fecha_inicio'] ?? null;
+    $hora_inicio = $row['hora_inicio'] ?? null;
+    $fecha_fin = $row['fecha_fin'] ?? null;
+    $hora_fin = $row['hora_fin'] ?? null;
+    $documento_eva_s = $row['documento_eva_s'] ?? null;
+    $horas_practicas = $row['hora_practicas'] ?? null;
+    $nota_eva_s = $row['nota_eva_s'] ?? null;
 }
 
-// Consultar el documento por ID
-$sql_doc_uno = "SELECT 
-       d1.id,
-       d1.estado, 
-       d1.paralelo, 
-       d1.promedio_notas
-FROM documento_uno d1
-WHERE d1.id = ? AND d1.usuario_id = ?";
+$stmt_doc_dos->close();
 
-$stmt_doc_uno = $conn->prepare($sql_doc_uno);
-$stmt_doc_uno->bind_param("ii", $documento_id, $usuario_id);
-$stmt_doc_uno->execute();
-$result_doc_uno = $stmt_doc_uno->get_result();
 
-if ($result_doc_uno->num_rows === 0) {
-    header("Location: for-uno.php?status=not_found");
-    exit();
+if (!$conn) {
+    die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
-
-$documento = $result_doc_uno->fetch_assoc();
-$paralelo = $documento['paralelo'];
-$promedio = $documento['promedio_notas'];
-
-$stmt_doc_uno->close();
-
-// Obtener las experiencias laborales relacionadas
-$sql_experiencias = "SELECT lugar_laborado, periodo_tiempo_meses, funciones_realizadas 
-FROM experiencia_laboral 
-WHERE documento_uno_id = ?";
-
-$stmt_exp = $conn->prepare($sql_experiencias);
-$stmt_exp->bind_param("i", $documento_id);
-$stmt_exp->execute();
-$result_exp = $stmt_exp->get_result();
-
-$experiencia_laboral = [];
-while ($exp = $result_exp->fetch_assoc()) {
-    $experiencia_laboral[] = $exp;
-}
-
-$stmt_exp->close();
 ?>
 
 <!doctype html>
@@ -69,7 +59,7 @@ $stmt_exp->close();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>For 1 Editar</title>
+    <title>For 2</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -287,86 +277,154 @@ $stmt_exp->close();
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
-            <h1 class="mb-2 text-center fw-bold">Actualizar Datos</h1>
+            <h1 class="mb-2 text-center fw-bold">Datos Generales del Estudiante</h1>
 
-            <div class="card shadow-lg container-fluid">
-                <div class="card-body">
-                    <form action="../estudiante/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
+            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
 
-                        <!-- Campo oculto para el ID del documento -->
-                        <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_id); ?>">
-
-                        <div class="row">
-                            <!-- Datos académicos -->
-                            <div class="col-md-6">
-                                <h2 class="card-title text-center">Datos Académicos</h2>
-                                <div class="mb-2">
-                                    <label for="paralelo" class="form-label fw-bold">Paralelo</label>
-                                    <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($paralelo); ?>" required>
+                <div class="card shadow-lg container-fluid">
+                    <div class="card-body">
+                        <form action="../estudiante/logic/documento-dos.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h2 class="card-title text-center">Periodo Práctica <br>Preprofesional</h2>
+                                    <div class="mb-2">
+                                        <label for="fecha_inicio" class="form-label fw-bold">Fecha Inicio:</label>
+                                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="hora_inicio" class="form-label fw-bold">Hora Inicio:</label>
+                                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="fecha_fin" class="form-label fw-bold">Fecha Fin:</label>
+                                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="hora_fin" class="form-label fw-bold">Hora Fin:</label>
+                                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="horas_practicas" class="form-label fw-bold">Horas Prácticas:</label>
+                                        <input type="number" class="form-control" id="horas_practicas" name="horas_practicas" step="0.01" placeholder="ej. 240" required>
+                                    </div>
                                 </div>
-                                <div class="mb-2">
-                                    <label for="promedio" class="form-label fw-bold">Promedio de notas:</label>
-                                    <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" min="0" max="100" value="<?php echo htmlspecialchars($promedio); ?>" required>
+
+                                <div class="col-md-6">
+                                    <h2 class="card-title text-center">Resultados Extraídos del EVA-S del Diagnóstico Inicial</h2>
+                                    <div class="mb-2">
+                                        <label for="eva-s" class="form-label fw-bold">Subir EVA-S:</label>
+                                        <input type="file" class="form-control" id="eva_s" name="eva_s" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="nota_eva-s" class="form-label fw-bold">Nota EVA-S:</label>
+                                        <input type="number" min="0" max="100" class="form-control" id="nota_eva-s" name="nota_eva-s" step="0.01" placeholder="ej. 100" required>
+                                    </div>
                                 </div>
+                                <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
+
                             </div>
 
-                            <!-- Experiencia laboral -->
-                            <div class="col-md-6">
-                                <h2 class="card-title text-center">Experiencia Laboral</h2>
-
-                                <div id="contenedor-experiencia">
-                                    <?php if (!empty($experiencia_laboral)): ?>
-                                        <?php foreach ($experiencia_laboral as $index => $exp): ?>
-                                            <div class="experiencia-laboral border p-3 mb-3 rounded">
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                    <input type="text" class="form-control" name="lugar_laborado[]" value="<?php echo htmlspecialchars($exp['lugar_laborado']); ?>" required>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                    <input type="text" class="form-control" name="periodo_tiempo[]" value="<?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?>" required>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                    <input type="text" class="form-control" name="funciones_realizadas[]" value="<?php echo htmlspecialchars($exp['funciones_realizadas']); ?>" required>
-                                                </div>
-
-                                                <?php if ($index > 0): ?>
-                                                    <button type="button" class="btn btn-sm eliminar-experiencia" style="background: #df1f1f;">Eliminar</button>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <!-- Si no hay experiencias, se muestra un campo vacío -->
-                                        <div class="experiencia-laboral border p-3 mb-3 rounded">
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                <input type="text" class="form-control" name="lugar_laborado[]" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                <input type="text" class="form-control" name="periodo_tiempo[]" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                <input type="text" class="form-control" name="funciones_realizadas[]" required>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-
-                                <button type="button" class="btn btn-sm mt-2" id="agregar-experiencia">Agregar más experiencia</button>
+                            <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
+                                <button type="submit" class="btn">Enviar Datos</button>
                             </div>
-                        </div>
-
-                        <div class="text-center mt-5 d-flex justify-content-center align-items-center gap-3">
-                            <button type="submit" class="btn">Actualizar</button>
-                            <a href="for-uno.php" class="btn" id="cancelar-btn">Cancelar</a>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            <?php else: ?>
+                <h3 class="text-center mt-4 mb-3">Estado del Documento</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered shadow-lg">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>Fecha Inicio</th>
+                                <th>Hora Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Hora Fin</th>
+                                <th>Horas Prácticas</th>
+                                <th>EVA-S</th>
+                                <th>Nota EVA-S</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- ✅ Aquí tus datos -->
+                                <td class="text-center"><?php echo $fecha_inicio; ?></td>
+                                <td class="text-center"><?php echo $hora_inicio; ?></td>
+                                <td class="text-center"><?php echo $fecha_fin; ?></td>
+                                <td class="text-center"><?php echo $hora_fin; ?></td>
+                                <td class="text-center"><?php echo $horas_practicas; ?></td>
+                                <td class="text-center"><?php echo $nota_eva_s; ?></td>
+                                <td class="text-center">
+                                    <a href="../uploads/eva-s/<?php echo $documento_eva_s; ?>" target="_blank">
+                                        Ver Documento
+                                    </a>
+
+                                </td>
+                                <td class="text-center">
+                                    <?php
+                                    // Lógica para asignar la clase de Bootstrap según el estado
+                                    $badgeClass = '';
+
+                                    if ($estado === 'Pendiente') {
+                                        $badgeClass = 'badge bg-warning text-dark'; // Amarillo
+                                    } elseif ($estado === 'Corregir') {
+                                        $badgeClass = 'badge bg-danger'; // Rojo
+                                    } elseif ($estado === 'Aprobado') {
+                                        $badgeClass = 'badge bg-success'; // Verde
+                                    } else {
+                                        $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
+                                    }
+                                    ?>
+
+                                    <span class="<?php echo $badgeClass; ?>">
+                                        <?php echo htmlspecialchars($estado); ?>
+                                    </span>
+                                </td>
+
+                                <!-- ✅ Acciones -->
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-dos-edit.php?id=<?php echo $id; ?>'">
+                                            <i class='bx bx-edit-alt'></i>
+                                        </button>
+
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
+                                            <i class='bx bxs-file-pdf'></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <!-- ✅ Modal fuera de la tabla -->
+                        <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="doc-dos-pdf.php" method="GET" target="_blank">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Se generará un documento en formato PDF.</p>
+                                            <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary">Aceptar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </table>
+                </div>
         </div>
+    <?php endif; ?>
+    </div>
     </div>
 
     <!-- Footer -->
@@ -378,9 +436,8 @@ $stmt_exp->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
-    <script src="../js/expLaboralEditar.js"></script>
+    <script src="../js/expLaboral.js"></script>
     <script src="../js/toast.js"></script>
-    
 </body>
 
 </html>

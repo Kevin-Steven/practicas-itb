@@ -36,13 +36,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
       <i class='bx bx-menu'></i>
     </div>
     <div class="topbar-right">
-      <div class="input-group search-bar">
-        <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-        <input type="text" id="search" class="form-control" placeholder="Search">
-      </div>
-      <!-- Iconos adicionales a la derecha -->
-      <i class='bx bx-envelope'></i>
-      <i class='bx bx-bell'></i>
+      
       <!-- Menú desplegable para el usuario -->
       <div class="user-profile dropdown">
         <div class="d-flex align-items-center" data-bs-toggle="dropdown" id="user-profile-toggle" aria-expanded="false">
@@ -86,11 +80,8 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
     </div>
     <nav class="nav flex-column">
       <a class="nav-link active" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
-      <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <!-- Módulo Informes con submenú -->
+      <a class="nav-link" href="ver-estudiantes.php"><i class='bx bx-user'></i> Estudiantes</a>
+      <!-- Módulo Informes con submenú
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -98,24 +89,22 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
       <div class="collapse" id="submenuInformes">
         <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active bg-secondary' : ''; ?>" href="informe-tutor.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active' : ''; ?>" href="informe-tutor.php">
               <i class="bx bx-file"></i> Informe Tutor
             </a>
           </li>
           <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active' : ''; ?>" href="informe-tesis.php">
               <i class="bx bx-file"></i> Informe Tesis
             </a>
           </li>
           <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active' : ''; ?>" href="informe-revisor-tesis.php">
               <i class="bx bx-file"></i> Jurado tesis
             </a>
           </li>
         </ul>
-      </div>
-      <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>
-      <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
+      </div> -->
     </nav>
   </div>
 
@@ -125,7 +114,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
       <div class="row justify-content-center">
         <div class="col-md-8 text-center">
           <h1 class="display-5 fw-bold mb-2">Bienvenido a tu panel de administración</h1>
-          <p class="lead mb-4">Desde este panel podrás revisar las inscripciones, verificar la documentación de los postulantes y generar reportes para el proceso de titulación.</p>
+          <p class="lead mb-4">Desde este panel podrás revisar la documentación de los estudiantes y generar reportes para el proceso de practicas profesionales.</p>
 
           <div class="row justify-content-center">
             <div class="col-md-4 mb-3">
@@ -161,50 +150,6 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
-            <div class="col-md-4 mb-3">
-              <div class="card card-principal h-100">
-                <div class="card-body text-center">
-                  <i class='bx bx-user-plus bx-lg mb-3'></i>
-                  <h5 class="card-title">Agregar Tutores</h5>
-                  <p class="card-text">Agrega tutores según sea necesario.</p>
-                  <a href="agg-del-tutores.php" class="btn">Acceder</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-              <div class="card card-principal h-100">
-                <div class="card-body text-center">
-                  <i class='bx bx-user-check bx-lg mb-3'></i>
-                  <h5 class="card-title">Asignar Revisores</h5>
-                  <p class="card-text">Asigna revisores para los anteproyectos, tesis y plagio.</p>
-                  <a href="asignar-revisores.php" class="btn">Acceder</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-              <div class="card card-principal h-100">
-                <div class="card-body text-center">
-                  <i class='bx bx-group bx-lg mb-3'></i>
-                  <h5 class="card-title">Asignar Jurado</h5>
-                  <p class="card-text">Asigna jurados para las sustentaciones de tesis.</p>
-                  <a href="asignar-jurado.php" class="btn">Acceder</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-12 mb-3">
-              <div class="card card-principal h-100">
-                <div class="card-body text-center">
-                  <i class='bx bx-time bx-lg mb-3'></i>
-                  <h5 class="card-title">Horario Sustentación</h5>
-                  <p class="card-text">Asignar horario de sustentación.</p>
-                  <a href="#" class="btn">Acceder</a>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -214,7 +159,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">
     <div class="container">
-      <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
+      <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
     </div>
   </footer>
 

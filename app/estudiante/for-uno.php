@@ -19,6 +19,7 @@ $sql_doc_uno = "SELECT
        d1.estado, 
        d1.paralelo, 
        d1.promedio_notas,
+       d1.motivo_rechazo,
        el.lugar_laborado,
        el.periodo_tiempo_meses,
        el.funciones_realizadas
@@ -38,6 +39,7 @@ while ($row = $result_tema->fetch_assoc()) {
     $estado = $row['estado'] ?? null;
     $paralelo = $row['paralelo'] ?? null;
     $promedio = $row['promedio_notas'] ?? null;
+    $motivo_rechazo = $row['motivo_rechazo'] ?? null;
 
     // Agregar experiencia solo si existen datos
     if ($row['lugar_laborado']) {
@@ -109,11 +111,11 @@ if (!$conn) {
         </div>
         <nav class="nav flex-column">
             <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
-            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-                <span><i class='bx bxs-folder-open'></i> Documentos</span>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase1" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bxs-folder-open'></i> Fase 1</span>
                 <i class="bx bx-chevron-down"></i>
             </a>
-            <div class="collapse show" id="submenuAnteproyecto">
+            <div class="collapse show" id="submenuFase1">
                 <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active' : ''; ?>" href="for-uno.php">
@@ -155,6 +157,16 @@ if (!$conn) {
                             <i class="bx bx-file"></i> For 8
                         </a>
                     </li>
+
+                </ul>
+            </div>
+
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase2" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bxs-folder-open'></i> Fase 2</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuFase2">
+                <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active' : ''; ?>" href="for-nueve.php">
                             <i class="bx bx-file"></i> For 9
@@ -186,15 +198,16 @@ if (!$conn) {
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active bg-secondary' : ''; ?>" href="for-quince.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active' : ''; ?>" href="for-quince.php">
                             <i class="bx bx-file"></i> For 15
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dieciseis.php' ? 'active bg-secondary' : ''; ?>" href="for-dieciseis.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diecis.php' ? 'active' : ''; ?>" href="for-diecis.php">
                             <i class="bx bx-file"></i> For 16
                         </a>
                     </li>
+
                 </ul>
             </div>
         </nav>
@@ -211,7 +224,7 @@ if (!$conn) {
                     <?php elseif ($_GET['status'] === 'deleted'): ?>
                         <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
                         <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
+                    <?php elseif ($_GET['status'] === 'updated'): ?>
                         <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
                         <strong class="me-auto">Documento Actualizado</strong>
                     <?php else: ?>
@@ -230,7 +243,7 @@ if (!$conn) {
                         case 'deleted':
                             echo "El documento se ha eliminado correctamente.";
                             break;
-                        case 'update':
+                        case 'updated':
                             echo "El documento se ha actualizado correctamente.";
                             break;
                         case 'invalid_extension':
@@ -267,16 +280,39 @@ if (!$conn) {
         </div>
     <?php endif; ?>
 
+    <?php if (!empty($motivo_rechazo)): ?>
+        <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalMotivoRechazoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalMotivoRechazoLabel">Motivo de Rechazo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p><?php echo htmlspecialchars($motivo_rechazo); ?></p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Enviar Datos</h1>
 
             <?php if (empty($estado)  || $estado === 'Corregir'): ?>
-
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
                         <form action="../estudiante/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <h2 class="card-title text-center">Datos académicos</h2>
@@ -315,8 +351,16 @@ if (!$conn) {
 
                             <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
                                 <button type="submit" class="btn">Enviar</button>
+
+                                <?php if (!empty($motivo_rechazo)): ?>
+                                    <a href="#" style="background: #df1f1f;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
+                                        Ver Motivo de Rechazo
+                                    </a>
+                                <?php endif; ?>
                             </div>
+
                         </form>
+
                     </div>
                 </div>
             <?php else: ?>

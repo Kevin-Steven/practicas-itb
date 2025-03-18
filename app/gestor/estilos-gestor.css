@@ -343,7 +343,7 @@ span {
 }
 
 .table-responsive a {
-  color: #04087c;
+  color: #135ecf;
 }
 
 .table-header-fixed {
@@ -362,14 +362,14 @@ span {
 table a i {
   font-size: 20px;
   margin-right: 1px;
-  color: #04087c;
+  color: #135ecf;
 }
 
 
 .tabla-descargar a {
   font-size: 16px;
   font-weight: bold;
-  color: #04087c;
+  color: #135ecf;
 }
 
 .tabla-descargar a i {
@@ -603,9 +603,6 @@ table td {
     font-size: 13px;
   }
 
-  .table-responsive a {
-    font-size: 13px;
-  }
 
   .botones-detalle-tema .btn {
     margin-bottom: 10px;
