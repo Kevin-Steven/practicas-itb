@@ -248,7 +248,7 @@ if (!$conn) {
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
-            <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
+            <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
         </div>
     </footer>
 

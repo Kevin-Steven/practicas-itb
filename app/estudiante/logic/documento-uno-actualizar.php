@@ -12,7 +12,6 @@ $usuario_id = $_SESSION['usuario_id'];
 
 // 2. Recibir los datos del formulario
 $documento_id = $_POST['documento_id'] ?? null;
-$paralelo = trim($_POST['paralelo'] ?? '');
 $promedio = floatval($_POST['promedio'] ?? 0);
 
 $lugares = $_POST['lugar_laborado'] ?? [];
@@ -20,7 +19,7 @@ $periodos = $_POST['periodo_tiempo'] ?? [];
 $funciones = $_POST['funciones_realizadas'] ?? [];
 
 // 3. Validar los datos importantes
-if (empty($documento_id) || empty($paralelo) || $promedio <= 0) {
+if (empty($documento_id) || $promedio <= 0) {
     header("Location: ../for-uno-edit.php?id=$documento_id&status=missing_data");
     exit();
 }
@@ -44,10 +43,10 @@ if ($result_check->num_rows === 0) {
 }
 $stmt_check->close();
 
-// 5. Actualizar el documento_uno con los nuevos datos académicos
-$sql_update_doc = "UPDATE documento_uno SET paralelo = ?, promedio_notas = ?, estado = 'Pendiente' WHERE id = ?";
+// 5. Actualizar el documento_uno con el nuevo promedio
+$sql_update_doc = "UPDATE documento_uno SET promedio_notas = ?, estado = 'Pendiente' WHERE id = ?";
 $stmt_update_doc = $conn->prepare($sql_update_doc);
-$stmt_update_doc->bind_param("sdi", $paralelo, $promedio, $documento_id);
+$stmt_update_doc->bind_param("di", $promedio, $documento_id);
 
 if (!$stmt_update_doc->execute()) {
     header("Location: ../for-uno-edit.php?id=$documento_id&status=db_error");

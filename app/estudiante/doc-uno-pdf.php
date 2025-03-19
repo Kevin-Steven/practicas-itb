@@ -22,14 +22,16 @@ $sql = "SELECT
             u.direccion,
             u.telefono,
             u.convencional,
-            u.carrera,
+            c.carrera AS carrera,
+            cu.paralelo AS paralelo,         -- ✅ Aquí se obtiene paralelo desde cursos
             u.foto_perfil,
             u.periodo,
             d1.estado, 
-            d1.paralelo, 
             d1.promedio_notas
         FROM documento_uno d1
         JOIN usuarios u ON d1.usuario_id = u.id
+        INNER JOIN carrera c ON u.carrera_id = c.id
+        LEFT JOIN cursos cu ON u.curso_id = cu.id   -- ✅ LEFT JOIN a cursos para obtener paralelo
         WHERE d1.id = $id";
 
 $result = $conn->query($sql);

@@ -17,6 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $telefono = $_POST['telefono'];
   $convencional = $_POST['convencional'];
 
+   // Convertir a minúsculas primero (soporta UTF-8)
+   $nombres = mb_strtolower($nombres, 'UTF-8');
+   $apellidos = mb_strtolower($apellidos, 'UTF-8');
+ 
+   // Luego convertir la primera letra de cada palabra a mayúscula
+   $nombres = mb_convert_case($nombres, MB_CASE_TITLE, "UTF-8");
+   $apellidos = mb_convert_case($apellidos, MB_CASE_TITLE, "UTF-8");
+
   // Validación de número de teléfono y convencional
   if (strlen($telefono) != 10) {
     header("Location: perfil.php?status=invalid_phone");

@@ -15,14 +15,24 @@ if (isset($_GET['id'])) {
   $estudiante_id = $_GET['id'];
 
   $sql = "SELECT 
-              u.nombres, u.apellidos, u.email, u.carrera, u.telefono, 
-              d1.id as id_uno, d1.estado as estado_uno, d1.nombre_doc as nombre_doc_uno,
-              d2.id as id_dos, d2.estado as estado_dos, d2.nombre_doc as nombre_doc_dos
-          FROM usuarios u
-          LEFT JOIN documento_uno d1 ON u.id = d1.usuario_id
-          LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
-          WHERE u.id = ?
-          ORDER BY d1.fecha_subida DESC LIMIT 1";
+    u.nombres, 
+    u.apellidos, 
+    u.email, 
+    c.carrera AS carrera,  -- El campo carrera lo obtienes de la tabla carrera
+    u.telefono, 
+    d1.id AS id_uno, 
+    d1.estado AS estado_uno, 
+    d1.nombre_doc AS nombre_doc_uno,
+    d2.id AS id_dos, 
+    d2.estado AS estado_dos, 
+    d2.nombre_doc AS nombre_doc_dos
+FROM usuarios u
+LEFT JOIN carrera c ON u.carrera_id = c.id               -- Únete a la tabla carrera
+LEFT JOIN documento_uno d1 ON u.id = d1.usuario_id
+LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
+WHERE u.id = ?
+ORDER BY d1.fecha_subida DESC
+LIMIT 1";
 
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $estudiante_id);

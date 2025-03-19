@@ -95,103 +95,104 @@ if (isset($_SESSION['mensaje'])) {
       <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-file'></i> Anteproyecto</span>
+      <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase1" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bxs-folder-open'></i> Fase 1</span>
         <i class="bx bx-chevron-down"></i>
       </a>
-      <div class="collapse" id="submenuAnteproyecto">
+      <div class="collapse" id="submenuFase1">
         <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="revisar-anteproyecto.php">
-              <i class="bx bx-file"></i> Revisar
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active' : ''; ?>" href="for-uno.php">
+              <i class="bx bx-file"></i> For 1
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-anteproyecto.php">
-              <i class="bx bx-file"></i> Observaciones
-            </a>
-          </li>
-        </ul>
-      </div>
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#RevisarTesis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-file'></i> Tesis</span>
-        <i class="bx bx-chevron-down"></i>
-      </a>
-      <div class="collapse" id="RevisarTesis">
-        <ul class="list-unstyled ps-4">
-          <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-tesis.php">
-              <i class="bx bx-book-reader"></i> Revisar
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dos.php' ? 'active' : ''; ?>" href="for-dos.php">
+              <i class="bx bx-file"></i> For 2
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-tesis.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-tesis.php">
-              <i class="bx bx-file"></i> Observaciones
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-tres.php' ? 'active' : ''; ?>" href="for-tres.php">
+              <i class="bx bx-file"></i> For 3
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-correcciones-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-correcciones-tesis.php">
-              <i class="bx bx-file"></i> Correcciones
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cuatro.php' ? 'active' : ''; ?>" href="for-cuatro.php">
+              <i class="bx bx-file"></i> For 4
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'rubrica-calificacion.php' ? 'active bg-secondary' : ''; ?>" href="rubrica-calificacion.php">
-              <i class="bx bx-file"></i> Rubrica Calificación
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cinco.php' ? 'active' : ''; ?>" href="for-cinco.php">
+              <i class="bx bx-file"></i> For 5
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'certificados.php' ? 'active bg-secondary' : ''; ?>" href="certificados.php">
-              <i class='bx bx-certification'></i> Certificado revisor
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-seis.php' ? 'active' : ''; ?>" href="for-seis.php">
+              <i class="bx bx-file"></i> For 6
             </a>
           </li>
-        </ul>
-      </div>
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-certification'></i> Plagio</span>
-        <i class="bx bx-chevron-down"></i>
-      </a>
-      <div class="collapse" id="submenuPlagio">
-        <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
-              <i class="bx bx-file"></i> Revisar
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-siete.php' ? 'active' : ''; ?>" href="for-siete.php">
+              <i class="bx bx-file"></i> For 7
             </a>
           </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-ocho.php' ? 'active' : ''; ?>" href="for-ocho.php">
+              <i class="bx bx-file"></i> For 8
+            </a>
+          </li>
+
         </ul>
       </div>
 
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-book-open'></i> Sustentación</span>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase2" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bxs-folder-open'></i> Fase 2</span>
         <i class="bx bx-chevron-down"></i>
       </a>
-      <div class="collapse" id="submenuSustentacion">
+      <div class="collapse" id="submenuFase2">
         <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
-              <i class="bx bx-file"></i> Revisar
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active' : ''; ?>" href="for-nueve.php">
+              <i class="bx bx-file"></i> For 9
             </a>
           </li>
-        </ul>
-      </div>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diez.php' ? 'active' : ''; ?>" href="for-diez.php">
+              <i class="bx bx-file"></i> For 10
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-once.php' ? 'active' : ''; ?>" href="for-once.php">
+              <i class="bx bx-file"></i> For 11
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-doce.php' ? 'active' : ''; ?>" href="for-doce.php">
+              <i class="bx bx-file"></i> For 12
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-trece.php' ? 'active' : ''; ?>" href="for-trece.php">
+              <i class="bx bx-file"></i> For 13
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-catorce.php' ? 'active' : ''; ?>" href="for-catorce.php">
+              <i class="bx bx-file"></i> For 14
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active' : ''; ?>" href="for-quince.php">
+              <i class="bx bx-file"></i> For 15
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diecis.php' ? 'active' : ''; ?>" href="for-diecis.php">
+              <i class="bx bx-file"></i> For 16
+            </a>
+          </li>
 
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-file'></i> Informes</span>
-        <i class="bx bx-chevron-down"></i>
-      </a>
-      <div class="collapse" id="submenuInformes">
-        <ul class="list-unstyled ps-4">
-          <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe.php' ? 'active bg-secondary' : ''; ?>" href="informe.php">
-              <i class="bx bx-file"></i> Informe Tutor
-            </a>
-          </li>
-          <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
-              <i class="bx bx-file"></i> Informe tesis
-            </a>
-          </li>
         </ul>
       </div>
     </nav>
@@ -232,7 +233,7 @@ if (isset($_SESSION['mensaje'])) {
 
             <!-- Botón para enviar el formulario -->
             <div class="d-grid gap-2 mt-4 mb-2">
-              <button type="submit" class="btn btn-primary">Actualizar Clave</button>
+              <button type="submit" class="btn">Actualizar Clave</button>
             </div>
           </form>
         </div>
@@ -243,7 +244,7 @@ if (isset($_SESSION['mensaje'])) {
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">
     <div class="container">
-      <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
+      <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
     </div>
   </footer>
 

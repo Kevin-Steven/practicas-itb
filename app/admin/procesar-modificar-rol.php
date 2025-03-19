@@ -1,41 +1,73 @@
-<?php
-session_start();
-require '../config/config.php';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tablas con Anchos Fijos</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 40px 350px;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed; /* IMPORTANTE para respetar los anchos del colgroup */
+        }
+        th {
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #000;
+            padding: 8px;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word; /* Si el contenido es largo, se ajusta */
+        }
+    </style>
+</head>
+<body>
 
-// Verificar si el usuario ha iniciado sesión y tiene permisos de administrador
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'administrador') {
-    header("Location: ../../index.php");
-    exit();
-}
+    <!-- Primera tabla -->
+    <table>
+        <colgroup>
+            <col style="width: 60%;">
+            <col style="width: 40%;">
+        </colgroup>
+        <tr>
+            <th colspan="2">DATOS GENERALES DEL ESTUDIANTE</th>
+        </tr>
+        <tr>
+            <td><strong>Apellidos y Nombres:</strong></td>
+            <td><strong>Cédula de identidad:</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Castillo Llanos Jostin Emilio</strong></td>
+            <td><strong>0951729367</strong></td>
+        </tr>
+    </table>
 
-if (isset($_POST['usuario_id']) && isset($_POST['nuevo_rol'])) {
-    $usuario_id = $_POST['usuario_id'];
-    $nuevo_rol = $_POST['nuevo_rol'];
+    <!-- Segunda tabla -->
+    <table>
+        <colgroup>
+            <col style="width: 70%;">
+            <col style="width: 10%;">
+            <col style="width: 20%;">
+        </colgroup>
+        <tr>
+            <td><strong>Carrera:</strong></td>
+            <td><strong>Grupo:</strong></td>
+            <td><strong>Nivel de Estudio:</strong></td>
+        </tr>
+        <tr>
+            <td>Tecnología Superior en Desarrollo de Software</td>
+            <td>DH4-DL-A01C</td>
+            <td>4TO NIVEL</td>
+        </tr>
+    </table>
 
-    // Verificar que el nuevo rol es válido
-    $roles_validos = ['postulante', 'administrador', 'gestor', 'docente'];
-    if (!in_array($nuevo_rol, $roles_validos)) {
-        echo "Rol no válido.";
-        exit();
-    }
-
-    // Actualizar el rol del usuario en la base de datos
-    $sql = "UPDATE usuarios SET rol = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $nuevo_rol, $usuario_id);
-
-    if ($stmt->execute()) {
-        // Redirigir de nuevo a la página de modificar rol con un mensaje de éxito
-        header("Location: modificar-rol.php?status=success");
-    } else {
-        // Redirigir con un mensaje de error si la actualización falló
-        header("Location: modificar-rol.php?status=error");
-    }
-
-    $stmt->close();
-} else {
-    // Redirigir con un mensaje de error si los datos no se han enviado correctamente
-    header("Location: modificar-rol.php?status=invalid_request");
-}
-
-$conn->close();
+</body>
+</html>

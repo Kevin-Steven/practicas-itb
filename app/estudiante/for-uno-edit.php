@@ -12,7 +12,7 @@ $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $usuario_id = $_SESSION['usuario_id'];
 
-// Aquí recibimos el ID desde la URL
+// ✅ Recibimos el documento id desde la URL
 $documento_id = $_GET['id'] ?? null;
 
 if (!$documento_id) {
@@ -20,48 +20,104 @@ if (!$documento_id) {
     exit();
 }
 
-// Consultar el documento por ID
+// ✅ Consulta mejorada para obtener toda la info (basada en for-uno.php)
 $sql_doc_uno = "SELECT 
-       d1.id,
-       d1.estado, 
-       d1.paralelo, 
-       d1.promedio_notas
-FROM documento_uno d1
-WHERE d1.id = ? AND d1.usuario_id = ?";
+    u.id AS usuario_id,
+    u.nombres,
+    u.apellidos,
+    u.cedula,
+    u.direccion,
+    u.telefono,
+    u.convencional,
+    u.email,
+    u.periodo,
+    c.carrera AS nombre_carrera,
+    cu.paralelo AS nombre_paralelo,
+
+    d1.id AS documento_uno_id,
+    d1.estado, 
+    d1.promedio_notas,
+    d1.motivo_rechazo,
+
+    el.lugar_laborado,
+    el.periodo_tiempo_meses,
+    el.funciones_realizadas
+
+FROM usuarios u
+INNER JOIN carrera c ON u.carrera_id = c.id
+LEFT JOIN cursos cu ON u.curso_id = cu.id
+LEFT JOIN documento_uno d1 ON d1.usuario_id = u.id
+LEFT JOIN experiencia_laboral el ON d1.id = el.documento_uno_id
+WHERE d1.id = ? AND u.id = ?
+ORDER BY d1.id DESC";
 
 $stmt_doc_uno = $conn->prepare($sql_doc_uno);
 $stmt_doc_uno->bind_param("ii", $documento_id, $usuario_id);
 $stmt_doc_uno->execute();
 $result_doc_uno = $stmt_doc_uno->get_result();
 
-if ($result_doc_uno->num_rows === 0) {
+$usuario_info = null;
+$experiencia_laboral = [];
+
+// ✅ Recogemos la información de la consulta
+while ($row = $result_doc_uno->fetch_assoc()) {
+    if (!$usuario_info) {
+        $usuario_info = [
+            'usuario_id' => $row['usuario_id'],
+            'nombres' => $row['nombres'],
+            'apellidos' => $row['apellidos'],
+            'cedula' => $row['cedula'],
+            'direccion' => $row['direccion'],
+            'telefono' => $row['telefono'],
+            'convencional' => $row['convencional'],
+            'email' => $row['email'],
+            'periodo' => $row['periodo'],
+            'carrera' => $row['nombre_carrera'],
+            'paralelo' => $row['nombre_paralelo'],
+            'documento_uno_id' => $row['documento_uno_id'],
+            'estado' => $row['estado'],
+            'promedio_notas' => $row['promedio_notas'],
+            'motivo_rechazo' => $row['motivo_rechazo']
+        ];
+    }
+
+    // ✅ Agregar experiencia si la hay
+    if (!empty($row['lugar_laborado'])) {
+        $experiencia_laboral[] = [
+            'lugar_laborado' => $row['lugar_laborado'],
+            'periodo_tiempo_meses' => $row['periodo_tiempo_meses'],
+            'funciones_realizadas' => $row['funciones_realizadas']
+        ];
+    }
+}
+
+$stmt_doc_uno->close();
+
+// ✅ Validamos si no se encontró el documento
+if (!$usuario_info) {
     header("Location: for-uno.php?status=not_found");
     exit();
 }
 
-$documento = $result_doc_uno->fetch_assoc();
-$paralelo = $documento['paralelo'];
-$promedio = $documento['promedio_notas'];
+// ✅ Asignamos a variables individuales para el HTML (esto pediste)
+$usuario_id = $usuario_info['usuario_id'];
+$nombres = $usuario_info['nombres'];
+$apellidos = $usuario_info['apellidos'];
+$cedula = $usuario_info['cedula'];
+$direccion = $usuario_info['direccion'];
+$telefono = $usuario_info['telefono'];
+$convencional = $usuario_info['convencional'] ?: 'NO APLICA'; // fallback si está vacío
+$email = $usuario_info['email'];
+$periodo = $usuario_info['periodo'];
+$carrera = $usuario_info['carrera'];
+$paralelo = $usuario_info['paralelo'];
+$documento_uno_id = $usuario_info['documento_uno_id'];
+$estado = $usuario_info['estado'];
+$promedio_notas = $usuario_info['promedio_notas'];
+$motivo_rechazo = $usuario_info['motivo_rechazo'];
 
-$stmt_doc_uno->close();
-
-// Obtener las experiencias laborales relacionadas
-$sql_experiencias = "SELECT lugar_laborado, periodo_tiempo_meses, funciones_realizadas 
-FROM experiencia_laboral 
-WHERE documento_uno_id = ?";
-
-$stmt_exp = $conn->prepare($sql_experiencias);
-$stmt_exp->bind_param("i", $documento_id);
-$stmt_exp->execute();
-$result_exp = $stmt_exp->get_result();
-
-$experiencia_laboral = [];
-while ($exp = $result_exp->fetch_assoc()) {
-    $experiencia_laboral[] = $exp;
-}
-
-$stmt_exp->close();
 ?>
+
 
 <!doctype html>
 <html lang="es">
@@ -294,24 +350,67 @@ $stmt_exp->close();
                     <form action="../estudiante/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
 
                         <!-- Campo oculto para el ID del documento -->
-                        <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_id); ?>">
+                        <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_uno_id); ?>">
 
                         <div class="row">
+                            <!-- Datos generales -->
+                            <div class="col-md-4">
+                                <h2 class="card-title text-center">Datos Generales</h2>
+
+                                <div class="mb-2">
+                                    <label for="nombres" class="form-label fw-bold">Nombres</label>
+                                    <input type="text" class="form-control" id="nombres" value="<?php echo htmlspecialchars($nombres); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="apellidos" class="form-label fw-bold">Apellidos</label>
+                                    <input type="text" class="form-control" id="apellidos" value="<?php echo htmlspecialchars($apellidos); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="cedula" class="form-label fw-bold">Cédula</label>
+                                    <input type="text" class="form-control" id="cedula" value="<?php echo htmlspecialchars($cedula); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="direccion" class="form-label fw-bold">Dirección</label>
+                                    <input type="text" class="form-control" id="direccion" value="<?php echo htmlspecialchars($direccion); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="telefono" class="form-label fw-bold">Teléfono</label>
+                                    <input type="text" class="form-control" id="telefono" value="<?php echo htmlspecialchars($telefono); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="convencional" class="form-label fw-bold">Teléfono Convencional</label>
+                                    <input type="text" class="form-control" id="convencional" value="<?php echo htmlspecialchars($convencional); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                                    <input type="text" class="form-control" id="email" value="<?php echo htmlspecialchars($email); ?>" disabled>
+                                </div>
+                            </div>
+
                             <!-- Datos académicos -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <h2 class="card-title text-center">Datos Académicos</h2>
+
+                                <div class="mb-2">
+                                    <label for="carrera" class="form-label fw-bold">Carrera</label>
+                                    <input type="text" class="form-control" id="carrera" value="<?php echo htmlspecialchars($carrera); ?>" disabled>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="periodo" class="form-label fw-bold">Periodo</label>
+                                    <input type="text" class="form-control" id="periodo" value="<?php echo htmlspecialchars($periodo); ?>" disabled>
+                                </div>
                                 <div class="mb-2">
                                     <label for="paralelo" class="form-label fw-bold">Paralelo</label>
-                                    <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($paralelo); ?>" required>
+                                    <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($paralelo); ?>" disabled>
                                 </div>
                                 <div class="mb-2">
                                     <label for="promedio" class="form-label fw-bold">Promedio de notas:</label>
-                                    <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" min="0" max="100" value="<?php echo htmlspecialchars($promedio); ?>" required>
+                                    <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" min="0" max="100" value="<?php echo htmlspecialchars($promedio_notas); ?>" required>
                                 </div>
                             </div>
 
                             <!-- Experiencia laboral -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <h2 class="card-title text-center">Experiencia Laboral</h2>
 
                                 <div id="contenedor-experiencia">
@@ -364,6 +463,7 @@ $stmt_exp->close();
                             <a href="for-uno.php" class="btn" id="cancelar-btn">Cancelar</a>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -380,7 +480,7 @@ $stmt_exp->close();
     <script src="../js/sidebar.js"></script>
     <script src="../js/expLaboralEditar.js"></script>
     <script src="../js/toast.js"></script>
-    
+
 </body>
 
 </html>

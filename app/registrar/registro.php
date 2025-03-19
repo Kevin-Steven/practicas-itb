@@ -1,3 +1,17 @@
+<?php
+session_start();
+require '../config/config.php'; // O la ruta que tengas de tu conexión
+
+require '../config/config.php';
+$sql_carreras = "SELECT id, carrera FROM carrera WHERE estado = 'activo'";
+$result_carreras = $conn->query($sql_carreras);
+
+$sql_cursos = "SELECT id, paralelo FROM cursos WHERE estado = 'activo'";
+$result_cursos = $conn->query($sql_cursos);
+
+$conn->close();
+?>
+
 <!doctype html>
 <html lang="es">
 
@@ -13,12 +27,11 @@
 <body>
 
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="card p-4 shadow-lg" style="width: 100%; max-width: 850px;">
+        <div class="card py-2 px-4 shadow-lg" style="width: 100%; max-width: 850px;">
             <h2 class="text-center mb-4 fw-bold">Crea tu Cuenta</h2>
 
             <!-- Mostrar mensaje si existe -->
             <?php
-            session_start();
             if (isset($_SESSION['mensaje'])):
             ?>
                 <p class="alert alert-<?php echo $_SESSION['tipo']; ?> text-center">
@@ -79,19 +92,36 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Carrera</label>
-                        <select class="form-select" name="carrera" id="carrera" required>
-                            <option selected value="" disabled>Selecciona una opción</option>
-                            <option value="Tecnología Superior en Desarrollo de software">Tecnología Superior en Desarrollo de software</option>
+                        <select class="form-select" name="carrera_id" id="carrera_id" required>
+                            <option selected value="" disabled>Selecciona una carrera</option>
+                            <?php while ($row = $result_carreras->fetch_assoc()): ?>
+                                <option value="<?php echo $row['id']; ?>"><?php echo $row['carrera']; ?></option>
+                            <?php endwhile; ?>
+                        </select>
+
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Curso (Paralelo)</label>
+                        <select class="form-select" name="curso_id" id="curso_id">
+                            <option selected value="">Selecciona un curso (opcional)</option>
+                            <?php while ($row = $result_cursos->fetch_assoc()): ?>
+                                <option value="<?php echo $row['id']; ?>"><?php echo $row['paralelo']; ?></option>
+                            <?php endwhile; ?>
                         </select>
                     </div>
-                    <div class="col-md-6 mb-5">
+
+                    
+                </div>
+                <div class="row">
+
+                    <div class="col-md-6 mb-4">
                         <label for="password" class="form-label fw-bold">Contraseña</label>
                         <div class="input-group">
                             <input type="password" id="password" name="password" class="form-control" placeholder="Ingrese su clave" required>
                         </div>
                     </div>
                 </div>
-                
+
 
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn w-50">Registrarse</button>

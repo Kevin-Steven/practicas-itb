@@ -10,15 +10,23 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $nombres = mb_strtoupper(mysqli_real_escape_string($conn, $_POST['nombres']), 'UTF-8');  
-  $apellidos = mb_strtoupper(mysqli_real_escape_string($conn, $_POST['apellidos']), 'UTF-8');
+  $nombres = trim(mysqli_real_escape_string($conn, $_POST['nombres']));
+  $apellidos = trim(mysqli_real_escape_string($conn, $_POST['apellidos']));
   $email = mysqli_real_escape_string($conn, $_POST['email']);
   $cedula = $_POST['cedula'];
   $telefono = $_POST['telefono'];
-  $whatsapp = $_POST['whatsapp'];
+  $convencional = $_POST['convencional']; // Cambiado de whatsapp a convencional
 
-  // Validación de número de teléfono y WhatsApp
-  if (strlen($telefono) != 10 || strlen($whatsapp) != 10) {
+  // Convertir a minúsculas primero (soporta UTF-8)
+  $nombres = mb_strtolower($nombres, 'UTF-8');
+  $apellidos = mb_strtolower($apellidos, 'UTF-8');
+
+  // Luego convertir la primera letra de cada palabra a mayúscula
+  $nombres = mb_convert_case($nombres, MB_CASE_TITLE, "UTF-8");
+  $apellidos = mb_convert_case($apellidos, MB_CASE_TITLE, "UTF-8");
+  
+  // Validación de número de teléfono y convencional
+  if (strlen($telefono) != 10 || (!empty($convencional) && strlen($convencional) != 9)) {
     header("Location: perfil-gestor.php?status=invalid_phone");
     exit();
   }
@@ -36,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
 
   // Verificar si los datos han cambiado
-  $sql = "SELECT nombres, apellidos, email, telefono, whatsapp, foto_perfil FROM usuarios WHERE id = ?";
+  $sql = "SELECT nombres, apellidos, email, telefono, convencional, foto_perfil FROM usuarios WHERE id = ?";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $usuario_id);
   $stmt->execute();
@@ -48,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $apellidos === $usuario_actual['apellidos'] &&
     $email === $usuario_actual['email'] &&
     $telefono === $usuario_actual['telefono'] &&
-    $whatsapp === $usuario_actual['whatsapp'] &&
+    $convencional === $usuario_actual['convencional'] &&
     $foto_perfil === $usuario_actual['foto_perfil']
   ) {
     // No se han realizado cambios
@@ -57,15 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
 
   // Actualizar los datos en la base de datos
-  $sql_update = "UPDATE usuarios SET nombres=?, apellidos=?, email=?, telefono=?, whatsapp=?, foto_perfil=? WHERE id=?";
+  $sql_update = "UPDATE usuarios SET nombres=?, apellidos=?, email=?, telefono=?, convencional=?, foto_perfil=? WHERE id=?";
   $stmt_update = $conn->prepare($sql_update);
-  $stmt_update->bind_param("ssssssi", $nombres, $apellidos, $email, $telefono, $whatsapp, $foto_perfil, $usuario_id);
+  $stmt_update->bind_param("ssssssi", $nombres, $apellidos, $email, $telefono, $convencional, $foto_perfil, $usuario_id);
 
   if ($stmt_update->execute()) {
     // Actualizar las variables de sesión
     $_SESSION['usuario_nombre'] = $nombres;
     $_SESSION['usuario_apellido'] = $apellidos;
-    
+
     // Redirigir con un estado de éxito
     header("Location: perfil-gestor.php?status=success");
     exit();
@@ -79,4 +87,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $conn->close();
-?>

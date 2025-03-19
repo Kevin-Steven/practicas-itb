@@ -10,8 +10,22 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 
 // Obtener los datos del usuario
-$sql = "SELECT u.nombres, u.apellidos, u.email, u.cedula, u.telefono, u.convencional, u.carrera, u.foto_perfil 
-          FROM usuarios u WHERE u.id = ?";
+$sql = $sql = "SELECT 
+u.nombres,
+u.apellidos,
+u.email,
+u.cedula,
+u.telefono,
+u.convencional,
+u.foto_perfil,
+u.periodo,
+c.carrera AS nombre_carrera,
+cu.paralelo AS nombre_paralelo
+FROM usuarios u
+INNER JOIN carrera c ON u.carrera_id = c.id
+LEFT JOIN cursos cu ON u.curso_id = cu.id
+WHERE u.id = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
@@ -83,7 +97,7 @@ $conn->close();
         </div>
         <ul class="dropdown-menu dropdown-menu-end mt-2">
           <li>
-            <a class="dropdown-item d-flex align-items-center" href="../docente/update/perfil.php"><i class='bx bx-user me-2'></i>Perfil</a>
+            <a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a>
           </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a>
@@ -108,92 +122,103 @@ $conn->close();
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bxs-folder-open'></i> Documentos</span>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase1" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bxs-folder-open'></i> Fase 1</span>
         <i class="bx bx-chevron-down"></i>
       </a>
-      <div class="collapse" id="submenuAnteproyecto">
+      <div class="collapse" id="submenuFase1">
         <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active bg-secondary' : ''; ?>" href="for-uno.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active' : ''; ?>" href="for-uno.php">
               <i class="bx bx-file"></i> For 1
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dos.php' ? 'active bg-secondary' : ''; ?>" href="for-dos.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dos.php' ? 'active' : ''; ?>" href="for-dos.php">
               <i class="bx bx-file"></i> For 2
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-tres.php' ? 'active bg-secondary' : ''; ?>" href="for-tres.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-tres.php' ? 'active' : ''; ?>" href="for-tres.php">
               <i class="bx bx-file"></i> For 3
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cuatro.php' ? 'active bg-secondary' : ''; ?>" href="for-cuatro.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cuatro.php' ? 'active' : ''; ?>" href="for-cuatro.php">
               <i class="bx bx-file"></i> For 4
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cinco.php' ? 'active bg-secondary' : ''; ?>" href="for-cinco.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cinco.php' ? 'active' : ''; ?>" href="for-cinco.php">
               <i class="bx bx-file"></i> For 5
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-seis.php' ? 'active bg-secondary' : ''; ?>" href="for-seis.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-seis.php' ? 'active' : ''; ?>" href="for-seis.php">
               <i class="bx bx-file"></i> For 6
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-siete.php' ? 'active bg-secondary' : ''; ?>" href="for-siete.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-siete.php' ? 'active' : ''; ?>" href="for-siete.php">
               <i class="bx bx-file"></i> For 7
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-ocho.php' ? 'active bg-secondary' : ''; ?>" href="for-ocho.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-ocho.php' ? 'active' : ''; ?>" href="for-ocho.php">
               <i class="bx bx-file"></i> For 8
             </a>
           </li>
+
+        </ul>
+      </div>
+
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase2" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bxs-folder-open'></i> Fase 2</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuFase2">
+        <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active bg-secondary' : ''; ?>" href="for-nueve.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active' : ''; ?>" href="for-nueve.php">
               <i class="bx bx-file"></i> For 9
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diez.php' ? 'active bg-secondary' : ''; ?>" href="for-diez.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diez.php' ? 'active' : ''; ?>" href="for-diez.php">
               <i class="bx bx-file"></i> For 10
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-once.php' ? 'active bg-secondary' : ''; ?>" href="for-once.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-once.php' ? 'active' : ''; ?>" href="for-once.php">
               <i class="bx bx-file"></i> For 11
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-doce.php' ? 'active bg-secondary' : ''; ?>" href="for-doce.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-doce.php' ? 'active' : ''; ?>" href="for-doce.php">
               <i class="bx bx-file"></i> For 12
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-trece.php' ? 'active bg-secondary' : ''; ?>" href="for-trece.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-trece.php' ? 'active' : ''; ?>" href="for-trece.php">
               <i class="bx bx-file"></i> For 13
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-catorce.php' ? 'active bg-secondary' : ''; ?>" href="for-catorce.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-catorce.php' ? 'active' : ''; ?>" href="for-catorce.php">
               <i class="bx bx-file"></i> For 14
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active bg-secondary' : ''; ?>" href="for-quince.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active' : ''; ?>" href="for-quince.php">
               <i class="bx bx-file"></i> For 15
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dieciseis.php' ? 'active bg-secondary' : ''; ?>" href="for-dieciseis.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diecis.php' ? 'active' : ''; ?>" href="for-diecis.php">
               <i class="bx bx-file"></i> For 16
             </a>
           </li>
+
         </ul>
       </div>
     </nav>
@@ -264,38 +289,57 @@ $conn->close();
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="nombres" class="form-label"><strong>Nombres:</strong></label>
-                    <input type="text" name="nombres" class="form-control" value="<?php echo $usuario['nombres']; ?>" required>
+                    <input type="text" name="nombres" class="form-control" value="<?php echo htmlspecialchars($usuario['nombres']); ?>" required>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="apellidos" class="form-label"><strong>Apellidos:</strong></label>
-                    <input type="text" name="apellidos" class="form-control" value="<?php echo $usuario['apellidos']; ?>" required>
+                    <input type="text" name="apellidos" class="form-control" value="<?php echo htmlspecialchars($usuario['apellidos']); ?>" required>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="email" class="form-label"><strong>Email:</strong></label>
-                    <input type="email" name="email" class="form-control" value="<?php echo $usuario['email']; ?>" required>
+                    <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($usuario['email']); ?>" required>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="cedula" class="form-label"><strong>Cédula:</strong></label>
-                    <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['cedula']; ?>" readonly>
+                    <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo htmlspecialchars($usuario['cedula']); ?>" readonly>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="telefono" class="form-label"><strong>Teléfono:</strong></label>
-                    <input type="text" name="telefono" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['telefono']; ?>" required>
+                    <input type="text" name="telefono" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo htmlspecialchars($usuario['telefono']); ?>" required>
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="convencional" class="form-label"><strong>convencional (Opcional):</strong></label>
-                    <input type="text" name="convencional" class="form-control" maxlength="9" value="<?php echo $usuario['convencional']; ?>">
+                    <label for="convencional" class="form-label"><strong>Convencional (Opcional):</strong></label>
+                    <input type="text" name="convencional" class="form-control" maxlength="9" value="<?php echo !empty($usuario['convencional']) ? htmlspecialchars($usuario['convencional']) : 'NO APLICA'; ?>">
                   </div>
                 </div>
 
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="carrera" class="form-label"><strong>Carrera:</strong></label>
+                    <input type="text" name="carrera" class="form-control" value="<?php echo htmlspecialchars($usuario['nombre_carrera']); ?>" readonly>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="paralelo" class="form-label"><strong>Paralelo:</strong></label>
+                    <input type="text" name="paralelo" class="form-control" value="<?php echo htmlspecialchars($usuario['nombre_paralelo']); ?>" readonly>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="periodo" class="form-label"><strong>Periodo Académico:</strong></label>
+                    <input type="text" name="periodo" class="form-control" value="<?php echo htmlspecialchars($usuario['periodo']); ?>" readonly>
+                  </div>
+                </div>
+
+
                 <div class="text-center mt-3">
-                  <button type="submit" class="btn btn-primary w-50">Actualizar</button>
+                  <button type="submit" class="btn w-50">Actualizar</button>
                 </div>
               </form>
             </div>
@@ -309,7 +353,7 @@ $conn->close();
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">
     <div class="container">
-      <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
+      <p class="mb-0">&copy; 2025 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
     </div>
   </footer>
 

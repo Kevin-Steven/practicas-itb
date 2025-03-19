@@ -14,18 +14,35 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 
 $usuario_id = $_SESSION['usuario_id'];
 
+// ✅ Consulta mejorada con LEFT JOIN a documento_uno
 $sql_doc_uno = "SELECT 
-       d1.id,
-       d1.estado, 
-       d1.paralelo, 
-       d1.promedio_notas,
-       d1.motivo_rechazo,
-       el.lugar_laborado,
-       el.periodo_tiempo_meses,
-       el.funciones_realizadas
-FROM documento_uno d1
+    u.id AS usuario_id,
+    u.nombres,
+    u.apellidos,
+    u.cedula,
+    u.direccion,
+    u.telefono,
+    u.convencional,
+    u.email,
+    u.periodo,
+    c.carrera AS nombre_carrera,
+    cu.paralelo AS nombre_paralelo,
+
+    d1.id AS documento_uno_id,
+    d1.estado, 
+    d1.promedio_notas,
+    d1.motivo_rechazo,
+
+    el.lugar_laborado,
+    el.periodo_tiempo_meses,
+    el.funciones_realizadas
+
+FROM usuarios u
+INNER JOIN carrera c ON u.carrera_id = c.id
+LEFT JOIN cursos cu ON u.curso_id = cu.id
+LEFT JOIN documento_uno d1 ON d1.usuario_id = u.id
 LEFT JOIN experiencia_laboral el ON d1.id = el.documento_uno_id
-WHERE d1.usuario_id = ?
+WHERE u.id = ?
 ORDER BY d1.id DESC";
 
 $stmt_doc_uno = $conn->prepare($sql_doc_uno);
@@ -33,16 +50,32 @@ $stmt_doc_uno->bind_param("i", $usuario_id);
 $stmt_doc_uno->execute();
 $result_tema = $stmt_doc_uno->get_result();
 
+$usuario_info = null;
 $experiencia_laboral = [];
-while ($row = $result_tema->fetch_assoc()) {
-    $id = $row['id'] ?? null;
-    $estado = $row['estado'] ?? null;
-    $paralelo = $row['paralelo'] ?? null;
-    $promedio = $row['promedio_notas'] ?? null;
-    $motivo_rechazo = $row['motivo_rechazo'] ?? null;
 
-    // Agregar experiencia solo si existen datos
-    if ($row['lugar_laborado']) {
+// ✅ Si hay resultados, los almacenamos
+while ($row = $result_tema->fetch_assoc()) {
+    if (!$usuario_info) {
+        $usuario_info = [
+            'usuario_id' => $row['usuario_id'],
+            'nombres' => $row['nombres'],
+            'apellidos' => $row['apellidos'],
+            'cedula' => $row['cedula'],
+            'direccion' => $row['direccion'],
+            'telefono' => $row['telefono'],
+            'convencional' => $row['convencional'],
+            'email' => $row['email'],
+            'periodo' => $row['periodo'],
+            'carrera' => $row['nombre_carrera'],
+            'paralelo' => $row['nombre_paralelo'],
+            'documento_uno_id' => $row['documento_uno_id'],
+            'estado' => $row['estado'],
+            'promedio_notas' => $row['promedio_notas'],
+            'motivo_rechazo' => $row['motivo_rechazo']
+        ];
+    }
+
+    if (!empty($row['lugar_laborado'])) {
         $experiencia_laboral[] = [
             'lugar_laborado' => $row['lugar_laborado'],
             'periodo_tiempo_meses' => $row['periodo_tiempo_meses'],
@@ -53,11 +86,67 @@ while ($row = $result_tema->fetch_assoc()) {
 
 $stmt_doc_uno->close();
 
+// ✅ Si no existe $usuario_info, hacemos una consulta directa al usuario
+if (!$usuario_info) {
+    $sql_usuario_simple = "SELECT 
+        u.id AS usuario_id,
+        u.nombres,
+        u.apellidos,
+        u.cedula,
+        u.direccion,
+        u.telefono,
+        u.convencional,
+        u.email,
+        u.periodo,
+        c.carrera AS nombre_carrera,
+        cu.paralelo AS nombre_paralelo
+    FROM usuarios u
+    INNER JOIN carrera c ON u.carrera_id = c.id
+    LEFT JOIN cursos cu ON u.curso_id = cu.id
+    WHERE u.id = ?";
 
+    $stmt_simple = $conn->prepare($sql_usuario_simple);
+    $stmt_simple->bind_param("i", $usuario_id);
+    $stmt_simple->execute();
+    $result_simple = $stmt_simple->get_result();
+
+    if ($row_simple = $result_simple->fetch_assoc()) {
+        $usuario_info = [
+            'usuario_id' => $row_simple['usuario_id'],
+            'nombres' => $row_simple['nombres'],
+            'apellidos' => $row_simple['apellidos'],
+            'cedula' => $row_simple['cedula'],
+            'direccion' => $row_simple['direccion'],
+            'telefono' => $row_simple['telefono'],
+            'convencional' => $row_simple['convencional'],
+            'email' => $row_simple['email'],
+            'periodo' => $row_simple['periodo'],
+            'carrera' => $row_simple['nombre_carrera'],
+            'paralelo' => $row_simple['nombre_paralelo'],
+            'documento_uno_id' => null,
+            'estado' => null,
+            'promedio_notas' => null,
+            'motivo_rechazo' => null
+        ];
+    } else {
+        die("❌ No se encontró información del usuario con id: $usuario_id");
+    }
+
+    $stmt_simple->close();
+}
+
+// ✅ Chequear conexión (opcional, pero mejor validarlo al inicio)
 if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
+
+// ✅ Asignar valores a variables individuales para uso fácil en el HTML
+$estado = $usuario_info['estado'] ?? null;
+$promedio = $usuario_info['promedio_notas'] ?? null;
+$paralelo = $usuario_info['paralelo'] ?? null;
+$motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 ?>
+
 
 <!doctype html>
 <html lang="es">
@@ -306,27 +395,73 @@ if (!$conn) {
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
-            <h1 class="mb-2 text-center fw-bold">Enviar Datos</h1>
+            <h1 class="mb-2 text-center fw-bold">Ficha de Estudiante</h1>
 
             <?php if (empty($estado)  || $estado === 'Corregir'): ?>
+
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
                         <form action="../estudiante/logic/documento-uno.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <h2 class="card-title text-center">Datos académicos</h2>
+                                <div class="col-md-4">
+                                    <h2 class="card-title text-center">Datos Generales</h2>
                                     <div class="mb-2">
-                                        <label for="paralelo" class="form-label fw-bold">Paralelo</label>
-                                        <input type="text" class="form-control" id="paralelo" name="paralelo" required>
+                                        <label for="nombres" class="form-label fw-bold">Nombres</label>
+                                        <input type="text" class="form-control" id="nombres" value="<?php echo htmlspecialchars($usuario_info['nombres']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="apellidos" class="form-label fw-bold">Apellidos</label>
+                                        <input type="text" class="form-control" id="apellidos" value="<?php echo htmlspecialchars($usuario_info['apellidos']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="cedula" class="form-label fw-bold">Cédula</label>
+                                        <input type="text" class="form-control" id="cedula" value="<?php echo htmlspecialchars($usuario_info['cedula']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="direccion" class="form-label fw-bold">Dirección</label>
+                                        <input type="text" class="form-control" id="direccion" value="<?php echo htmlspecialchars($usuario_info['direccion']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="telefono" class="form-label fw-bold">Teléfono</label>
+                                        <input type="text" class="form-control" id="telefono" value="<?php echo htmlspecialchars($usuario_info['telefono']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="convencional" class="form-label fw-bold">Teléfono convencional</label>
+                                        <input type="text" class="form-control" id="convencional" value="<?php echo !empty($usuario_info['convencional']) ? htmlspecialchars($usuario_info['convencional']) : 'NO APLICA'; ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="email" class="form-label fw-bold">Correo electrónico</label>
+                                        <input type="text" class="form-control" id="email" value="<?php echo htmlspecialchars($usuario_info['email']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="card-title text-center">Datos académicos</h2>
+
+                                    <div class="mb-2">
+                                        <label for="carrera" class="form-label fw-bold">Carrera</label>
+                                        <input type="text" class="form-control" id="carrera" value="<?php echo htmlspecialchars($usuario_info['carrera']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="periodo" class="form-label fw-bold">Periodo</label>
+                                        <input type="text" class="form-control" id="periodo" value="<?php echo htmlspecialchars($usuario_info['periodo']); ?>" disabled>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="paralelo" class="form-label fw-bold">Paralelo (curso)</label>
+                                        <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($usuario_info['paralelo']); ?>" disabled>
                                     </div>
                                     <div class="mb-2">
                                         <label for="promedio" class="form-label fw-bold">Promedio de notas:</label>
-                                        <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" required>
+                                        <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" placeholder="ej. 90.00" required>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <h2 class="card-title text-center">Experiencia laboral</h2>
                                     <div id="contenedor-experiencia">
                                         <div class="experiencia-laboral">
@@ -350,7 +485,7 @@ if (!$conn) {
                             </div>
 
                             <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                                <button type="submit" class="btn">Enviar</button>
+                                <button type="submit" class="btn">Enviar Datos</button>
 
                                 <?php if (!empty($motivo_rechazo)): ?>
                                     <a href="#" style="background: #df1f1f;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
@@ -414,16 +549,18 @@ if (!$conn) {
                                             <!-- ✅ Acciones con rowspan -->
                                             <td class="text-center" rowspan="<?= max(1, count($experiencia_laboral)) ?>">
                                                 <div class="d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-warning" onclick="window.location.href='for-uno-edit.php?id=<?php echo $id; ?>'">
+                                                    <button type="button" class="btn btn-warning" onclick="window.location.href='for-uno-edit.php?id=<?php echo $usuario_info['documento_uno_id']; ?>'">
                                                         <i class='bx bx-edit-alt'></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $usuario_info['documento_uno_id']; ?>">
                                                         <i class='bx bxs-file-pdf'></i>
                                                     </button>
+
                                                 </div>
                                             </td>
 
-                                            <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                                            <div class="modal fade" id="modalImprimir<?php echo $usuario_info['documento_uno_id']; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $usuario_info['documento_uno_id']; ?>" aria-hidden="true">
+
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <form action="doc-uno-pdf.php" method="GET" target="_blank">
@@ -433,7 +570,7 @@ if (!$conn) {
                                                             </div>
                                                             <div class="modal-body">
                                                                 <p>Se generará un documento en formato PDF</p>
-                                                                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                                                <input type="hidden" name="id" value="<?php echo $usuario_info['documento_uno_id']; ?>">
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

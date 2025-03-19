@@ -10,10 +10,8 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 
 // Obtener los datos del usuario
-$sql = "SELECT u.nombres, u.apellidos, u.email, u.cedula, u.telefono, u.whatsapp, u.carrera, u.fecha_subida, 
-                d.estado_inscripcion, u.foto_perfil 
+$sql = "SELECT u.nombres, u.apellidos, u.email, u.convencional, u.cedula, u.telefono, u.foto_perfil 
           FROM usuarios u 
-          LEFT JOIN documentos_postulante d ON u.id = d.usuario_id 
           WHERE u.id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -33,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $email = mysqli_real_escape_string($conn, $_POST['email']);
   $cedula = $_POST['cedula'];
   $telefono = $_POST['telefono'];
-  $whatsapp = $_POST['whatsapp'];
+  $convencional = $_POST['convencional'];
 
   // Verificar si se ha subido una imagen de perfil
   if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] == 0) {
@@ -76,14 +74,7 @@ $conn->close();
       <i class='bx bx-menu'></i>
     </div>
     <div class="topbar-right">
-      <div class="input-group search-bar">
-        <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-        <input type="text" id="search" class="form-control" placeholder="Search">
-      </div>
-      <!-- Iconos adicionales a la derecha -->
-      <i class='bx bx-envelope'></i>
-      <i class='bx bx-bell'></i>
-      <!-- Menú desplegable para el usuario -->
+
       <div class="user-profile dropdown">
         <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
           <img id="topbar-profile" src="<?php echo $usuario['foto_perfil'] ? $usuario['foto_perfil'] : '../../images/user.png'; ?>" alt="Perfil">
@@ -126,11 +117,8 @@ $conn->close();
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
-      <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <!-- Módulo Informes con submenú -->
+      <a class="nav-link" href="ver-estudiantes.php"><i class='bx bx-user'></i> Estudiantes</a>
+      <!-- Módulo Informes con submenú
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -138,24 +126,22 @@ $conn->close();
       <div class="collapse" id="submenuInformes">
         <ul class="list-unstyled ps-4">
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active bg-secondary' : ''; ?>" href="informe-tutor.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active' : ''; ?>" href="informe-tutor.php">
               <i class="bx bx-file"></i> Informe Tutor
             </a>
           </li>
           <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active' : ''; ?>" href="informe-tesis.php">
               <i class="bx bx-file"></i> Informe Tesis
             </a>
           </li>
           <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active' : ''; ?>" href="informe-revisor-tesis.php">
               <i class="bx bx-file"></i> Jurado tesis
             </a>
           </li>
         </ul>
-      </div>
-      <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>
-      <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
+      </div> -->
     </nav>
   </div>
 
@@ -186,7 +172,7 @@ $conn->close();
                         <?php if ($_GET['status'] == 'success'): ?>
                           Perfil actualizado correctamente.
                         <?php elseif ($_GET['status'] == 'invalid_phone'): ?>
-                          El número de teléfono o WhatsApp debe tener 10 dígitos.
+                          El número de teléfono 10 dígitos.
                         <?php elseif ($_GET['status'] == 'no_changes'): ?>
                           No se realizaron cambios en los datos.
                         <?php else: ?>
@@ -248,8 +234,8 @@ $conn->close();
                     <input type="text" name="telefono" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['telefono']; ?>" required>
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label for="whatsapp" class="form-label"><strong>WhatsApp:</strong></label>
-                    <input type="text" name="whatsapp" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['whatsapp']; ?>" required>
+                    <label for="convencional" class="form-label"><strong>Convencional:</strong></label>
+                    <input type="text" name="convencional" class="form-control" maxlength="9" oninput="validateInput(this)" placeholder="No tiene" value="<?php echo $usuario['convencional'] ?? ''; ?>">
                   </div>
                 </div>
 
@@ -268,7 +254,7 @@ $conn->close();
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">
     <div class="container">
-      <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
+      <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
     </div>
   </footer>
 

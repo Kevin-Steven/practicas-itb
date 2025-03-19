@@ -12,12 +12,23 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener inscripciones de los postulantes
-$sql = "SELECT u.id, u.nombres, u.apellidos, u.carrera, u.cedula
-        FROM usuarios u
-        WHERE u.rol = 'estudiante'";
+$sql = "SELECT 
+    u.id, 
+    u.nombres, 
+    u.apellidos, 
+    c.paralelo AS paralelo,  -- renombrar a 'carrera'
+    u.cedula
+FROM usuarios u
+INNER JOIN cursos c ON u.curso_id = c.id
+WHERE u.rol = 'estudiante'
+";
 
 $result = $conn->query($sql);
 $estudiantes = $result->fetch_all(MYSQLI_ASSOC);
+
+$sql_paralelo = "SELECT id, paralelo FROM cursos";
+$result_paralelo = $conn->query($sql_paralelo);
+
 ?>
 
 <!doctype html>
@@ -124,20 +135,34 @@ $estudiantes = $result->fetch_all(MYSQLI_ASSOC);
         <div class="col-md-6 col-12 mb-2 mb-md-0">
           <div class="input-group">
             <span class="input-group-text"><i class='bx bx-search'></i></span>
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar por cédula, nombre o apellido...">
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control"
+              placeholder="Buscar por cédula, nombre o apellido...">
           </div>
         </div>
 
         <!-- Select para filtrar por carrera -->
         <div class="col-md-6 col-12">
           <select id="filterCarrera" class="form-select">
-            <option selected disabled>Seleccionar Carrera</option>
+            <option selected disabled>Seleccionar Curso</option>
             <option value="todos">Todos</option>
-            <option value="Tecnología Superior en Desarrollo de software">Tecnología Superior en Desarrollo de software</option>
-            <option value="Tecnología Superior en Gestión de la Tecnología de la Información">Tecnología Superior en Gestión de la Tecnología de la Información</option>
+
+            <?php if ($result_paralelo->num_rows > 0): ?>
+              <?php while ($row_paralelo = $result_paralelo->fetch_assoc()): ?>
+                <option value="<?php echo htmlspecialchars($row_paralelo['paralelo']); ?>">
+                  <?php echo htmlspecialchars($row_paralelo['paralelo']); ?>
+                </option>
+              <?php endwhile; ?>
+            <?php else: ?>
+              <option disabled>No hay cursos registrados</option>
+            <?php endif; ?>
+
           </select>
         </div>
       </div>
+
       <script>
         const postulantesData = <?php echo json_encode($estudiantes); ?>;
       </script>
@@ -151,7 +176,7 @@ $estudiantes = $result->fetch_all(MYSQLI_ASSOC);
               <th>Cédula</th>
               <th>Nombre</th>
               <th>Apellido</th>
-              <th class="d-none d-sm-table-cell">Carrera</th>
+              <th>Curso</th>
               <th class="text-center">Acciones</th>
             </tr>
           </thead>
