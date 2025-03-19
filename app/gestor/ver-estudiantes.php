@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../config/config.php';
-
+require '../gestor/sidebar/sidebar-gestor.php';
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
   header("Location: ../../index.php");
   exit();
@@ -87,42 +87,8 @@ $result_paralelo = $conn->query($sql_paralelo);
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <div class="sidebar z-2" id="sidebar">
-    <div class="profile">
-      <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-      <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
-      <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
-    </div>
-    <nav class="nav flex-column">
-      <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link active" href="ver-estudiantes.php"><i class='bx bx-user'></i> Estudiantes</a>
-      <!-- Módulo Informes con submenú
-      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-        <span><i class='bx bx-file'></i> Informes</span>
-        <i class="bx bx-chevron-down"></i>
-      </a>
-      <div class="collapse" id="submenuInformes">
-        <ul class="list-unstyled ps-4">
-          <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active' : ''; ?>" href="informe-tutor.php">
-              <i class="bx bx-file"></i> Informe Tutor
-            </a>
-          </li>
-          <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active' : ''; ?>" href="informe-tesis.php">
-              <i class="bx bx-file"></i> Informe Tesis
-            </a>
-          </li>
-          <li>
-            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active' : ''; ?>" href="informe-revisor-tesis.php">
-              <i class="bx bx-file"></i> Jurado tesis
-            </a>
-          </li>
-        </ul>
-      </div> -->
-    </nav>
-  </div>
+  <?php renderSidebarGestor($primer_nombre, $primer_apellido, $foto_perfil); ?>
+
 
   <!-- Content -->
   <div class="content" id="content">

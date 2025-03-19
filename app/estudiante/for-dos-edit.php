@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../config/config.php';
-
+require '../estudiante/sidebar/sidebar-estudiante.php';
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -97,115 +97,8 @@ if (!$conn) {
         </div>
     </div>
 
-    <div class="sidebar z-2" id="sidebar">
-        <div class="profile">
-            <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-            <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
-            <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
-        </div>
-        <nav class="nav flex-column">
-            <a class="nav-link" href="inicio-estudiante.php"><i class='bx bx-home-alt'></i> Inicio</a>
-            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase1" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-                <span><i class='bx bxs-folder-open'></i> Fase 1</span>
-                <i class="bx bx-chevron-down"></i>
-            </a>
-            <div class="collapse show" id="submenuFase1">
-                <ul class="list-unstyled ps-4">
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active' : ''; ?>" href="for-uno.php">
-                            <i class="bx bx-file"></i>Ficha de Estudiante
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dos.php' ? 'active' : ''; ?>" href="for-dos.php">
-                            <i class="bx bx-file"></i>Plan de Aprendizaje
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-tres.php' ? 'active' : ''; ?>" href="for-tres.php">
-                            <i class="bx bx-file"></i>Carta de Asignación
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cuatro.php' ? 'active' : ''; ?>" href="for-cuatro.php">
-                            <i class="bx bx-file"></i>Perfil de Egreso
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cinco.php' ? 'active' : ''; ?>" href="for-cinco.php">
-                            <i class="bx bx-file"></i>Carta de Compromiso
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-seis.php' ? 'active' : ''; ?>" href="for-seis.php">
-                            <i class="bx bx-file"></i>Ficha de Entidad
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-siete.php' ? 'active' : ''; ?>" href="for-siete.php">
-                            <i class="bx bx-file"></i>Compromiso Ético
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-ocho.php' ? 'active' : ''; ?>" href="for-ocho.php">
-                            <i class="bx bx-file"></i>Plan de Rotación 
-                        </a>
-                    </li>
+    <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-                </ul>
-            </div>
-
-            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuFase2" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
-                <span><i class='bx bxs-folder-open'></i> Fase 2</span>
-                <i class="bx bx-chevron-down"></i>
-            </a>
-            <div class="collapse" id="submenuFase2">
-                <ul class="list-unstyled ps-4">
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-nueve.php' ? 'active' : ''; ?>" href="for-nueve.php">
-                            <i class="bx bx-file"></i> For 9
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diez.php' ? 'active' : ''; ?>" href="for-diez.php">
-                            <i class="bx bx-file"></i> For 10
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-once.php' ? 'active' : ''; ?>" href="for-once.php">
-                            <i class="bx bx-file"></i> For 11
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-doce.php' ? 'active' : ''; ?>" href="for-doce.php">
-                            <i class="bx bx-file"></i> For 12
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-trece.php' ? 'active' : ''; ?>" href="for-trece.php">
-                            <i class="bx bx-file"></i> For 13
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-catorce.php' ? 'active' : ''; ?>" href="for-catorce.php">
-                            <i class="bx bx-file"></i> For 14
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-quince.php' ? 'active' : ''; ?>" href="for-quince.php">
-                            <i class="bx bx-file"></i> For 15
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-diecis.php' ? 'active' : ''; ?>" href="for-diecis.php">
-                            <i class="bx bx-file"></i> For 16
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-        </nav>
-    </div>
 
     <!-- Toast -->
     <?php if (isset($_GET['status'])): ?>
