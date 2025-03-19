@@ -1,6 +1,6 @@
 <?php
-require '../config/config.php';
-require_once('../../TCPDF-main/tcpdf.php');
+require '../../config/config.php';
+require_once('../../../TCPDF-main/tcpdf.php');
 
 // Verificar si el ID está presente en la URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -54,8 +54,10 @@ $email = $estudiante['email'] ?: 'N/A';
 $carrera = $estudiante['carrera'] ?: 'N/A';
 $paralelo = $estudiante['paralelo'] ?: 'N/A';
 $promedio = $estudiante['promedio_notas'] ?: 'N/A';
-$foto_perfil = $estudiante['foto_perfil'] ?: 'Sin Foto';
+$foto_perfil_path = $estudiante['foto_perfil'] ?: 'Sin Foto';
 $periodoAcademico = $estudiante['periodo'] ?: 'N/A';
+
+$foto_perfil = '../' . $foto_perfil_path;
 
 
 class CustomPDF extends TCPDF
@@ -64,7 +66,7 @@ class CustomPDF extends TCPDF
     {
         $margen_derecha = 10; // Ajusta este valor según necesites
 
-        $this->Image('../../images/logoITB-F.png', 15, 12, 20);
+        $this->Image('../../../images/index.png', 15, 12, 20);
 
         // Fuente y alineación
         $this->SetFont('times', 'B', 11);
@@ -303,5 +305,5 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Salida del PDF
-$pdf->Output('ficha_estudiante-$cedula.pdf', 'I');
+$pdf->Output('ficha_estudiante-' . $cedula . '.pdf', 'I');
 exit();

@@ -89,42 +89,42 @@ if (!$conn) {
                 <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-uno.php' ? 'active' : ''; ?>" href="for-uno.php">
-                            <i class="bx bx-file"></i> For 1
+                            <i class="bx bx-file"></i>Ficha de Estudiante
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-dos.php' ? 'active' : ''; ?>" href="for-dos.php">
-                            <i class="bx bx-file"></i> For 2
+                            <i class="bx bx-file"></i>Plan de Aprendizaje
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-tres.php' ? 'active' : ''; ?>" href="for-tres.php">
-                            <i class="bx bx-file"></i> For 3
+                            <i class="bx bx-file"></i>Carta de Asignación
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cuatro.php' ? 'active' : ''; ?>" href="for-cuatro.php">
-                            <i class="bx bx-file"></i> For 4
+                            <i class="bx bx-file"></i>Perfil de Egreso
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-cinco.php' ? 'active' : ''; ?>" href="for-cinco.php">
-                            <i class="bx bx-file"></i> For 5
+                            <i class="bx bx-file"></i>Carta de Compromiso
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-seis.php' ? 'active' : ''; ?>" href="for-seis.php">
-                            <i class="bx bx-file"></i> For 6
+                            <i class="bx bx-file"></i>Ficha de Entidad
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-siete.php' ? 'active' : ''; ?>" href="for-siete.php">
-                            <i class="bx bx-file"></i> For 7
+                            <i class="bx bx-file"></i>Compromiso Ético
                         </a>
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'for-ocho.php' ? 'active' : ''; ?>" href="for-ocho.php">
-                            <i class="bx bx-file"></i> For 8
+                            <i class="bx bx-file"></i>Plan de Rotación 
                         </a>
                     </li>
                     

@@ -48,14 +48,14 @@ LIMIT 1";
         'id' => $documento['id_uno'],
         'nombre' => $documento['nombre_doc_uno'],
         'estado' => $documento['estado_uno'],
-        'pdf' => "../../app/estudiante/doc-uno-pdf.php?id=" . $documento['id_uno'],
+        'pdf' => "../../app/estudiante/pdf/doc-uno-pdf.php?id=" . $documento['id_uno'],
         'tipo' => 'uno'
       ],
       [
         'id' => $documento['id_dos'],
         'nombre' => $documento['nombre_doc_dos'],
         'estado' => $documento['estado_dos'],
-        'pdf' => "../../app/estudiante/doc-dos-pdf.php?id=" . $documento['id_dos'],
+        'pdf' => "../../app/estudiante/pdf/doc-dos-pdf.php?id=" . $documento['id_dos'],
         'tipo' => 'dos'
       ],
       // Aquí continúas hasta el documento 16...
