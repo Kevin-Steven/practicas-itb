@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../config/config.php';
-require '../gestor/sidebar/sidebar-gestor.php';
+require 'sidebar-gestor.php';
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
   header("Location: ../../index.php");
   exit();

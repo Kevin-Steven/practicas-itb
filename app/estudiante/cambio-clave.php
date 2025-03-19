@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../estudiante/sidebar/sidebar-estudiante.php';
+require 'sidebar-estudiante.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
   header("Location: ../../index.php");

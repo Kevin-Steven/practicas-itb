@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../config/config.php';
-require '../estudiante/sidebar/sidebar-estudiante.php';
+require 'sidebar-estudiante.php';
 
 if (!isset($_SESSION['usuario_id'])) {
   header("Location: ../../index.php");

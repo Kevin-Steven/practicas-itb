@@ -30,6 +30,7 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
     // Detectar si está en una página de Fase 1 o Fase 2 para abrir el collapse
     $fase1_open = in_array($currentFile, array_keys($fase1_files)) ? 'show' : '';
     $fase2_open = in_array($currentFile, array_keys($fase2_files)) ? 'show' : '';
+
     ?>
 
     <div class="sidebar z-2" id="sidebar">
