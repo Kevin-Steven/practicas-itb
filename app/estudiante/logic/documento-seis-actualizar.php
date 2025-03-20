@@ -21,6 +21,7 @@ $nombres_representante = trim($_POST['nombres-representante'] ?? '');
 $cargo_tutor = trim($_POST['cargo_tutor'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
 $numero_telefono = trim($_POST['numero_telefono'] ?? '');
+$numero_institucional = trim($_POST['numero_institucional'] ?? '');
 
 // 3. Validaciones básicas (puedes extenderlas según sea necesario)
 if (
@@ -31,14 +32,14 @@ if (
     empty($nombres_representante) ||
     empty($cargo_tutor) ||
     empty($numero_practicas) ||
-    empty($numero_telefono)
+    empty($numero_telefono) 
 ) {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=missing_data");
     exit();
 }
 
 // Validación adicional (número de teléfono)
-if (!preg_match('/^[0-9]{7,15}$/', $numero_telefono)) {
+if (!preg_match('/^[0-9]{10}$/', $numero_telefono)) {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=invalid_phone");
     exit();
 }
@@ -58,7 +59,8 @@ $sql_select = "SELECT
     nombres_representante,
     cargo_tutor,
     numero_practicas,
-    numero_telefono
+    numero_telefono,
+    numero_institucional
 FROM documento_seis
 WHERE usuario_id = ?
 ORDER BY id DESC
@@ -88,7 +90,8 @@ if (
     $nombres_representante !== $datos_actuales['nombres_representante'] ||
     $cargo_tutor !== $datos_actuales['cargo_tutor'] ||
     $numero_practicas !== $datos_actuales['numero_practicas'] ||
-    $numero_telefono !== $datos_actuales['numero_telefono']
+    $numero_telefono !== $datos_actuales['numero_telefono'] ||
+    $numero_institucional !== $datos_actuales['numero_institucional']
 ) {
     $hubo_cambios = true;
 }
@@ -109,6 +112,7 @@ $sql_update = "UPDATE documento_seis SET
     cargo_tutor = ?,
     numero_practicas = ?,
     numero_telefono = ?,
+    numero_institucional = ?,
     estado = 'Pendiente'
 WHERE usuario_id = ?
 ORDER BY id DESC
@@ -122,7 +126,7 @@ if (!$stmt_update) {
 }
 
 $stmt_update->bind_param(
-    "ssssssssi",
+    "sssssssssi",
     $actividad_economica,
     $provincia,
     $horario_practica,
@@ -131,6 +135,7 @@ $stmt_update->bind_param(
     $cargo_tutor,
     $numero_practicas,
     $numero_telefono,
+    $numero_institucional,
     $usuario_id_session
 );
 

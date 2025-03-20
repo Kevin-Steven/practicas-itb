@@ -23,8 +23,8 @@ $sql_doc_cinco = "SELECT
        d5.direccion_entidad_receptora,
        d5.logo_entidad_receptora,
        d5.nombre_ciudad,
-       d5.nombre_representante,
-       d5.numero_institucional,
+       d5.nombre_representante_rrhh,
+       d5.numero_representante_rrhh,
        d5.correo_representante
 FROM documento_cinco d5
 WHERE d5.usuario_id = ?
@@ -43,8 +43,8 @@ while ($row = $result_doc_cinco->fetch_assoc()) {
     $direccion_entidad_receptora = $row['direccion_entidad_receptora'] ?? null;
     $logo_entidad_receptora = $row['logo_entidad_receptora'] ?? null;
     $nombre_ciudad = $row['nombre_ciudad'] ?? null;
-    $nombre_representante = $row['nombre_representante'] ?? null;
-    $numero_institucional = $row['numero_institucional'] ?? null;
+    $nombre_representante_rrhh = $row['nombre_representante_rrhh'] ?? null;
+    $numero_representante_rrhh = $row['numero_representante_rrhh'] ?? null;
     $correo_representante = $row['correo_representante'] ?? null;
     $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
 }
@@ -164,7 +164,7 @@ if (!$conn) {
                             echo "El correo electrónico del representante no es válido.";
                             break;
                         case 'invalid_phone':
-                            echo "El número institucional no es válido. Debe contener solo números (7-15 dígitos).";
+                            echo "El número de teléfono no es válido. Debe contener solo números (10 dígitos).";
                             break;
                         case 'invalid_extension':
                             echo "Solo se permiten archivos de imagen: PNG, JPG, JPEG o GIF para el logo.";
@@ -234,16 +234,16 @@ if (!$conn) {
 
                                 <div class="col-md-6">
                                     <div class="mb-2">
-                                        <label for="nombres-representante" class="form-label fw-bold">Nombres del representante de RRHH:</label>
-                                        <input type="text" class="form-control" id="nombres-representante" name="nombres-representante" required>
+                                        <label for="nombres-representante-rrhh" class="form-label fw-bold">Nombres del representante de RRHH:</label>
+                                        <input type="text" class="form-control" id="nombres-representante-rrhh" name="nombres-representante-rrhh" required>
                                     </div>
                                     <div class="mb-2">
                                         <label for="correo-entidad" class="form-label fw-bold">Correo electrónico de la entidad receptora:</label>
                                         <input type="email" class="form-control" id="correo-entidad" name="correo-entidad" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="numero-institucional" class="form-label fw-bold">Número institucional:</label>
-                                        <input type="number" class="form-control" id="numero-institucional" name="numero-institucional" required>
+                                        <label for="numero_representante_rrhh" class="form-label fw-bold">Teléfono:</label>
+                                        <input type="number" class="form-control" id="numero_representante_rrhh" name="numero_representante_rrhh" required>
                                     </div>
                                 </div>
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
@@ -269,7 +269,7 @@ if (!$conn) {
                                 <th>Dirección de la entidad receptora</th>
                                 <th>Nombres del representante de RRHH</th>
                                 <th>Correo electrónico de la entidad receptora</th>
-                                <th>Número institucional</th>
+                                <th>Teléfono</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -286,9 +286,9 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $nombre_entidad_receptora; ?></td>
                                 <td class="text-center"><?php echo $ruc; ?></td>
                                 <td class="text-center"><?php echo $direccion_entidad_receptora; ?></td>
-                                <td class="text-center"><?php echo $nombre_representante; ?></td>
+                                <td class="text-center"><?php echo $nombre_representante_rrhh; ?></td>
                                 <td class="text-center"><?php echo $correo_representante; ?></td>
-                                <td class="text-center"><?php echo $numero_institucional; ?></td>
+                                <td class="text-center"><?php echo $numero_representante_rrhh; ?></td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

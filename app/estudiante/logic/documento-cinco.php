@@ -23,9 +23,9 @@ $nombre_entidad = trim($_POST['nombre_entidad'] ?? '');
 $ruc = trim($_POST['ruc'] ?? '');
 $direccion_entidad = trim($_POST['direccion-entidad'] ?? '');
 $nombre_ciudad = trim($_POST['ciudad'] ?? '');
-$nombre_representante = trim($_POST['nombres-representante'] ?? '');
+$nombre_representante = trim($_POST['nombres-representante-rrhh'] ?? '');
 $correo_representante = trim($_POST['correo-entidad'] ?? '');
-$numero_institucional = trim($_POST['numero-institucional'] ?? '');
+$numero_representante_rrhh = trim($_POST['numero_representante_rrhh'] ?? '');
 $estado = 'Pendiente';
 
 $nombre_representante = mb_strtolower($nombre_representante, 'UTF-8');
@@ -39,7 +39,7 @@ if (
     empty($nombre_ciudad) ||
     empty($nombre_representante) ||
     empty($correo_representante) ||
-    empty($numero_institucional)
+    empty($numero_representante_rrhh)
 ) {
     header("Location: ../for-cinco.php?status=missing_data");
     exit();
@@ -57,8 +57,8 @@ if (!filter_var($correo_representante, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-// Validación del número institucional (ajusta si se requiere otro formato)
-if (!preg_match('/^\d{7,15}$/', $numero_institucional)) {
+// Validación del número de teléfono
+if (!preg_match('/^\d{10}$/', $numero_representante_rrhh)) {
     header("Location: ../for-cinco.php?status=invalid_phone");
     exit();
 }
@@ -112,8 +112,8 @@ $sql_insert = "INSERT INTO documento_cinco (
     direccion_entidad_receptora, 
     logo_entidad_receptora, 
     nombre_ciudad, 
-    nombre_representante, 
-    numero_institucional, 
+    nombre_representante_rrhh, 
+    numero_representante_rrhh, 
     correo_representante, 
     estado
 ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -137,7 +137,7 @@ $stmt_insert->bind_param(
     $nombre_archivo_logo,
     $nombre_ciudad,
     $nombre_representante,
-    $numero_institucional,
+    $numero_representante_rrhh,
     $correo_representante,
     $estado
 );

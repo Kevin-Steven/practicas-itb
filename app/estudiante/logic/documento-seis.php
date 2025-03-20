@@ -20,6 +20,7 @@ $nombres_representante = trim($_POST['nombres-representante'] ?? '');
 $cargo_tutor = trim($_POST['cargo_tutor'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
 $numero_telefono = trim($_POST['numero_telefono'] ?? '');
+$numero_institucional = trim($_POST['numero_institucional'] ?? '');
 
 // 3. Validación de datos básicos (que no estén vacíos)
 if (
@@ -30,15 +31,14 @@ if (
     empty($nombres_representante) ||
     empty($cargo_tutor) ||
     empty($numero_practicas) ||
-    empty($numero_telefono)
+    empty($numero_telefono) 
 ) {
     header("Location: ../for-seis.php?status=missing_data");
     exit();
 }
 
-// 4. Validación adicional (opcional pero recomendado)
 // Validar el teléfono (debe tener solo números y longitud adecuada)
-if (!preg_match('/^[0-9]{7,15}$/', $numero_telefono)) {
+if (!preg_match('/^[0-9]{10}$/', $numero_telefono)) {
     header("Location: ../for-seis.php?status=invalid_phone");
     exit();
 }
@@ -60,8 +60,9 @@ $sql_insert = "INSERT INTO documento_seis (
     cargo_tutor,
     numero_practicas,
     numero_telefono,
+    numero_institucional,
     estado
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
 
 $stmt_insert = $conn->prepare($sql_insert);
 
@@ -71,16 +72,17 @@ if (!$stmt_insert) {
 }
 
 $stmt_insert->bind_param(
-    "issssssss",
-    $usuario_id_session,
-    $actividad_economica,
-    $provincia,
-    $horario_practica,
-    $jornada_laboral,
-    $nombres_representante,
-    $cargo_tutor,
-    $numero_practicas,
-    $numero_telefono
+    "isssssssss", // 1 entero + 9 strings
+    $usuario_id_session,       // i
+    $actividad_economica,      // s
+    $provincia,                // s
+    $horario_practica,         // s
+    $jornada_laboral,          // s
+    $nombres_representante,    // s
+    $cargo_tutor,              // s
+    $numero_practicas,         // s
+    $numero_telefono,          // s
+    $numero_institucional      // s
 );
 
 if ($stmt_insert->execute()) {

@@ -24,6 +24,7 @@ $sql = "SELECT d6.id,
        d6.numero_telefono, 
        d6.estado, 
        d6.nombre_doc,
+       d6.numero_institucional,
        u.nombres, 
        u.apellidos, 
        d5.nombre_entidad_receptora,
@@ -31,8 +32,8 @@ $sql = "SELECT d6.id,
        d5.direccion_entidad_receptora, 
        d5.logo_entidad_receptora, 
        d5.nombre_ciudad, 
-       d5.nombre_representante, 
-       d5.numero_institucional, 
+       d5.nombre_representante_rrhh, 
+       d5.numero_representante_rrhh, 
        d5.correo_representante,
        d2.fecha_inicio, 
        d2.fecha_fin
@@ -64,6 +65,7 @@ $cargo_tutor = $estudiante['cargo_tutor'] ?? 'N/A';
 $numero_practicas = $estudiante['numero_practicas'] ?? 'N/A';
 $numero_telefono = $estudiante['numero_telefono'] ?? 'N/A';
 $nombre_doc = $estudiante['nombre_doc'] ?? 'N/A';
+$numero_institucional = $estudiante['numero_institucional'];
 
 $estado = $estudiante['estado'] ?? 'N/A';
 
@@ -78,7 +80,7 @@ $logo_entidad_receptora = $estudiante['logo_entidad_receptora'] ?? 'N/A';
 $nombre_ciudad = $estudiante['nombre_ciudad'] ?? 'N/A';
 
 $nombre_representante_legal = $estudiante['nombre_representante'] ?? 'N/A';
-$numero_institucional = $estudiante['numero_institucional'] ?? 'N/A';
+$numero_representante_rrhh = $estudiante['numero_representante_rrhh'] ?? 'N/A';
 $correo_representante = $estudiante['correo_representante'] ?? 'N/A';
 
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
@@ -318,7 +320,7 @@ $tabla10 = '
     <tr>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Número de teléfono institucional: </strong><br>
-            ' . $numero_institucional . '
+            ' . (!empty($numero_institucional) ? $numero_institucional : 'NO APLICA') . '
         </td>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Número de teléfono celular:</strong><br>

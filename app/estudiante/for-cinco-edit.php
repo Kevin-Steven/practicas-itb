@@ -23,8 +23,8 @@ $sql_doc_cinco = "SELECT
        d5.direccion_entidad_receptora,
        d5.logo_entidad_receptora,
        d5.nombre_ciudad,
-       d5.nombre_representante,
-       d5.numero_institucional,
+       d5.nombre_representante_rrhh,
+       d5.numero_representante_rrhh,
        d5.correo_representante
 FROM documento_cinco d5
 WHERE d5.usuario_id = ?
@@ -43,8 +43,8 @@ while ($row = $result_doc_cinco->fetch_assoc()) {
     $direccion_entidad_receptora = $row['direccion_entidad_receptora'] ?? null;
     $logo_entidad_receptora = $row['logo_entidad_receptora'] ?? null;
     $nombre_ciudad = $row['nombre_ciudad'] ?? null;
-    $nombre_representante = $row['nombre_representante'] ?? null;
-    $numero_institucional = $row['numero_institucional'] ?? null;
+    $nombre_representante_rrhh = $row['nombre_representante_rrhh'] ?? null;
+    $numero_representante_rrhh = $row['numero_representante_rrhh'] ?? null;
     $correo_representante = $row['correo_representante'] ?? null;
     $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
 }
@@ -236,16 +236,16 @@ if (!$conn) {
 
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label for="nombres-representante" class="form-label fw-bold">Nombres del representante de la entidad receptora:</label>
-                                    <input type="text" class="form-control" id="nombres-representante" name="nombres-representante" value="<?php echo $nombre_representante; ?>">
+                                    <label for="nombres-representante-rrhh" class="form-label fw-bold">Nombres del representante de RRHH:</label>
+                                    <input type="text" class="form-control" id="nombres-representante-rrhh" name="nombres-representante-rrhh" value="<?php echo $nombre_representante_rrhh; ?>">
                                 </div>
                                 <div class="mb-2">
                                     <label for="correo-entidad" class="form-label fw-bold">Correo electrónico de la entidad receptora:</label>
                                     <input type="email" class="form-control" id="correo-entidad" name="correo-entidad" value="<?php echo $correo_representante; ?>">
                                 </div>
                                 <div class="mb-2">
-                                    <label for="numero-institucional" class="form-label fw-bold">Número institucional:</label>
-                                    <input type="number" class="form-control" id="numero-institucional" name="numero-institucional" value="<?php echo $numero_institucional; ?>">
+                                    <label for="numero_representante_rrhh" class="form-label fw-bold">Teléfono:</label>
+                                    <input type="number" class="form-control" id="numero_representante_rrhh" name="numero_representante_rrhh" value="<?php echo $numero_representante_rrhh; ?>">
                                 </div>
                             </div>
                             <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
@@ -253,7 +253,7 @@ if (!$conn) {
                         </div>
 
                         <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                            <button type="submit" class="btn">Enviar Datos</button>
+                            <button type="submit" class="btn">Actualizar Datos</button>
                         </div>
                     </form>
                 </div>

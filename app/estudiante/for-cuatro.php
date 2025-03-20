@@ -182,7 +182,7 @@ if (!$conn) {
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Perfil de Egreso Desarrollo de Software</h1>
 
-            <?php if (empty($estado)): ?>
+            <?php if (empty($estado_doc_cuatro)): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
@@ -269,10 +269,6 @@ if (!$conn) {
                                 <!-- ✅ Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-dos-edit.php?id=<?php echo $id; ?>'">
-                                            <i class='bx bx-edit-alt'></i>
-                                        </button>
-
                                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
                                             <i class='bx bxs-file-pdf'></i>
                                         </button>

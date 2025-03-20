@@ -25,6 +25,7 @@ $sql_doc_seis = "SELECT
        d6.cargo_tutor,
        d6.numero_practicas,
        d6.numero_telefono,
+       d6.numero_institucional,
        d6.estado 
 FROM documento_seis d6
 WHERE d6.usuario_id = ?
@@ -47,6 +48,7 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $cargo_tutor = $row['cargo_tutor'];
     $numero_practicas = $row['numero_practicas'];
     $numero_telefono = $row['numero_telefono'];
+    $numero_institucional = $row['numero_institucional'];
 }
 
 
@@ -231,6 +233,10 @@ if (!$conn) {
                                             <option value="Completa">Completa</option>
                                         </select>
                                     </div>
+                                    <div class="mb-2">
+                                        <label for="numero_institucional" class="form-label fw-bold">Número institucional (opcional):</label>
+                                        <input type="number" class="form-control" id="numero_institucional" name="numero_institucional" placeholder="Ej: 0987654321">
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -278,6 +284,7 @@ if (!$conn) {
                                 <th>Cargo del tutor </th>
                                 <th>Número de prácticas</th>
                                 <th>Número de teléfono</th>
+                                <th>Número institucional</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -293,6 +300,8 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $cargo_tutor; ?></td>
                                 <td class="text-center"><?php echo $numero_practicas; ?></td>
                                 <td class="text-center"><?php echo $numero_telefono; ?></td>
+                                <td class="text-center"><?php echo (!empty($numero_institucional)) ? $numero_institucional : 'NO APLICA'; ?></td>
+                                
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

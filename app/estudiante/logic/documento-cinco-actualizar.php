@@ -23,9 +23,9 @@ $nombre_entidad_receptora = trim($_POST['nombre_entidad'] ?? '');
 $ruc = trim($_POST['ruc'] ?? '');
 $direccion_entidad_receptora = trim($_POST['direccion-entidad'] ?? '');
 $nombre_ciudad = trim($_POST['ciudad'] ?? '');
-$nombre_representante = trim($_POST['nombres-representante'] ?? '');
+$nombre_representante = trim($_POST['nombres-representante-rrhh'] ?? '');
 $correo_representante = trim($_POST['correo-entidad'] ?? '');
-$numero_institucional = trim($_POST['numero-institucional'] ?? '');
+$numero_representante_rrhh = trim($_POST['numero_representante_rrhh'] ?? '');
 
 $nombre_representante = mb_strtolower($nombre_representante, 'UTF-8');
 $nombre_representante = mb_convert_case($nombre_representante, MB_CASE_TITLE, "UTF-8");
@@ -37,7 +37,7 @@ if (
     empty($nombre_ciudad) ||
     empty($nombre_representante) ||
     empty($correo_representante) ||
-    empty($numero_institucional)
+    empty($numero_representante_rrhh)
 ) {
     header("Location: ../for-cinco.php?status=missing_data");
     exit();
@@ -49,9 +49,9 @@ $sql_actual = "SELECT
     ruc, 
     direccion_entidad_receptora, 
     nombre_ciudad, 
-    nombre_representante, 
+    nombre_representante_rrhh, 
     correo_representante, 
-    numero_institucional,
+    numero_representante_rrhh,
     logo_entidad_receptora
 FROM documento_cinco
 WHERE usuario_id = ?";
@@ -109,9 +109,9 @@ if (
     $ruc !== $datos_actuales['ruc'] ||
     $direccion_entidad_receptora !== $datos_actuales['direccion_entidad_receptora'] ||
     $nombre_ciudad !== $datos_actuales['nombre_ciudad'] ||
-    $nombre_representante !== $datos_actuales['nombre_representante'] ||
+    $nombre_representante !== $datos_actuales['nombre_representante_rrhh'] ||
     $correo_representante !== $datos_actuales['correo_representante'] ||
-    $numero_institucional !== $datos_actuales['numero_institucional'] ||
+    $numero_representante_rrhh !== $datos_actuales['numero_representante_rrhh'] ||
     $nombre_archivo_logo !== $datos_actuales['logo_entidad_receptora']
 ) {
     $hubo_cambios = true;
@@ -130,8 +130,8 @@ $sql_update = "UPDATE documento_cinco SET
     direccion_entidad_receptora = ?,
     logo_entidad_receptora = ?,
     nombre_ciudad = ?,
-    nombre_representante = ?,
-    numero_institucional = ?,
+    nombre_representante_rrhh = ?,
+    numero_representante_rrhh = ?,
     correo_representante = ?,
     estado = 'Pendiente'
 WHERE usuario_id = ?";
@@ -151,7 +151,7 @@ $stmt_update->bind_param(
     $nombre_archivo_logo,
     $nombre_ciudad,
     $nombre_representante,
-    $numero_institucional,
+    $numero_representante_rrhh,
     $correo_representante,
     $usuario_id_session
 );

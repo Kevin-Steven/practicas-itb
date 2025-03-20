@@ -25,6 +25,7 @@ $sql_doc_seis = "SELECT
        d6.cargo_tutor,
        d6.numero_practicas,
        d6.numero_telefono,
+       d6.numero_institucional,
        d6.estado 
 FROM documento_seis d6
 WHERE d6.usuario_id = ?
@@ -47,6 +48,7 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $cargo_tutor = $row['cargo_tutor'];
     $numero_practicas = $row['numero_practicas'];
     $numero_telefono = $row['numero_telefono'];
+    $numero_institucional = $row['numero_institucional'] ?? 'NO APLICA';
 }
 
 
@@ -229,6 +231,10 @@ if (!$conn) {
                                         <option value="Lunes a sábado" <?php echo $jornada_laboral === 'Lunes a sábado' ? 'selected' : ''; ?>>Lunes a sábado</option>
                                         <option value="Completa" <?php echo $jornada_laboral === 'Completa' ? 'selected' : ''; ?>>Completa</option>
                                     </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="numero_institucional" class="form-label fw-bold">Número institucional (opcional):</label>
+                                    <input type="number" class="form-control" id="numero_institucional" name="numero_institucional" placeholder="No aplica" value="<?php echo $numero_institucional; ?>">
                                 </div>
                             </div>
 
