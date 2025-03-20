@@ -54,9 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $periodo = trim($conn->real_escape_string($periodos_tiempo[$i]));
                     $funciones = trim($conn->real_escape_string($funciones_realizadas_array[$i]));
 
-                    if (empty($lugar) || empty($periodo) || empty($funciones)) {
-                        continue;
-                    }
+                    // Si el campo viene vacío, colocamos "NO APLICA"
+                    $lugar = !empty($lugar) ? $lugar : 'NO APLICA';
+                    $periodo = !empty($periodo) ? $periodo : 'NO APLICA';
+                    $funciones = !empty($funciones) ? $funciones : 'NO APLICA';
 
                     $stmt_experiencia->bind_param("isss", $documento_uno_id, $lugar, $periodo, $funciones);
                     $stmt_experiencia->execute();
@@ -69,7 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Error al actualizar el documento: " . $stmt_update->error;
             header("Location: ../for-uno.php?status=error");
         }
-
     } else {
         $sql_documento = "INSERT INTO documento_uno (usuario_id, promedio_notas) VALUES (?, ?)";
         $stmt_documento = $conn->prepare($sql_documento);
@@ -90,11 +90,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $lugar = trim($conn->real_escape_string($lugares_laborados[$i]));
                     $periodo = trim($conn->real_escape_string($periodos_tiempo[$i]));
                     $funciones = trim($conn->real_escape_string($funciones_realizadas_array[$i]));
-
-                    if (empty($lugar) || empty($periodo) || empty($funciones)) {
-                        continue;
-                    }
-
+            
+                    // Si el campo viene vacío, colocamos "NO APLICA"
+                    $lugar = !empty($lugar) ? $lugar : 'NO APLICA';
+                    $periodo = !empty($periodo) ? $periodo : 'NO APLICA';
+                    $funciones = !empty($funciones) ? $funciones : 'NO APLICA';
+            
                     $stmt_experiencia->bind_param("isss", $documento_uno_id, $lugar, $periodo, $funciones);
                     $stmt_experiencia->execute();
                 }
@@ -112,4 +113,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $conn->close();
-?>

@@ -22,8 +22,11 @@ $fecha_fin        = $_POST['fecha_fin'] ?? null;
 $hora_fin         = $_POST['hora_fin'] ?? null;
 $horas_practicas  = floatval($_POST['horas_practicas'] ?? 0);
 $nota_eva_s       = floatval($_POST['nota_eva-s'] ?? 0);
+$nombre_tutor_academico = $_POST['tutor_academico'] ?? null;
+$cedula_tutor_academico = $_POST['cedula_tutor'] ?? null;
+$correo_tutor_academico = $_POST['correo_tutor'] ?? null;
 
-if (!$fecha_inicio || !$hora_inicio || !$fecha_fin || !$hora_fin || $horas_practicas <= 0 || $nota_eva_s < 0 || $nota_eva_s > 100) {
+if (!$fecha_inicio || !$hora_inicio || !$fecha_fin || !$hora_fin || $horas_practicas <= 0 || $nota_eva_s < 0 || $nota_eva_s > 100 || empty($nombre_tutor_academico) || empty($cedula_tutor_academico) || empty($correo_tutor_academico)) {
     header("Location: ../for-dos-edit.php?id=$usuario_id&status=missing_data");
     exit();
 }
@@ -75,11 +78,11 @@ if (isset($_FILES['eva_s']) && $_FILES['eva_s']['error'] === 0) {
 }
 
 $sql_update = "UPDATE documento_dos 
-               SET fecha_inicio = ?, hora_inicio = ?, fecha_fin = ?, hora_fin = ?, hora_practicas = ?, documento_eva_s = ?, nota_eva_s = ?, estado = 'Pendiente'
+               SET fecha_inicio = ?, hora_inicio = ?, fecha_fin = ?, hora_fin = ?, hora_practicas = ?, documento_eva_s = ?, nota_eva_s = ?, nombre_tutor_academico = ?, cedula_tutor_academico = ?, correo_tutor_academico = ?, estado = 'Pendiente'
                WHERE id = ?";
 
 $stmt_update = $conn->prepare($sql_update);
-$stmt_update->bind_param("ssssissi", 
+$stmt_update->bind_param("ssssisdsssi", 
     $fecha_inicio, 
     $hora_inicio, 
     $fecha_fin, 
@@ -87,6 +90,9 @@ $stmt_update->bind_param("ssssissi",
     $horas_practicas, 
     $archivo_nombre_final, 
     $nota_eva_s,
+    $nombre_tutor_academico,
+    $cedula_tutor_academico,
+    $correo_tutor_academico,
     $documento_id
 );
 

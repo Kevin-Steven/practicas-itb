@@ -124,7 +124,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>For 1 Editar</title>
+    <title>Ficha de Estudiante</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -310,15 +310,15 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
                                             <div class="experiencia-laboral border p-3 mb-3 rounded">
                                                 <div class="mb-2">
                                                     <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                    <input type="text" class="form-control" name="lugar_laborado[]" value="<?php echo htmlspecialchars($exp['lugar_laborado']); ?>" required>
+                                                    <input type="text" class="form-control" name="lugar_laborado[]" value="<?php echo htmlspecialchars($exp['lugar_laborado']); ?>">
                                                 </div>
                                                 <div class="mb-2">
                                                     <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                    <input type="text" class="form-control" name="periodo_tiempo[]" value="<?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?>" required>
+                                                    <input type="text" class="form-control" name="periodo_tiempo[]" value="<?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?>">
                                                 </div>
                                                 <div class="mb-2">
                                                     <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                    <input type="text" class="form-control" name="funciones_realizadas[]" value="<?php echo htmlspecialchars($exp['funciones_realizadas']); ?>" required>
+                                                    <input type="text" class="form-control" name="funciones_realizadas[]" value="<?php echo htmlspecialchars($exp['funciones_realizadas']); ?>">
                                                 </div>
 
                                                 <?php if ($index > 0): ?>
@@ -331,15 +331,15 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
                                         <div class="experiencia-laboral border p-3 mb-3 rounded">
                                             <div class="mb-2">
                                                 <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                <input type="text" class="form-control" name="lugar_laborado[]" required>
+                                                <input type="text" class="form-control" name="lugar_laborado[]">
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                <input type="text" class="form-control" name="periodo_tiempo[]" required>
+                                                <input type="text" class="form-control" name="periodo_tiempo[]">
                                             </div>
                                             <div class="mb-2">
                                                 <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                <input type="text" class="form-control" name="funciones_realizadas[]" required>
+                                                <input type="text" class="form-control" name="funciones_realizadas[]">
                                             </div>
                                         </div>
                                     <?php endif; ?>

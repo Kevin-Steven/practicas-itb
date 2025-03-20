@@ -155,7 +155,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>For 1</title>
+    <title>Ficha de Estudiante</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -361,15 +361,15 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                         <div class="experiencia-laboral">
                                             <div class="mb-2">
                                                 <label for="lugar_laborado" class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                <input type="text" class="form-control" name="lugar_laborado[]" required>
+                                                <input type="text" class="form-control" name="lugar_laborado[]">
                                             </div>
                                             <div class="mb-2">
                                                 <label for="periodo_tiempo" class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                <input type="text" class="form-control" name="periodo_tiempo[]" required>
+                                                <input type="text" class="form-control" name="periodo_tiempo[]">
                                             </div>
                                             <div class="mb-2">
                                                 <label for="funciones_realizadas" class="form-label fw-bold">Funciones realizadas:</label>
-                                                <input type="text" class="form-control" name="funciones_realizadas[]" required>
+                                                <input type="text" class="form-control" name="funciones_realizadas[]">
                                             </div>
                                             <button type="button" class="btn btn-sm eliminar-experiencia" style="display: none; background: #df1f1f;">Eliminar</button>
                                         </div>
@@ -393,7 +393,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                     </div>
                 </div>
             <?php else: ?>
-                <h3 class="text-center mt-4 mb-3">Estado del Documento</h3>
+                <h3 class="text-center mt-2 mb-3">Estado del Documento</h3>
                 <div class="table-responsive">
                     <table class="table table-bordered shadow-lg">
                         <thead class="table-light text-center">

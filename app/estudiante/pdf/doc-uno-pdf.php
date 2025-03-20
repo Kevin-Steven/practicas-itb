@@ -27,7 +27,8 @@ $sql = "SELECT
             u.foto_perfil,
             u.periodo,
             d1.estado, 
-            d1.promedio_notas
+            d1.promedio_notas,
+            d1.nombre_doc
         FROM documento_uno d1
         JOIN usuarios u ON d1.usuario_id = u.id
         INNER JOIN carrera c ON u.carrera_id = c.id
@@ -56,7 +57,7 @@ $paralelo = $estudiante['paralelo'] ?: 'N/A';
 $promedio = $estudiante['promedio_notas'] ?: 'N/A';
 $foto_perfil_path = $estudiante['foto_perfil'] ?: 'Sin Foto';
 $periodoAcademico = $estudiante['periodo'] ?: 'N/A';
-
+$nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
 $foto_perfil = '../' . $foto_perfil_path;
 
 
@@ -305,5 +306,5 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Salida del PDF
-$pdf->Output('ficha_estudiante-' . $cedula . '.pdf', 'I');
+$pdf->Output($nombre_doc .'.pdf', 'I');
 exit();

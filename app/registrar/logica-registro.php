@@ -16,6 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $periodo = mysqli_real_escape_string($conn, $_POST['periodo']);
     $curso_id = !empty($_POST['curso_id']) ? intval($_POST['curso_id']) : NULL;
 
+    $nombres = mb_strtolower($nombres, 'UTF-8');
+    $apellidos = mb_strtolower($apellidos, 'UTF-8');
+  
+    // Luego convertir la primera letra de cada palabra a mayúscula
+    $nombres = mb_convert_case($nombres, MB_CASE_TITLE, "UTF-8");
+    $apellidos = mb_convert_case($apellidos, MB_CASE_TITLE, "UTF-8");
+
     if (strlen($cedula) != 10 || !ctype_digit($cedula)) {
         $_SESSION['mensaje'] = "La cédula debe tener exactamente 10 dígitos.";
         $_SESSION['tipo'] = "danger";

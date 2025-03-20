@@ -15,44 +15,41 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 
 $usuario_id = $_SESSION['usuario_id'];
 
-$sql_doc_dos = "SELECT 
-       d2.id,
-       d2.estado, 
-       d2.fecha_inicio,
-       d2.hora_inicio,
-       d2.fecha_fin,
-       d2.hora_fin,
-       d2.documento_eva_s,
-       d2.hora_practicas,
-       d2.nota_eva_s,
-       d2.nombre_tutor_academico,
-       d2.cedula_tutor_academico,
-       d2.correo_tutor_academico
-FROM documento_dos d2
-WHERE d2.usuario_id = ?
-ORDER BY d2.id DESC";
+$sql_doc_cinco = "SELECT 
+       d5.id,
+       d5.estado, 
+       d5.nombre_entidad_receptora,
+       d5.ruc,
+       d5.direccion_entidad_receptora,
+       d5.logo_entidad_receptora,
+       d5.nombre_ciudad,
+       d5.nombre_representante,
+       d5.numero_institucional,
+       d5.correo_representante
+FROM documento_cinco d5
+WHERE d5.usuario_id = ?
+ORDER BY d5.id DESC";
 
-$stmt_doc_dos = $conn->prepare($sql_doc_dos);
-$stmt_doc_dos->bind_param("i", $usuario_id);
-$stmt_doc_dos->execute();
-$result_tema = $stmt_doc_dos->get_result();
+$stmt_doc_cinco = $conn->prepare($sql_doc_cinco);
+$stmt_doc_cinco->bind_param("i", $usuario_id);
+$stmt_doc_cinco->execute();
+$result_doc_cinco = $stmt_doc_cinco->get_result();
 
-while ($row = $result_tema->fetch_assoc()) {
+while ($row = $result_doc_cinco->fetch_assoc()) {
     $id = $row['id'] ?? null;
     $estado = $row['estado'] ?? null;
-    $fecha_inicio = $row['fecha_inicio'] ?? null;
-    $hora_inicio = $row['hora_inicio'] ?? null;
-    $fecha_fin = $row['fecha_fin'] ?? null;
-    $hora_fin = $row['hora_fin'] ?? null;
-    $documento_eva_s = $row['documento_eva_s'] ?? null;
-    $horas_practicas = $row['hora_practicas'] ?? null;
-    $nota_eva_s = $row['nota_eva_s'] ?? null;
-    $nombre_tutor_academico = $row['nombre_tutor_academico'] ?? null;
-    $cedula_tutor_academico = $row['cedula_tutor_academico'] ?? null;
+    $nombre_entidad_receptora = $row['nombre_entidad_receptora'] ?? null;
+    $ruc = $row['ruc'] ?? null;
+    $direccion_entidad_receptora = $row['direccion_entidad_receptora'] ?? null;
+    $logo_entidad_receptora = $row['logo_entidad_receptora'] ?? null;
+    $nombre_ciudad = $row['nombre_ciudad'] ?? null;
+    $nombre_representante = $row['nombre_representante'] ?? null;
+    $numero_institucional = $row['numero_institucional'] ?? null;
+    $correo_representante = $row['correo_representante'] ?? null;
     $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
 }
 
-$stmt_doc_dos->close();
+$stmt_doc_cinco->close();
 
 
 if (!$conn) {
@@ -106,21 +103,31 @@ if (!$conn) {
 
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-
     <!-- Toast -->
     <?php if (isset($_GET['status'])): ?>
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
+                    <?php
+                    // Determinar el tipo de icono según el estado
+                    $success_status = ['success', 'update', 'deleted'];
+                    if (in_array($_GET['status'], $success_status)) : ?>
                         <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
+                        <strong class="me-auto">
+                            <?php
+                            switch ($_GET['status']) {
+                                case 'success':
+                                    echo 'Registro Exitoso';
+                                    break;
+                                case 'update':
+                                    echo 'Actualización Exitosa';
+                                    break;
+                                case 'deleted':
+                                    echo 'Eliminación Exitosa';
+                                    break;
+                            }
+                            ?>
+                        </strong>
                     <?php else: ?>
                         <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
                         <strong class="me-auto">Error</strong>
@@ -128,44 +135,59 @@ if (!$conn) {
                     <small>Justo ahora</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
+
                 <div class="toast-body">
                     <?php
                     switch ($_GET['status']) {
+                        // Éxitos
                         case 'success':
-                            echo "Los datos se han subido correctamente.";
+                            echo "Los datos de la entidad receptora se han registrado correctamente.";
+                            break;
+                        case 'update':
+                            echo "Los datos se han actualizado correctamente.";
                             break;
                         case 'deleted':
                             echo "El documento se ha eliminado correctamente.";
                             break;
-                        case 'update':
-                            echo "El documento se ha actualizado correctamente.";
+
+                        // Errores específicos
+                        case 'invalid_user':
+                            echo "Usuario inválido. Debes iniciar sesión nuevamente.";
+                            break;
+                        case 'missing_data':
+                            echo "Faltan datos en el formulario. Revisa que todos los campos estén completos.";
+                            break;
+                        case 'invalid_ruc':
+                            echo "El RUC ingresado no es válido. Debe contener exactamente 13 dígitos.";
+                            break;
+                        case 'invalid_email':
+                            echo "El correo electrónico del representante no es válido.";
+                            break;
+                        case 'invalid_phone':
+                            echo "El número institucional no es válido. Debe contener solo números (7-15 dígitos).";
                             break;
                         case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
+                            echo "Solo se permiten archivos de imagen: PNG, JPG, JPEG o GIF para el logo.";
                             break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
+                        case 'no_logo_file':
+                            echo "Debes seleccionar el logo de la entidad receptora.";
                             break;
                         case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
+                            echo "Hubo un error al subir el logo. Intenta nuevamente.";
                             break;
                         case 'db_error':
-                            echo "Error al actualizar la base de datos.";
+                            echo "Error al guardar los datos en la base de datos.";
                             break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
+                        case 'prepare_error':
+                            echo "Error en la preparación de la consulta SQL.";
                             break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
+
+                        // Otros casos
                         case 'not_found':
                             echo "No se encontraron datos del usuario.";
                             break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
                         default:
-                            echo "Ocurrió un error desconocido.";
+                            echo "Ocurrió un error inesperado. Intenta nuevamente.";
                             break;
                     }
                     ?>
@@ -174,62 +196,54 @@ if (!$conn) {
         </div>
     <?php endif; ?>
 
+
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
-            <h1 class="mb-2 text-center fw-bold">Datos Generales del Estudiante</h1>
+            <h1 class="mb-2 text-center fw-bold">Carta de Compromiso</h1>
 
-            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
+            <?php if (empty($estado) || $estado === 'Corregir'): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
-                        <form action="../estudiante/logic/documento-dos.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                        <form action="../estudiante/logic/documento-cinco.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
                             <div class="row">
+                                <h2 class="card-title text-center mb-3">Datos de la Entidad Receptora</h2>
                                 <div class="col-md-6">
-                                    <h2 class="card-title text-center">Periodo Práctica <br>Preprofesional</h2>
                                     <div class="mb-2">
-                                        <label for="fecha_inicio" class="form-label fw-bold">Fecha Inicio:</label>
-                                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                        <label for="logo-entidad" class="form-label fw-bold">Logo de la entidad receptora:</label>
+                                        <input type="file" class="form-control" id="logo-entidad" name="logo-entidad" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="hora_inicio" class="form-label fw-bold">Hora Inicio:</label>
-                                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                                        <label for="ciudad" class="form-label fw-bold">Ciudad:</label>
+                                        <input type="text" class="form-control" id="ciudad" name="ciudad" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="fecha_fin" class="form-label fw-bold">Fecha Fin:</label>
-                                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                        <label for="nombre_entidad" class="form-label fw-bold">Nombre entidad receptora:</label>
+                                        <input type="text" class="form-control" id="nombre_entidad" name="nombre_entidad" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="hora_fin" class="form-label fw-bold">Hora Fin:</label>
-                                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
+                                        <label for="ruc" class="form-label fw-bold">RUC:</label>
+                                        <input type="text" class="form-control" id="ruc" name="ruc" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="horas_practicas" class="form-label fw-bold">Horas Prácticas:</label>
-                                        <input type="number" class="form-control" id="horas_practicas" name="horas_practicas" step="0.01" placeholder="ej. 240" required>
+                                        <label for="direccion-entidad" class="form-label fw-bold">Dirección de la entidad receptora:</label>
+                                        <input type="text" class="form-control" id="direccion-entidad" name="direccion-entidad" required>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <h2 class="card-title text-center">Resultados Extraídos del EVA-S del Diagnóstico Inicial</h2>
                                     <div class="mb-2">
-                                        <label for="eva-s" class="form-label fw-bold">Subir EVA-S:</label>
-                                        <input type="file" class="form-control" id="eva_s" name="eva_s" required>
+                                        <label for="nombres-representante" class="form-label fw-bold">Nombres del representante de RRHH:</label>
+                                        <input type="text" class="form-control" id="nombres-representante" name="nombres-representante" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="nota_eva-s" class="form-label fw-bold">Nota EVA-S:</label>
-                                        <input type="number" min="0" max="100" class="form-control" id="nota_eva-s" name="nota_eva-s" step="0.01" placeholder="ej. 100" required>
+                                        <label for="correo-entidad" class="form-label fw-bold">Correo electrónico de la entidad receptora:</label>
+                                        <input type="email" class="form-control" id="correo-entidad" name="correo-entidad" required>
                                     </div>
                                     <div class="mb-2">
-                                        <label for="tutor_academico" class="form-label fw-bold">Tutor Académico:</label>
-                                        <input type="text" class="form-control" id="tutor_academico" name="tutor_academico" placeholder="ej. Juan Carlos Pérez Mora" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="cedula_tutor" class="form-label fw-bold">Cédula del tutor:</label>
-                                        <input type="text" class="form-control" id="cedula_tutor" name="cedula_tutor" placeholder="ej. 1234567890" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="correo_tutor" class="form-label fw-bold">Correo electrónico del tutor:</label>
-                                        <input type="email" class="form-control" id="correo_tutor" name="correo_tutor" placeholder="ej. tutor@gmail.com" required>
+                                        <label for="numero-institucional" class="form-label fw-bold">Número institucional:</label>
+                                        <input type="number" class="form-control" id="numero-institucional" name="numero-institucional" required>
                                     </div>
                                 </div>
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
@@ -248,16 +262,14 @@ if (!$conn) {
                     <table class="table table-bordered shadow-lg">
                         <thead class="table-light text-center">
                             <tr>
-                                <th>Fecha Inicio</th>
-                                <th>Hora Inicio</th>
-                                <th>Fecha Fin</th>
-                                <th>Hora Fin</th>
-                                <th>Horas Prácticas</th>
-                                <th>EVA-S</th>
-                                <th>Nota EVA-S</th>
-                                <th>Tutor Académico</th>
-                                <th>Cédula del tutor</th>
-                                <th>Correo electrónico del tutor</th>
+                                <th>Logo de la entidad receptora</th>
+                                <th>Ciudad</th>
+                                <th>Nombre entidad receptora</th>
+                                <th>RUC</th>
+                                <th>Dirección de la entidad receptora</th>
+                                <th>Nombres del representante de RRHH</th>
+                                <th>Correo electrónico de la entidad receptora</th>
+                                <th>Número institucional</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -265,34 +277,31 @@ if (!$conn) {
                         <tbody>
                             <tr>
                                 <!-- ✅ Aquí tus datos -->
-                                <td class="text-center"><?php echo $fecha_inicio; ?></td>
-                                <td class="text-center"><?php echo $hora_inicio; ?></td>
-                                <td class="text-center"><?php echo $fecha_fin; ?></td>
-                                <td class="text-center"><?php echo $hora_fin; ?></td>
-                                <td class="text-center"><?php echo $horas_practicas; ?></td>
-                                <td class="text-center"><?php echo $nota_eva_s; ?></td>
                                 <td class="text-center">
-                                    <a href="../uploads/eva-s/<?php echo $documento_eva_s; ?>" target="_blank">
-                                        Ver Imagen
+                                    <a href="../uploads/logo-entidad/<?php echo $logo_entidad_receptora; ?>" target="_blank">
+                                        Ver Logo
                                     </a>
-
                                 </td>
-                                <td class="text-center"><?php echo $nombre_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $cedula_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $correo_tutor_academico; ?></td>
+                                <td class="text-center"><?php echo $nombre_ciudad; ?></td>
+                                <td class="text-center"><?php echo $nombre_entidad_receptora; ?></td>
+                                <td class="text-center"><?php echo $ruc; ?></td>
+                                <td class="text-center"><?php echo $direccion_entidad_receptora; ?></td>
+                                <td class="text-center"><?php echo $nombre_representante; ?></td>
+                                <td class="text-center"><?php echo $correo_representante; ?></td>
+                                <td class="text-center"><?php echo $numero_institucional; ?></td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado
                                     $badgeClass = '';
 
                                     if ($estado === 'Pendiente') {
-                                        $badgeClass = 'badge bg-warning text-dark'; // Amarillo
+                                        $badgeClass = 'badge bg-warning text-dark';
                                     } elseif ($estado === 'Corregir') {
-                                        $badgeClass = 'badge bg-danger'; // Rojo
+                                        $badgeClass = 'badge bg-danger';
                                     } elseif ($estado === 'Aprobado') {
-                                        $badgeClass = 'badge bg-success'; // Verde
+                                        $badgeClass = 'badge bg-success';
                                     } else {
-                                        $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
+                                        $badgeClass = 'badge bg-secondary';
                                     }
                                     ?>
 
@@ -304,7 +313,7 @@ if (!$conn) {
                                 <!-- ✅ Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-dos-edit.php?id=<?php echo $id; ?>'">
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-cinco-edit.php?id=<?php echo $id; ?>'">
                                             <i class='bx bx-edit-alt'></i>
                                         </button>
 
@@ -320,7 +329,7 @@ if (!$conn) {
                         <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="../estudiante/pdf/doc-dos-pdf.php" method="GET" target="_blank">
+                                    <form action="../estudiante/pdf/doc-cinco-pdf.php" method="GET" target="_blank">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

@@ -41,6 +41,20 @@ $fecha_fin = $_POST['fecha_fin'] ?? '';
 $hora_fin = $_POST['hora_fin'] ?? '';
 $horas_practicas = floatval($_POST['horas_practicas'] ?? 0);
 $nota_eva_s = floatval($_POST['nota_eva-s'] ?? 0);
+$nombre_tutor_academico = trim($_POST['tutor_academico'] ?? '');
+$cedula_tutor_academico = trim($_POST['cedula_tutor'] ?? '');
+$correo_tutor_academico = trim($_POST['correo_tutor'] ?? '');
+
+if (empty($nombre_tutor_academico) || empty($cedula_tutor_academico) || empty($correo_tutor_academico)) {
+    header("Location: ../for-dos.php?status=missing_tutor_data");
+    exit();
+}
+
+if (!filter_var($correo_tutor_academico, FILTER_VALIDATE_EMAIL)) {
+    header("Location: ../for-dos.php?status=invalid_email");
+    exit();
+}
+
 
 // Validaciones básicas
 if (empty($fecha_inicio) || empty($hora_inicio) || empty($fecha_fin) || empty($hora_fin) || $horas_practicas <= 0) {
@@ -74,7 +88,7 @@ if (isset($_FILES['eva_s']) && $_FILES['eva_s']['error'] === UPLOAD_ERR_OK) {
 
     // Ruta de guardado
     $ruta_destino = '../../uploads/eva-s/';
-    
+
     // Asegura que el directorio exista
     if (!is_dir($ruta_destino)) {
         mkdir($ruta_destino, 0775, true);
@@ -88,7 +102,6 @@ if (isset($_FILES['eva_s']) && $_FILES['eva_s']['error'] === UPLOAD_ERR_OK) {
         header("Location: ../for-dos.php?status=upload_error");
         exit();
     }
-
 } else {
     header("Location: ../for-dos.php?status=no_file");
     exit();
@@ -96,21 +109,31 @@ if (isset($_FILES['eva_s']) && $_FILES['eva_s']['error'] === UPLOAD_ERR_OK) {
 
 // 6. Guardar los datos en la tabla documento_dos
 $sql_insert = "INSERT INTO documento_dos 
-    (usuario_id, fecha_inicio, hora_inicio, fecha_fin, hora_fin, hora_practicas, documento_eva_s, nota_eva_s, estado) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+(usuario_id, fecha_inicio, hora_inicio, fecha_fin, hora_fin, hora_practicas, documento_eva_s, nota_eva_s, nombre_tutor_academico, cedula_tutor_academico, correo_tutor_academico, estado)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
 
-$stmt_insert = $conn->prepare($sql_insert);
+$stmt_insert = $conn->prepare($sql_insert); 
+
+if (!$stmt_insert) {
+    header("Location: ../for-dos.php?status=prepare_error");
+    exit();
+}
+
 $stmt_insert->bind_param(
-    "issssdsd",
-    $usuario_id_session,
-    $fecha_inicio,
-    $hora_inicio,
-    $fecha_fin,
-    $hora_fin,
-    $horas_practicas,
-    $nombre_archivo,
-    $nota_eva_s
+    "issssisdsss",
+    $usuario_id_session,       
+    $fecha_inicio,             
+    $hora_inicio,              
+    $fecha_fin,                
+    $hora_fin,                 
+    $horas_practicas,          
+    $nombre_archivo,           
+    $nota_eva_s,               
+    $nombre_tutor_academico,   
+    $cedula_tutor_academico,   
+    $correo_tutor_academico    
 );
+
 
 if ($stmt_insert->execute()) {
     header("Location: ../for-dos.php?status=success");
@@ -122,4 +145,3 @@ if ($stmt_insert->execute()) {
 
 $stmt_insert->close();
 $conn->close();
-?>
