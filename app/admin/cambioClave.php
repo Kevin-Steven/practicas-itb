@@ -48,7 +48,7 @@ if (isset($_SESSION['mensaje'])) {
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <form action="logica-cambio-clave.php" class="formularioCambioClave" method="post">
+          <form action="../admin/logic/cambio-clave.php" class="formularioCambioClave" method="post">
             <h2 class="title-crd text-center mb-4 fw-bold">Cambio de Contraseña</h2>
 
             <!-- Mostrar el mensaje si existe -->

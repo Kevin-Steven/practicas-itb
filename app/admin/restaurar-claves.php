@@ -74,90 +74,68 @@ if (isset($_POST['nuevo_password'], $_POST['usuario_id'])) {
 
     <!-- Content -->
     <div class="content" id="content">
-        <div class="container-fluid py-5">
+        <div class="container-fluid py-3">
             <div class="row justify-content-center">
-                <div class="col-md-6">
+                <div class="col-md-6 d-grid">
+                    <h1 class="fw-bold text-center mb-2">Restaurar Contraseña</h1>
+                    <p class="text-center mb-4">Desde este apartado podrás <strong>restaurar la contraseña</strong> de los usuarios registrados.</h5>
+
+                    <!-- Tarjeta para restaurar clave -->
                     <div class="card shadow-lg" id="card-restaurar">
-                        <div class="card-body">
-                            <h2 class="mb-4 fw-bold text-center">Restaurar Clave de Postulantes</h2>
+                        <div class="card-body d-grid gap-3">
 
-                            <!-- Toast -->
-                            <?php if (isset($_GET['status'])): ?>
-                                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                                        <div class="toast-header">
-                                            <?php if ($_GET['status'] === 'success'): ?>
-                                                <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                                                <strong class="me-auto">Actualización Exitosa</strong>
-                                            <?php elseif ($_GET['status'] === 'error'): ?>
-                                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                                <strong class="me-auto">Usuario No Encontrado</strong>
-                                            <?php elseif ($_GET['status'] === 'invalid_request'): ?>
-                                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                                <strong class="me-auto">Error en el Formulario</strong>
-                                            <?php endif; ?>
-                                            <small>Justo ahora</small>
-                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        </div>
-                                        <div class="toast-body">
-                                            <?php
-                                            switch ($_GET['status']) {
-                                                case 'success':
-                                                    echo "Contraseña actualizada con éxito.";
-                                                    break;
-                                                case 'error':
-                                                    echo "No se encontró ningún usuario con esa cédula.";
-                                                    break;
-                                                case 'invalid_request':
-                                                    echo "Hubo un error en el envío del formulario.";
-                                                    break;
-                                                default:
-                                                    echo "Ha ocurrido un error desconocido.";
-                                                    break;
-                                            }
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
+                            <!-- Título -->
 
-                            <!-- Formulario de búsqueda por cédula -->
-                            <form action="restaurar-claves.php" method="POST">
-                                <div class="mb-3">
-                                    <label for="cedula" class="form-label fw-bold">Cédula del Postulante</label>
-                                    <input type="text" class="form-control" id="cedula" name="cedula" placeholder="Ingrese la cédula" required oninput="validateInput(this)" maxlength="10" value="<?php echo $cedula; ?>">
+                            <!-- Formulario de búsqueda -->
+                            <form action="restaurar-claves.php" method="POST" class="d-grid gap-3">
+                                <div>
+                                    <label for="cedula" class="form-label fw-bold">Cédula del Usuario</label>
+                                    <input type="text" class="form-control" id="cedula" name="cedula" placeholder="Ingrese la cédula" required
+                                        oninput="validateInput(this)" maxlength="10" value="<?php echo $cedula; ?>">
                                 </div>
 
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn">Buscar</button>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn">Buscar Usuario</button>
                                 </div>
                             </form>
 
-                            <!-- Si el usuario es encontrado, mostrar el campo para cambiar la clave -->
+                            <!-- Mostrar formulario para cambiar contraseña si encuentra usuario -->
                             <?php if ($usuario): ?>
-                                <h3 class="mt-5 mb-3 text-center fw-bold">Cambiar Clave para: <?php echo $usuario['nombres'] . ' ' . $usuario['apellidos']; ?></h3>
+                                <div class="d-grid gap-3 mt-4">
+                                    <h5 class="fw-bold text-center">Cambiar Contraseña para: <?php echo $usuario['nombres'] . ' ' . $usuario['apellidos']; ?></h4>
 
-                                <form id="updatePasswordForm" action="restaurar-claves.php" method="POST">
-                                    <input type="hidden" name="usuario_id" value="<?php echo $usuario['id']; ?>">
+                                    <form id="updatePasswordForm" action="restaurar-claves.php" method="POST" class="d-grid gap-3">
+                                        <input type="hidden" name="usuario_id" value="<?php echo $usuario['id']; ?>">
 
-                                    <div class="mb-3">
-                                        <label for="nuevo_password" class="form-label fw-bold">Nueva Clave</label>
-                                        <input type="password" class="form-control" id="nuevo_password" name="nuevo_password" placeholder="Ingrese la nueva clave" required>
-                                    </div>
+                                        <div>
+                                            <label for="nuevo_password" class="form-label fw-bold">Nueva Contraseña</label>
+                                            <input type="password"
+                                                class="form-control"
+                                                id="nuevo_password"
+                                                name="nuevo_password"
+                                                placeholder="Ingrese la nueva contraseña"
+                                                required>
+                                        </div>
 
-                                    <div class="d-grid gap-2">
-                                        <!-- Botón que activa el modal -->
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
-                                            Actualizar Clave
-                                        </button>
-                                    </div>
-                                </form>
+                                        <div class="d-grid">
+                                            <button type="button"
+                                                class="btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#confirmModal">
+                                                Actualizar Contraseña
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             <?php endif; ?>
-                        </div>
+
+                        </div> 
                     </div>
-                </div>
+
+                </div> 
             </div>
-        </div>
+        </div> 
+
     </div>
 
     <!-- Modal de confirmación -->
@@ -178,6 +156,45 @@ if (isset($_POST['nuevo_password'], $_POST['usuario_id'])) {
             </div>
         </div>
     </div>
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?php if ($_GET['status'] === 'success'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">Actualización Exitosa</strong>
+                    <?php elseif ($_GET['status'] === 'error'): ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Usuario No Encontrado</strong>
+                    <?php elseif ($_GET['status'] === 'invalid_request'): ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Error en el Formulario</strong>
+                    <?php endif; ?>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <?php
+                    switch ($_GET['status']) {
+                        case 'success':
+                            echo "Contraseña actualizada con éxito.";
+                            break;
+                        case 'error':
+                            echo "No se encontró ningún usuario con esa cédula.";
+                            break;
+                        case 'invalid_request':
+                            echo "Hubo un error en el envío del formulario.";
+                            break;
+                        default:
+                            echo "Ha ocurrido un error desconocido.";
+                            break;
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php renderFooterAdmin(); ?>
 

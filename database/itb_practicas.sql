@@ -1,18 +1,6 @@
 CREATE DATABASE IF NOT EXISTS itb_practicas;
 USE itb_practicas;
 
-CREATE TABLE carrera (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    carrera VARCHAR(255) NOT NULL,
-    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
-);
-
-CREATE TABLE cursos (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    paralelo VARCHAR(255) NOT NULL,
-    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
-);
-
 CREATE TABLE usuarios (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	nombres VARCHAR(100) NOT NULL,
@@ -28,17 +16,30 @@ CREATE TABLE usuarios (
 	foto_perfil VARCHAR(255),
     periodo VARCHAR(255) DEFAULT NULL,
 	rol ENUM('estudiante', 'gestor', 'administrador') NOT NULL DEFAULT 'estudiante',
+    estado ENUM('activo','inactivo') NOT NULL DEFAULT 'activo',
     fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (carrera_id) REFERENCES carrera(id),
     FOREIGN KEY (curso_id) REFERENCES cursos(id)
 );
 
-
 CREATE TABLE registro (
 	id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id int NOT NULL,
 	cedula VARCHAR(20) NOT NULL,
 	password VARCHAR(255) NOT NULL,
-    estado ENUM('activo','inactivo') NOT NULL DEFAULT 'activo'
+    CONSTRAINT fk_usuario_registro FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE carrera (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    carrera VARCHAR(255) NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+);
+
+CREATE TABLE cursos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    paralelo VARCHAR(255) NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
 
 CREATE TABLE documento_uno (
@@ -196,12 +197,12 @@ END$$
 DELIMITER ;
 documento_uno
   
-  DELIMITER $$
+DELIMITER $$
 CREATE TRIGGER after_user_insert
 AFTER INSERT ON usuarios
 FOR EACH ROW
 BEGIN
-	INSERT INTO registro (cedula, password) 
-	VALUES (NEW.cedula, NEW.password);
+	INSERT INTO registro (usuario_id, cedula, password)
+	VALUES (NEW.id, NEW.cedula, NEW.password);
 END$$
 DELIMITER ;

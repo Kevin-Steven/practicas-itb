@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../config/config.php'; // Conexión a la base de datos
+require '../../config/config.php'; // Conexión a la base de datos
 
 // Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['usuario_id'])) {
@@ -21,7 +21,7 @@ if (isset($_POST['actualPassword'], $_POST['newPassword'], $_POST['confirmPasswo
     if ($newPassword !== $confirmPassword) {
         $_SESSION['mensaje'] = "La nueva contraseña y la confirmación no coinciden.";
         $_SESSION['tipo_mensaje'] = 'warning'; // Mensaje de advertencia
-        header("Location: cambioClave.php");
+        header("Location: ../cambioClave.php");
         exit();
     }
 
@@ -38,7 +38,7 @@ if (isset($_POST['actualPassword'], $_POST['newPassword'], $_POST['confirmPasswo
     if (!password_verify($actualPassword, $hashedPassword)) {
         $_SESSION['mensaje'] = "La contraseña actual es incorrecta.";
         $_SESSION['tipo_mensaje'] = 'warning'; // Mensaje de advertencia
-        header("Location: cambioClave.php");
+        header("Location: ../cambioClave.php");
         exit();
     }
 
@@ -62,12 +62,12 @@ if (isset($_POST['actualPassword'], $_POST['newPassword'], $_POST['confirmPasswo
     $conn->close();
 
     // Redirigir de vuelta al formulario con el mensaje
-    header("Location: cambioClave.php");
+    header("Location: ../cambioClave.php");
     exit();
 } else {
     // Si no se completaron los campos, redirigir al formulario
     $_SESSION['mensaje'] = "Por favor, complete todos los campos.";
     $_SESSION['tipo_mensaje'] = 'warning'; 
-    header("Location: cambioClave.php");
+    header("Location: ../cambioClave.php");
     exit();
 }

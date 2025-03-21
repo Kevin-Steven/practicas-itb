@@ -6,7 +6,7 @@ function renderLayoutAdmin($primer_nombre, $primer_apellido, $foto_perfil)
 
     // Sidebar: Clases activas según el archivo actual
     $isInicioActive = ($currentFile === 'inicio-administrador.php') ? 'active' : '';
-    $isModificarRolActive = ($currentFile === 'modificar-rol.php') ? 'active' : '';
+    $isModificarUsuariosActive = ($currentFile === 'modificar-usuarios.php') ? 'active' : '';
     $isRestaurarClaveActive = ($currentFile === 'restaurar-claves.php') ? 'active' : '';
     ?>
 
@@ -22,8 +22,8 @@ function renderLayoutAdmin($primer_nombre, $primer_apellido, $foto_perfil)
             <a class="nav-link <?php echo $isInicioActive; ?>" href="inicio-administrador.php">
                 <i class='bx bx-home-alt'></i> Inicio
             </a>
-            <a class="nav-link <?php echo $isModificarRolActive; ?>" href="modificar-rol.php">
-                <i class='bx bx-user'></i> Modificar Rol
+            <a class="nav-link <?php echo $isModificarUsuariosActive; ?>" href="modificar-usuarios.php">
+                <i class='bx bx-user'></i> Gestionar Usuarios
             </a>
             <a class="nav-link <?php echo $isRestaurarClaveActive; ?>" href="restaurar-claves.php">
                 <i class='bx bx-lock'></i> Restaurar clave
@@ -37,13 +37,6 @@ function renderLayoutAdmin($primer_nombre, $primer_apellido, $foto_perfil)
             <i class='bx bx-menu'></i>
         </div>
         <div class="topbar-right">
-            <div class="input-group search-bar">
-                <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-                <input type="text" id="search" class="form-control" placeholder="Buscar">
-            </div>
-            <i class='bx bx-envelope'></i>
-            <i class='bx bx-bell'></i>
-
             <!-- Menú desplegable de usuario -->
             <div class="user-profile dropdown">
                 <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">

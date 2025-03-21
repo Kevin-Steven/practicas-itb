@@ -196,7 +196,7 @@ span {
 }
 
 .card-principal i {
-  color: #04087c;
+  color: #3b7ddd;
   margin-bottom: 10px;
 }
 
@@ -232,7 +232,7 @@ span {
 .formulario-inscripcion .form-select:focus,
 .form-control:focus,
 .formularioCambioClave .form-control:focus {
-  border-color: #04087c;
+  border-color: #3b7ddd;
   box-shadow: 0 0 5px rgba(58, 87, 232, 0.2);
 }
 
@@ -244,7 +244,7 @@ span {
 .botones-detalle-tema .btn,
 .generar-reporte .btn,
 .inf .subir-informe {
-  background-color: #04087c;
+  background-color: #3b7ddd;
   color: white;
   padding: 12px 30px;
   border-radius: 50px;
@@ -262,7 +262,7 @@ span {
 .anteproyecto .btns .btn:hover,
 .inf .subir-informe:hover {
   color: white;
-  background-color: #04087c;
+  background-color: #3b7ddd;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3);
 }
@@ -297,7 +297,7 @@ span {
 .formulario-aceptar-rechazar .btn {
   padding: 10px 30px;
   border-radius: 50px;
-  background: #04087c;
+  background: #3b7ddd;
   color: white;
 }
 
@@ -398,11 +398,11 @@ table td {
 
 
 .container .documentos-aprobados {
-  border: 2px solid #04087c;
+  border: 2px solid #3b7ddd;
 }
 
 .container .documentos-aprobados .card-title {
-  color: #04087c;
+  color: #3b7ddd;
 }
 
 /* Estilos para el Footer */
@@ -433,13 +433,13 @@ table td {
 
 .regresar-enlace {
   font-size: 50px;
-  color: #04087c;
+  color: #3b7ddd;
   text-decoration: none;
   transition: .3s;
 }
 
 .regresar-enlace:hover {
-  color: #007bff;
+  color: #3b7ddd;
 }
 
 #color-verde {
