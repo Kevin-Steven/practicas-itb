@@ -2,6 +2,7 @@
 session_start();
 require '../config/config.php';
 require 'sidebar-estudiante.php';
+require '../admin/sidebar-admin.php';
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -74,104 +75,7 @@ if (!$conn) {
 </head>
 
 <body>
-    <div class="topbar z-1">
-        <div class="menu-toggle">
-            <i class='bx bx-menu'></i>
-        </div>
-        <div class="topbar-right">
-            <div class="user-profile dropdown">
-                <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-                    <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
-                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php"><i class='bx bx-log-out me-2'></i>Cerrar Sesión</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
-
-
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        case 'success':
-                            echo "Los datos se han subido correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-                        case 'update':
-                            echo "El documento se ha actualizado correctamente.";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
-                            break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
-                            break;
-                        case 'db_error':
-                            echo "Error al actualizar la base de datos.";
-                            break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
-                            break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error desconocido.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
 
     <!-- Content -->
     <div class="content" id="content">
@@ -247,12 +151,8 @@ if (!$conn) {
 
     </div>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light text-center">
-        <div class="container">
-            <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
-        </div>
-    </footer>
+    <?php renderFooterAdmin(); ?>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>

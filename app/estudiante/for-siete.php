@@ -2,6 +2,7 @@
 session_start();
 require '../config/config.php';
 require 'sidebar-estudiante.php';
+require '../admin/sidebar-admin.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
@@ -20,16 +21,12 @@ $sql_doc_siete = "SELECT
         u.nombres,
         u.apellidos,
         u.cedula,
-        u.direccion,
-        u.telefono,
-        u.convencional,
-        u.email,
-        u.periodo,
         c.carrera AS nombre_carrera,
-        cu.paralelo AS nombre_paralelo
+        ds.estado,
+        ds.motivo_rechazo
     FROM usuarios u
     INNER JOIN carrera c ON u.carrera_id = c.id
-    LEFT JOIN cursos cu ON u.curso_id = cu.id
+    LEFT JOIN documento_siete ds ON u.id = ds.usuario_id
     WHERE u.id = ?";
 
 $stmt_doc_siete = $conn->prepare($sql_doc_siete);
@@ -42,17 +39,12 @@ while ($row = $result_doc_siete->fetch_assoc()) {
     $nombres = $row['nombres'] ?? null;
     $apellidos = $row['apellidos'] ?? null;
     $cedula = $row['cedula'] ?? null;
-    $direccion = $row['direccion'] ?? null;
-    $telefono = $row['telefono'] ?? null;
-    $convencional = $row['convencional'] ?? null;
-    $email = $row['email'] ?? null;
-    $periodo = $row['periodo'] ?? null;
     $nombre_carrera = $row['nombre_carrera'] ?? null;
-    $nombre_paralelo = $row['nombre_paralelo'] ?? null;
+    $estado = $row['estado'] ?? "Sin estado";
+    $motivo_rechazo = $row['motivo_rechazo'] ?? "<span class='text-muted'>No tiene motivo de rechazo</span>";
 }
 
 $stmt_doc_siete->close();
-
 
 if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
@@ -74,37 +66,7 @@ if (!$conn) {
 </head>
 
 <body>
-    <div class="topbar z-1">
-        <div class="menu-toggle">
-            <i class='bx bx-menu'></i>
-        </div>
-        <div class="topbar-right">
-            <div class="user-profile dropdown">
-                <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-                    <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
-                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php"><i class='bx bx-log-out me-2'></i>Cerrar Sesión</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
-
 
     <!-- Toast -->
     <?php if (isset($_GET['status'])): ?>
@@ -186,8 +148,9 @@ if (!$conn) {
                             <th>Nombres</th>
                             <th>Apellidos</th>
                             <th>Cédula</th>
-                            <th>Dirección</th>
                             <th>Carrera</th>
+                            <th>Motivo de Rechazo</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -197,18 +160,18 @@ if (!$conn) {
                             <td class="text-center"><?php echo $nombres; ?></td>
                             <td class="text-center"><?php echo $apellidos; ?></td>
                             <td class="text-center"><?php echo $cedula; ?></td>
-                            <td class="text-center"><?php echo $direccion; ?></td>
                             <td class="text-center"><?php echo $nombre_carrera; ?></td>
-                            <!-- <td class="text-center">
+                            <td class="text-center"><?php echo $motivo_rechazo; ?></td>
+                            <td class="text-center">
                                 <?php
                                 // Lógica para asignar la clase de Bootstrap según el estado
                                 $badgeClass = '';
 
-                                if ($estado_doc_tres === 'Pendiente') {
+                                if ($estado === 'Pendiente') {
                                     $badgeClass = 'badge bg-warning text-dark'; // Amarillo
-                                } elseif ($estado_doc_tres === 'Corregir') {
+                                } elseif ($estado === 'Corregir') {
                                     $badgeClass = 'badge bg-danger'; // Rojo
-                                } elseif ($estado_doc_tres === 'Aprobado') {
+                                } elseif ($estado === 'Aprobado') {
                                     $badgeClass = 'badge bg-success'; // Verde
                                 } else {
                                     $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
@@ -216,14 +179,13 @@ if (!$conn) {
                                 ?>
 
                                 <span class="<?php echo $badgeClass; ?>">
-                                    <?php echo htmlspecialchars($estado_doc_tres); ?>
+                                    <?php echo htmlspecialchars($estado); ?>
                                 </span>
-                            </td> -->
+                            </td> 
 
                             <!-- ✅ Acciones -->
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-
                                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
                                         <i class='bx bxs-file-pdf'></i>
                                     </button>
@@ -247,7 +209,7 @@ if (!$conn) {
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-primary">Aceptar</button>
+                                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
                                     </div>
                                 </form>
                             </div>
@@ -259,12 +221,7 @@ if (!$conn) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light text-center">
-        <div class="container">
-            <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
-        </div>
-    </footer>
+    <?php renderFooterAdmin(); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>

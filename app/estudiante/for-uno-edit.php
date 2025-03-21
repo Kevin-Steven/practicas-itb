@@ -2,6 +2,8 @@
 session_start();
 require '../config/config.php';
 require 'sidebar-estudiante.php';
+require '../admin/sidebar-admin.php';
+
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -133,103 +135,24 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
 </head>
 
 <body>
-    <div class="topbar z-1">
-        <div class="menu-toggle">
-            <i class='bx bx-menu'></i>
-        </div>
-        <div class="topbar-right">
-            <div class="user-profile dropdown">
-                <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-                    <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
-                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
+    <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
+
+    <div class="modal fade" id="modalCamposIncompletos" tabindex="-1" aria-labelledby="modalCamposIncompletosLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="modalCamposIncompletosLabel">Atención</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php"><i class='bx bx-log-out me-2'></i>Cerrar Sesión</a>
-                    </li>
-                </ul>
+                <div class="modal-body">
+                    Por favor completa todos los campos antes de agregar otra semana de actividades.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
-
-    <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
-
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        case 'success':
-                            echo "Los datos se han subido correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-                        case 'update':
-                            echo "El documento se ha actualizado correctamente.";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
-                            break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
-                            break;
-                        case 'db_error':
-                            echo "Error al actualizar la base de datos.";
-                            break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
-                            break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error desconocido.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
 
     <!-- Content -->
     <div class="content" id="content">
@@ -238,134 +161,151 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
 
             <div class="card shadow-lg container-fluid">
                 <div class="card-body">
-                    <form action="../estudiante/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
+                    <form action="../estudiante/logic/documento-ocho-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
 
-                        <!-- Campo oculto para el ID del documento -->
                         <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_uno_id); ?>">
 
-                        <div class="row">
-                            <!-- Datos generales -->
-                            <div class="col-md-4">
-                                <h2 class="card-title text-center">Datos Generales</h2>
+                        <div class="container">
+                            <!-- Fila principal -->
+                            <div class="row g-4">
 
-                                <div class="mb-2">
-                                    <label for="nombres" class="form-label fw-bold">Nombres</label>
-                                    <input type="text" class="form-control" id="nombres" value="<?php echo htmlspecialchars($nombres); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="apellidos" class="form-label fw-bold">Apellidos</label>
-                                    <input type="text" class="form-control" id="apellidos" value="<?php echo htmlspecialchars($apellidos); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="cedula" class="form-label fw-bold">Cédula</label>
-                                    <input type="text" class="form-control" id="cedula" value="<?php echo htmlspecialchars($cedula); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="direccion" class="form-label fw-bold">Dirección</label>
-                                    <input type="text" class="form-control" id="direccion" value="<?php echo htmlspecialchars($direccion); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="telefono" class="form-label fw-bold">Teléfono</label>
-                                    <input type="text" class="form-control" id="telefono" value="<?php echo htmlspecialchars($telefono); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="convencional" class="form-label fw-bold">Teléfono Convencional</label>
-                                    <input type="text" class="form-control" id="convencional" value="<?php echo htmlspecialchars($convencional); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="email" class="form-label fw-bold">Correo Electrónico</label>
-                                    <input type="text" class="form-control" id="email" value="<?php echo htmlspecialchars($email); ?>" disabled>
-                                </div>
-                            </div>
+                                <!-- Columna 1: Datos Generales -->
+                                <div class="col-md-4">
+                                    <h2 class="card-title text-center mb-4">Datos Generales</h2>
 
-                            <!-- Datos académicos -->
-                            <div class="col-md-4">
-                                <h2 class="card-title text-center">Datos Académicos</h2>
+                                    <div class="mb-3">
+                                        <label for="nombres" class="form-label fw-bold">Nombres</label>
+                                        <input type="text" class="form-control" id="nombres" value="<?php echo htmlspecialchars($nombres); ?>" disabled>
+                                    </div>
 
-                                <div class="mb-2">
-                                    <label for="carrera" class="form-label fw-bold">Carrera</label>
-                                    <input type="text" class="form-control" id="carrera" value="<?php echo htmlspecialchars($carrera); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="periodo" class="form-label fw-bold">Periodo</label>
-                                    <input type="text" class="form-control" id="periodo" value="<?php echo htmlspecialchars($periodo); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="paralelo" class="form-label fw-bold">Paralelo</label>
-                                    <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($paralelo); ?>" disabled>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="promedio" class="form-label fw-bold">Promedio de notas:</label>
-                                    <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" min="0" max="100" value="<?php echo htmlspecialchars($promedio_notas); ?>" required>
-                                </div>
-                            </div>
+                                    <div class="mb-3">
+                                        <label for="apellidos" class="form-label fw-bold">Apellidos</label>
+                                        <input type="text" class="form-control" id="apellidos" value="<?php echo htmlspecialchars($apellidos); ?>" disabled>
+                                    </div>
 
-                            <!-- Experiencia laboral -->
-                            <div class="col-md-4">
-                                <h2 class="card-title text-center">Experiencia Laboral</h2>
+                                    <div class="mb-3">
+                                        <label for="cedula" class="form-label fw-bold">Cédula</label>
+                                        <input type="text" class="form-control" id="cedula" value="<?php echo htmlspecialchars($cedula); ?>" disabled>
+                                    </div>
 
-                                <div id="contenedor-experiencia">
-                                    <?php if (!empty($experiencia_laboral)): ?>
-                                        <?php foreach ($experiencia_laboral as $index => $exp): ?>
+                                    <div class="mb-3">
+                                        <label for="direccion" class="form-label fw-bold">Dirección</label>
+                                        <input type="text" class="form-control" id="direccion" value="<?php echo htmlspecialchars($direccion); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="telefono" class="form-label fw-bold">Teléfono</label>
+                                        <input type="text" class="form-control" id="telefono" value="<?php echo htmlspecialchars($telefono); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="convencional" class="form-label fw-bold">Teléfono Convencional</label>
+                                        <input type="text" class="form-control" id="convencional" value="<?php echo htmlspecialchars($convencional); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                                        <input type="text" class="form-control" id="email" value="<?php echo htmlspecialchars($email); ?>" disabled>
+                                    </div>
+                                </div>
+
+                                <!-- Columna 2: Datos Académicos -->
+                                <div class="col-md-4">
+                                    <h2 class="card-title text-center mb-4">Datos Académicos</h2>
+
+                                    <div class="mb-3">
+                                        <label for="carrera" class="form-label fw-bold">Carrera</label>
+                                        <input type="text" class="form-control" id="carrera" value="<?php echo htmlspecialchars($carrera); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="periodo" class="form-label fw-bold">Periodo</label>
+                                        <input type="text" class="form-control" id="periodo" value="<?php echo htmlspecialchars($periodo); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="paralelo" class="form-label fw-bold">Paralelo</label>
+                                        <input type="text" class="form-control" id="paralelo" name="paralelo" value="<?php echo htmlspecialchars($paralelo); ?>" disabled>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="promedio" class="form-label fw-bold">Promedio de notas:</label>
+                                        <input type="number" class="form-control" id="promedio" name="promedio" step="0.01" min="0" max="100" value="<?php echo htmlspecialchars($promedio_notas); ?>" required>
+                                    </div>
+                                </div>
+
+                                <!-- Columna 3: Experiencia Laboral -->
+                                <div class="col-md-4">
+                                    <h2 class="card-title text-center mb-4">Experiencia Laboral</h2>
+
+                                    <div id="contenedor-experiencia">
+                                        <?php if (!empty($experiencia_laboral)): ?>
+                                            <?php foreach ($experiencia_laboral as $index => $exp): ?>
+                                                <div class="experiencia-laboral border p-3 mb-3 rounded">
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
+                                                        <input type="text" class="form-control" name="lugar_laborado[]" value="<?php echo htmlspecialchars($exp['lugar_laborado']); ?>">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
+                                                        <input type="text" class="form-control" name="periodo_tiempo[]" value="<?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?>">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">Funciones realizadas:</label>
+                                                        <input type="text" class="form-control" name="funciones_realizadas[]" value="<?php echo htmlspecialchars($exp['funciones_realizadas']); ?>">
+                                                    </div>
+
+                                                    <?php if ($index > 0): ?>
+                                                        <button type="button" class="btn btn-sm eliminar-experiencia" style="background: #df1f1f; color: #fff;">Eliminar</button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <!-- Si no hay experiencias, muestra un campo vacío -->
                                             <div class="experiencia-laboral border p-3 mb-3 rounded">
-                                                <div class="mb-2">
+                                                <div class="mb-3">
                                                     <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                    <input type="text" class="form-control" name="lugar_laborado[]" value="<?php echo htmlspecialchars($exp['lugar_laborado']); ?>">
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                    <input type="text" class="form-control" name="periodo_tiempo[]" value="<?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?>">
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                    <input type="text" class="form-control" name="funciones_realizadas[]" value="<?php echo htmlspecialchars($exp['funciones_realizadas']); ?>">
+                                                    <input type="text" class="form-control" name="lugar_laborado[]">
                                                 </div>
 
-                                                <?php if ($index > 0): ?>
-                                                    <button type="button" class="btn btn-sm eliminar-experiencia" style="background: #df1f1f;">Eliminar</button>
-                                                <?php endif; ?>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
+                                                    <input type="text" class="form-control" name="periodo_tiempo[]">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Funciones realizadas:</label>
+                                                    <input type="text" class="form-control" name="funciones_realizadas[]">
+                                                </div>
                                             </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <!-- Si no hay experiencias, se muestra un campo vacío -->
-                                        <div class="experiencia-laboral border p-3 mb-3 rounded">
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Últimos lugares donde ha laborado:</label>
-                                                <input type="text" class="form-control" name="lugar_laborado[]">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Periodo de tiempo (meses):</label>
-                                                <input type="text" class="form-control" name="periodo_tiempo[]">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label fw-bold">Funciones realizadas:</label>
-                                                <input type="text" class="form-control" name="funciones_realizadas[]">
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="button" class="btn btn-primary btn-sm mt-2" id="agregar-experiencia">Agregar más experiencia</button>
+                                    </div>
                                 </div>
 
-                                <button type="button" class="btn btn-sm mt-2" id="agregar-experiencia">Agregar más experiencia</button>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="text-center mt-5 d-flex justify-content-center align-items-center gap-3">
+                                <button type="submit" class="btn">Actualizar</button>
+                                <a href="for-uno.php" id="cancelar-btn" class="btn ">Cancelar</a>
                             </div>
                         </div>
 
-                        <div class="text-center mt-5 d-flex justify-content-center align-items-center gap-3">
-                            <button type="submit" class="btn">Actualizar</button>
-                            <a href="for-uno.php" class="btn" id="cancelar-btn">Cancelar</a>
-                        </div>
                     </form>
+
 
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light text-center">
-        <div class="container">
-            <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
-        </div>
-    </footer>
+    <?php renderFooterAdmin(); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>

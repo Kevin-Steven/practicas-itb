@@ -4,14 +4,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let contadorClones = 1;
 
+    // Instancia del modal (Bootstrap 5)
+    const modalAdvertencia = new bootstrap.Modal(document.getElementById('modalAdvertencia'));
+
     botonAgregar.addEventListener('click', function() {
         const experiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
 
-        // Oculta todas las experiencias existentes
-        experiencias.forEach(exp => exp.style.display = 'none');
+        if (experiencias.length === 0) return; // Seguridad
+
+        const ultimaExperiencia = experiencias[experiencias.length - 1];
+        const campos = ultimaExperiencia.querySelectorAll('input, textarea');
+
+        let camposCompletos = true;
+
+        campos.forEach(input => {
+            if (input.value.trim() === '') {
+                camposCompletos = false;
+            }
+        });
+
+        if (!camposCompletos) {
+            // Muestra el modal si hay campos vacíos
+            modalAdvertencia.show();
+            return; // No continúa con el clon
+        }
 
         // Clona la última experiencia que estaba agregada (puede ser la primera si es la inicial)
-        const ultimaExperiencia = experiencias[experiencias.length - 1];
         const nuevaExperiencia = ultimaExperiencia.cloneNode(true);
 
         // Limpia los campos del clon
@@ -25,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
             encabezado.classList.add('titulo-experiencia', 'mb-3');
             nuevaExperiencia.prepend(encabezado);
         }
-        encabezado.textContent = `Nueva experiencia ${contadorClones}`;
+
+        encabezado.textContent = `Nueva experiencia ${contadorClones + 1}`;
 
         // Aplica estilos para distinguir
         nuevaExperiencia.style.border = '2px dashed #007bff';
@@ -53,16 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const experiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
 
             if (experiencias.length > 1) {
-                // Oculta todas menos la última
                 experiencias.forEach((exp, index) => {
                     exp.style.display = (index === experiencias.length - 1) ? 'block' : 'none';
                 });
 
-                // Si es un clon, agrega el estilo visual; si es la original, quítaselo
                 const ultima = experiencias[experiencias.length - 1];
                 const encabezado = ultima.querySelector('.titulo-experiencia');
+
                 if (encabezado) {
-                    encabezado.textContent = `Nueva experiencia ${experiencias.length - 1}`; // Restamos 1 porque la primera no cuenta como nueva
+                    encabezado.textContent = `Nueva experiencia ${experiencias.length - 1}`;
                     ultima.style.border = '2px dashed #007bff';
                     ultima.style.backgroundColor = '#f0f8ff';
                 } else {
@@ -70,9 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     ultima.style.backgroundColor = '';
                 }
 
-                contadorClones = experiencias.length; // Actualizamos el contador
+                contadorClones = experiencias.length;
             } else {
-                // Si solo queda una, muéstrala sin estilos especiales
                 experiencias[0].style.display = 'block';
                 experiencias[0].style.border = '';
                 experiencias[0].style.backgroundColor = '';

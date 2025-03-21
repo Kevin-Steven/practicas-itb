@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'sidebar-estudiante.php';
+require '../admin/sidebar-admin.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
   header("Location: ../../index.php");
@@ -41,46 +42,7 @@ if (isset($_SESSION['mensaje'])) {
 </head>
 
 <body>
-  <!-- Topbar con ícono de menú hamburguesa (fuera del menú) -->
-  <div class="topbar z-1">
-    <div class="menu-toggle">
-      <i class='bx bx-menu'></i>
-    </div>
-    <div class="topbar-right">
-      
-      <div class="user-profile dropdown">
-        <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-          <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
-          <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
-        </div>
-        <ul class="dropdown-menu dropdown-menu-end mt-2">
-          <li>
-            <a class="dropdown-item d-flex align-items-center" href="perfil.php">
-              <i class='bx bx-user me-2'></i>
-              Perfil
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
-              <i class='bx bx-lock me-2'></i>
-              Cambio de Clave
-            </a>
-          </li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-          <li>
-            <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
-              <i class='bx bx-log-out me-2'></i>
-              Cerrar Sesión
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
+ 
   <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
 
@@ -127,12 +89,8 @@ if (isset($_SESSION['mensaje'])) {
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="footer mt-auto py-3 bg-light text-center">
-    <div class="container">
-      <p class="mb-0">&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
-    </div>
-  </footer>
+  <?php renderFooterAdmin(); ?>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js"></script>

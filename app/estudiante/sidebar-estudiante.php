@@ -13,36 +13,36 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
         'for-cinco.php' => 'Carta de Compromiso',
         'for-seis.php' => 'Ficha de Entidad',
         'for-siete.php' => 'Compromiso Ético',
-        'for-ocho.php' => 'Plan de Rotación',
     ];
 
     $fase2_files = [
-        'for-nueve.php' => 'For 9',
-        'for-diez.php' => 'For 10',
-        'for-once.php' => 'For 11',
-        'for-doce.php' => 'For 12',
-        'for-trece.php' => 'For 13',
-        'for-catorce.php' => 'For 14',
-        'for-quince.php' => 'For 15',
-        'for-diecis.php' => 'For 16',
+        'for-ocho.php' => 'Informe Actividades',
+        'for-nueve.php' => 'Evaluación Conductual',
+        'for-diez.php' => 'Evaluación Final',
+        'for-once.php' => 'Supervisión Académico',
+        'for-doce.php' => 'Supervisión Entidad',
+        'for-trece.php' => 'Certificado Prácticas',
+        'for-catorce.php' => 'Base Legal',
+        'for-quince.php' => 'Evidencia de Prácticas',
+        'for-diecis.php' => 'Plan de Rotación',
     ];
 
     // Detectar si está en una página de Fase 1 o Fase 2 para abrir el collapse
     $fase1_open = in_array($currentFile, array_keys($fase1_files)) ? 'show' : '';
     $fase2_open = in_array($currentFile, array_keys($fase2_files)) ? 'show' : '';
-
     ?>
 
+    <!-- Sidebar -->
     <div class="sidebar z-2" id="sidebar">
         <div class="profile">
-            <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-            <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
-            <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
+            <img src="<?php echo htmlspecialchars($foto_perfil); ?>" alt="Foto de Perfil">
+            <h5><?php echo htmlspecialchars($primer_nombre . ' ' . $primer_apellido); ?></h5>
+            <p><?php echo ucfirst(htmlspecialchars($_SESSION['usuario_rol'])); ?></p>
         </div>
 
         <nav class="nav flex-column">
             <!-- Inicio -->
-            <a class="nav-link <?php echo ($currentFile == 'inicio-estudiante.php') ? 'active' : ''; ?>" href="inicio-estudiante.php">
+            <a class="nav-link <?php echo ($currentFile === 'inicio-estudiante.php') ? 'active' : ''; ?>" href="inicio-estudiante.php">
                 <i class='bx bx-home-alt'></i> Inicio
             </a>
 
@@ -55,7 +55,7 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
                 <ul class="list-unstyled ps-4">
                     <?php
                     foreach ($fase1_files as $file => $label) {
-                        $active = ($currentFile == $file) ? 'active' : '';
+                        $active = ($currentFile === $file) ? 'active' : '';
                         echo "<li><a class='nav-link $active' href='$file'><i class='bx bx-file'></i> $label</a></li>";
                     }
                     ?>
@@ -71,7 +71,7 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
                 <ul class="list-unstyled ps-4">
                     <?php
                     foreach ($fase2_files as $file => $label) {
-                        $active = ($currentFile == $file) ? 'active' : '';
+                        $active = ($currentFile === $file) ? 'active' : '';
                         echo "<li><a class='nav-link $active' href='$file'><i class='bx bx-file'></i> $label</a></li>";
                     }
                     ?>
@@ -80,6 +80,43 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
         </nav>
     </div>
 
-    <?php
+    <!-- Topbar -->
+    <div class="topbar z-1">
+        <div class="menu-toggle">
+            <i class='bx bx-menu'></i>
+        </div>
+
+        <div class="topbar-right">
+            <!-- Menú desplegable para el usuario -->
+            <div class="user-profile dropdown">
+                <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="<?php echo htmlspecialchars($foto_perfil); ?>" alt="Foto de Perfil">
+                    <span><?php echo htmlspecialchars($primer_nombre) . ' ' . htmlspecialchars($primer_apellido); ?></span>
+                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
+                </div>
+
+                <ul class="dropdown-menu dropdown-menu-end mt-2">
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="perfil.php">
+                            <i class='bx bx-user me-2'></i> Perfil
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
+                            <i class='bx bx-lock me-2'></i> Cambio de Clave
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
+                            <i class='bx bx-log-out me-2'></i> Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<?php
 }
 ?>

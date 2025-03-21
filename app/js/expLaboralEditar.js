@@ -2,19 +2,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const contenedorExperiencia = document.getElementById('contenedor-experiencia');
     const botonAgregar = document.getElementById('agregar-experiencia');
 
-    let contadorNuevasExperiencias = 1;
+    // Modal para advertencia de campos incompletos (reutilizando el modal que mencionaste)
+    const modalCamposIncompletos = new bootstrap.Modal(document.getElementById('modalCamposIncompletos'));
+
+    let contadorNuevasExperiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral').length || 1;
 
     botonAgregar.addEventListener('click', function () {
+        const experiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
+        const ultimaExperiencia = experiencias[experiencias.length - 1];
+
+        // ✅ Verificar que los campos de la última experiencia no estén vacíos antes de crear una nueva
+        const inputsUltima = ultimaExperiencia.querySelectorAll('input, textarea');
+        let camposCompletos = true;
+
+        inputsUltima.forEach(input => {
+            if (input.value.trim() === '') {
+                camposCompletos = false;
+            }
+        });
+
+        if (!camposCompletos) {
+            // ✅ Mostrar modal de advertencia si faltan campos por completar
+            modalCamposIncompletos.show();
+            return; // Evita continuar si no están completos
+        }
+
+        // ✅ Crear un nuevo contenedor de experiencia laboral
         const nuevaExperiencia = document.createElement('div');
         nuevaExperiencia.classList.add('experiencia-laboral', 'border', 'p-3', 'mb-3', 'rounded');
 
-        // Agregar título dinámico
+        // ✅ Agregar título dinámico
         const titulo = document.createElement('h5');
         titulo.classList.add('titulo-experiencia', 'mb-3');
-        titulo.textContent = `Nueva experiencia ${contadorNuevasExperiencias}`;
+        titulo.textContent = `Nueva experiencia ${contadorNuevasExperiencias + 1}`;
         nuevaExperiencia.appendChild(titulo);
 
-        // Campo: Lugar Laborado
+        // ✅ Campo: Lugar Laborado
         const lugarDiv = document.createElement('div');
         lugarDiv.classList.add('mb-2');
         lugarDiv.innerHTML = `
@@ -23,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         nuevaExperiencia.appendChild(lugarDiv);
 
-        // Campo: Periodo Tiempo
+        // ✅ Campo: Periodo Tiempo
         const periodoDiv = document.createElement('div');
         periodoDiv.classList.add('mb-2');
         periodoDiv.innerHTML = `
@@ -32,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         nuevaExperiencia.appendChild(periodoDiv);
 
-        // Campo: Funciones realizadas
+        // ✅ Campo: Funciones realizadas
         const funcionesDiv = document.createElement('div');
         funcionesDiv.classList.add('mb-2');
         funcionesDiv.innerHTML = `
@@ -41,24 +64,26 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         nuevaExperiencia.appendChild(funcionesDiv);
 
-        // Botón Eliminar
+        // ✅ Botón Eliminar
         const btnEliminar = document.createElement('button');
         btnEliminar.type = 'button';
         btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-experiencia');
         btnEliminar.textContent = 'Eliminar';
-        btnEliminar.style.backgroundColor = '#df1f1f'; // ✅ Color personalizado
-        btnEliminar.style.color = '#ffffff'; // Texto en blanco (opcional para contraste)
+        btnEliminar.style.backgroundColor = '#df1f1f';
+        btnEliminar.style.color = '#ffffff';
 
         nuevaExperiencia.appendChild(btnEliminar);
 
-        // Agregar al contenedor
+        // ✅ Agregar al contenedor
         contenedorExperiencia.appendChild(nuevaExperiencia);
 
-        // Incrementar contador para el título
+        // ✅ Incrementa el contador para el título
         contadorNuevasExperiencias++;
+
+        actualizarBotonesEliminar();
     });
 
-    // Delegación de eventos para eliminar experiencia
+    // ✅ Delegación de eventos para eliminar experiencia
     contenedorExperiencia.addEventListener('click', function (event) {
         if (event.target.classList.contains('eliminar-experiencia')) {
             const experienciaAEliminar = event.target.closest('.experiencia-laboral');
@@ -67,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 experienciaAEliminar.remove();
             }
 
-            // Reorganizamos los títulos si es necesario
+            // ✅ Reorganizamos los títulos
             const todasLasExperiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
             let nuevaExpIndex = 1;
 
@@ -79,36 +104,33 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             contadorNuevasExperiencias = nuevaExpIndex;
+
+            actualizarBotonesEliminar();
         }
     });
 
-    // Mostrar/ocultar botón eliminar en las existentes según cantidad
-    const todasLasExperiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
-    todasLasExperiencias.forEach((exp, index) => {
-        let btnEliminar = exp.querySelector('.eliminar-experiencia');
+    // ✅ Función para mostrar u ocultar el botón eliminar según cantidad
+    function actualizarBotonesEliminar() {
+        const todasLasExperiencias = contenedorExperiencia.querySelectorAll('.experiencia-laboral');
 
-        if (!btnEliminar) {
-            btnEliminar = document.createElement('button');
-            btnEliminar.type = 'button';
-            btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-experiencia');
-            btnEliminar.textContent = 'Eliminar';
+        todasLasExperiencias.forEach((exp, index) => {
+            let btnEliminar = exp.querySelector('.eliminar-experiencia');
 
-            btnEliminar.style.backgroundColor = '#df1f1f';
-            btnEliminar.style.color = '#ffffff'; // Texto en blanco (opcional)
+            if (!btnEliminar) {
+                btnEliminar = document.createElement('button');
+                btnEliminar.type = 'button';
+                btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-experiencia');
+                btnEliminar.textContent = 'Eliminar';
+                btnEliminar.style.backgroundColor = '#df1f1f';
+                btnEliminar.style.color = '#ffffff';
+                exp.appendChild(btnEliminar);
+            }
 
-            exp.appendChild(btnEliminar);
-        } else {
-            // ✅ Si el botón ya existe, nos aseguramos que tenga el color correcto
-            btnEliminar.style.backgroundColor = '#df1f1f';
-            btnEliminar.style.color = '#ffffff'; // Blanco para que el texto sea visible
-        }
+            // ✅ Oculta el botón si solo queda una experiencia
+            btnEliminar.style.display = (todasLasExperiencias.length === 1) ? 'none' : 'inline-block';
+        });
+    }
 
-        // Si solo hay una experiencia, ocultar el botón eliminar
-        if (todasLasExperiencias.length === 1) {
-            btnEliminar.style.display = 'none';
-        } else {
-            btnEliminar.style.display = 'inline-block';
-        }
-    });
-
+    // ✅ Inicializamos los botones al cargar
+    actualizarBotonesEliminar();
 });
