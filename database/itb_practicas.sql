@@ -1,6 +1,18 @@
 CREATE DATABASE IF NOT EXISTS itb_practicas;
 USE itb_practicas;
 
+CREATE TABLE carrera (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    carrera VARCHAR(255) NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+);
+
+CREATE TABLE cursos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    paralelo VARCHAR(255) NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+);
+
 CREATE TABLE usuarios (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	nombres VARCHAR(100) NOT NULL,
@@ -28,18 +40,6 @@ CREATE TABLE registro (
 	cedula VARCHAR(20) NOT NULL,
 	password VARCHAR(255) NOT NULL,
     CONSTRAINT fk_usuario_registro FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
-CREATE TABLE carrera (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    carrera VARCHAR(255) NOT NULL,
-    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
-);
-
-CREATE TABLE cursos (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    paralelo VARCHAR(255) NOT NULL,
-    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
 );
 
 CREATE TABLE documento_uno (
