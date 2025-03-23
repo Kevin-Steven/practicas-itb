@@ -66,7 +66,7 @@ CREATE TABLE documento_uno (
     documento_uno_id INT(11),
     lugar_laborado VARCHAR(255) NULL,
     periodo_tiempo_meses VARCHAR(255) NULL,
-    funciones_realizadas TEXT,
+    funciones_realizadas TEXT NULL,
     FOREIGN KEY (documento_uno_id) REFERENCES documento_uno(id) ON DELETE CASCADE
 );
 
@@ -90,10 +90,17 @@ CREATE TABLE documento_dos (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
   
+  -- ! 3 CARTA DE ASIGNACIÓN DE ESTUDIANTE DE DESRROLLO DE SOFTWARE + ciudad provincia, departamento, nombres_tutor_entidad, cargo_tutor_entidad, numero_telefono_tutor_entidad
   CREATE TABLE documento_tres (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id int(11) NOT NULL,
   nombre_doc VARCHAR(250) NOT NULL DEFAULT '3 CARTA DE ASIGNACIÓN DE ESTUDIANTE DE DESRROLLO DE SOFTWARE',
+  nombre_entidad_receptora VARCHAR(255) NOT NULL,
+  departamento_entidad_receptora VARCHAR(255) NOT NULL,
+  nombres_tutor_receptor VARCHAR(255) NOT NULL,
+  cargo_tutor_receptor VARCHAR(255) NOT NULL,
+  numero_telefono_tutor_receptor VARCHAR(10) NOT NULL,
+  ciudad_entidad_receptora VARCHAR(255) NOT NULL,
   motivo_rechazo TEXT NULL,
   estado ENUM('Pendiente', 'Corregir', 'Aprobado')DEFAULT 'Pendiente',
   fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
@@ -111,37 +118,36 @@ CREATE TABLE documento_dos (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
   
+  -- ! 5 CARTA DE COMPROMISO - Se extrajo la ciudad y el nombre de la entidad receptora
   CREATE TABLE documento_cinco (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id int(11) NOT NULL,
   nombre_doc VARCHAR(250) NOT NULL DEFAULT '5 CARTA DE COMPROMISO',
-  nombre_entidad_receptora VARCHAR(255) NOT NULL,
   ruc VARCHAR(13) NOT NULL,
   direccion_entidad_receptora VARCHAR(255) NOT NULL,
   logo_entidad_receptora VARCHAR(255) NOT NULL,
-  nombre_ciudad VARCHAR(255) NOT NULL,
   nombre_representante_rrhh VARCHAR(255) NOT NULL,
-  numero_representante_rrhh VARCHAR(10) NOT NULL,
-  correo_representante VARCHAR(255) NOT NULL,
+  numero_institucional VARCHAR(10) NOT NULL,
+  correo_institucional VARCHAR(255) NOT NULL,
   motivo_rechazo TEXT NULL,
   estado ENUM('Pendiente', 'Corregir', 'Aprobado') DEFAULT 'Pendiente',
   fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
-  
+
+  -- ! 6 FICHA DE ENTIDAD RECEPTORA - SE Extrajo el nombre_tutor_entidad, cargo_tutor_entidad, numero_telefono_tutor_entidad
 CREATE TABLE documento_seis (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id int(11) NOT NULL,
   nombre_doc VARCHAR(250) NOT NULL DEFAULT '6 FICHA DE ENTIDAD RECEPTORA',
   actividad_economica VARCHAR(255) NOT NULL,
   provincia VARCHAR(255) NOT NULL,
-  horario_practica VARCHAR(255) NOT NULL,
   jornada_laboral VARCHAR(255) NOT NULL,
-  nombres_representante VARCHAR(255) NOT NULL,
-  cargo_tutor VARCHAR(255) NOT NULL,
   numero_practicas VARCHAR(255) NOT NULL,
   numero_telefono VARCHAR(10) NOT NULL,
   numero_institucional VARCHAR(20) DEFAULT 'NO APLICA',
+  hora_inicio TIME NOT NULL,
+  hora_fin TIME NOT NULL,
   motivo_rechazo TEXT NULL,	
   estado ENUM('Pendiente', 'Corregir', 'Aprobado')DEFAULT 'Pendiente',
   fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
@@ -158,11 +164,11 @@ CREATE TABLE documento_siete (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
   
+  -- ! 8 INFORME DE ACTIVIDADES - SE Extrajo el departamento
  CREATE TABLE documento_ocho (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT(11) NOT NULL,
   nombre_doc VARCHAR(250) NOT NULL DEFAULT '8 INFORME DE ACTIVIDADES',
-  departamento VARCHAR(255) NOT NULL,
   motivo_rechazo TEXT NULL,
   estado ENUM('Pendiente', 'Corregir', 'Aprobado') DEFAULT 'Pendiente',
   fecha_subida TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
@@ -203,13 +209,13 @@ CREATE TABLE documento_nueve (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 
-  
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');
 INSERT INTO carrera (carrera) VALUES ('Tecnología Superior en Desarrollo de software');
   
+-- TRIGGERS --
 DELIMITER $$
 CREATE TRIGGER after_insert_documento_dos
-AFTER INSERT ON documento_dos
+AFTER INSERT ON documento_seis
 FOR EACH ROW
 BEGIN
     INSERT INTO documento_tres (usuario_id, nombre_doc, motivo_rechazo, estado, fecha_subida)

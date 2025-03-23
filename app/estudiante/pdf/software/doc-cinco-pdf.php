@@ -1,6 +1,6 @@
 <?php
-require '../../config/config.php';
-require_once('../../../TCPDF-main/tcpdf.php');
+require '../../../config/config.php';
+require_once('../../../../TCPDF-main/tcpdf.php');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
@@ -15,10 +15,11 @@ if ($id <= 0) {
 // Consulta para obtener los datos del estudiante
 $sql = "SELECT 
             u.nombres, u.apellidos, u.cedula, c.carrera AS carrera,
-            cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, d5.nombre_entidad_receptora, 
-            d5.ruc, d5.direccion_entidad_receptora, d5.logo_entidad_receptora, d5.nombre_ciudad, 
-            d5.nombre_representante_rrhh, d5.numero_representante_rrhh, d5.correo_representante, d5.nombre_doc
+            cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, d3.nombre_entidad_receptora, 
+            d5.ruc, d5.direccion_entidad_receptora, d5.logo_entidad_receptora, d3.ciudad_entidad_receptora, 
+            d5.nombre_representante_rrhh, d5.numero_institucional, d5.correo_institucional, d5.nombre_doc
         FROM documento_dos d2
+        LEFT JOIN documento_tres d3 ON d2.usuario_id = d3.usuario_id
         JOIN documento_cinco d5 ON d2.usuario_id = d5.usuario_id
         JOIN usuarios u ON d2.usuario_id = u.id
         INNER JOIN carrera c ON u.carrera_id = c.id
@@ -48,10 +49,10 @@ $nombre_entidad_receptora = $estudiante['nombre_entidad_receptora'] ?: 'N/A';
 $ruc = $estudiante['ruc'] ?: 'N/A';
 $direccion_entidad_receptora = $estudiante['direccion_entidad_receptora'] ?: 'N/A';
 $logo_entidad_receptora = $estudiante['logo_entidad_receptora'] ?: 'N/A';
-$nombre_ciudad = $estudiante['nombre_ciudad'] ?: 'N/A';
+$nombre_ciudad = $estudiante['ciudad_entidad_receptora'] ?: 'N/A';
 $nombre_representante_rrhh = $estudiante['nombre_representante_rrhh'] ?: 'N/A';
-$numero_representante_rrhh = $estudiante['numero_representante_rrhh'] ?: 'N/A';
-$correo_representante = $estudiante['correo_representante'] ?: 'N/A';
+$numero_institucional = $estudiante['numero_institucional'] ?: 'N/A';
+$correo_institucional = $estudiante['correo_institucional'] ?: 'N/A';
 
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
 
@@ -118,7 +119,7 @@ $pdf->SetMargins(23, 35, 23);
 $pdf->AddPage();
 $pdf->SetY(62);
 
-$pdf->Image('../../uploads/logo-entidad/'. $logo_entidad_receptora, 85, 20, 40, 40, '');
+$pdf->Image('../../../uploads/logo-entidad/'. $logo_entidad_receptora, 85, 20, 40, 40, '');
 
 $pdf->SetFont('times', 'B', 14);
 $pdf->Cell(0, 1, 'CARTA DE COMPROMISO', 0, 1, 'C');
@@ -160,7 +161,7 @@ $pdf->Cell(0, 1, $nombre_representante_rrhh, 0, 1, 'L');
 $pdf->Cell(0, 8, 'Representante de Talento Humano de la entidad receptora', 0, 1, 'L');
 $pdf->SetFont('times', '', 11);
 $pdf->Cell(0, 8, 'Dirección: '.$direccion_entidad_receptora, 0, 1, 'L');
-$pdf->Cell(0, 8, 'Teléfono: '.$numero_representante_rrhh, 0, 1, 'L');
-$pdf->Cell(0, 8, 'Correo electrónico: '.$correo_representante, 0, 1, 'L');
+$pdf->Cell(0, 8, 'Teléfono: '.$numero_institucional, 0, 1, 'L');
+$pdf->Cell(0, 8, 'Correo electrónico: '.$correo_institucional, 0, 1, 'L');
 
 $pdf->Output($nombre_doc .'.pdf', 'I');

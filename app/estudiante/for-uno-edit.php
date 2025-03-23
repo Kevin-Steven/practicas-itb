@@ -161,7 +161,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'];
 
             <div class="card shadow-lg container-fluid">
                 <div class="card-body">
-                    <form action="../estudiante/logic/documento-ocho-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
+                    <form action="../estudiante/logic/documento-uno-actualizar.php" class="inscripcion" method="POST" enctype="multipart/form-data">
 
                         <input type="hidden" name="documento_id" value="<?php echo htmlspecialchars($documento_uno_id); ?>">
 

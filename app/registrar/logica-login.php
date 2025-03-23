@@ -43,9 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'administrador':
                     header("Location: ../admin/inicio-administrador.php");
                     break;
-                case 'docente':
-                    header("Location: ../docente/docente-inicio.php");
-                    break;
                 default:
                     header("Location: ../estudiante/inicio-estudiante.php");
                     break;

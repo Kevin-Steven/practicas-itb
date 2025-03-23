@@ -356,7 +356,7 @@ $departamento = $usuario_info['departamento'] ?? null;
                                                 <div class="modal fade" id="modalImprimir<?= $usuario_info['documento_ocho_id']; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?= $usuario_info['documento_ocho_id']; ?>" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <form action="../estudiante/pdf/doc-ocho-pdf.php" method="GET" target="_blank">
+                                                            <form action="../estudiante/pdf/software/doc-ocho-pdf.php" method="GET" target="_blank">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="modalImprimirLabel<?= $usuario_info['documento_ocho_id']; ?>">¿Desea generar el documento?</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

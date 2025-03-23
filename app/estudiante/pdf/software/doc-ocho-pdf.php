@@ -1,6 +1,6 @@
 <?php
-require '../../config/config.php';
-require_once('../../../TCPDF-main/tcpdf.php');
+require '../../../config/config.php';
+require_once('../../../../TCPDF-main/tcpdf.php');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
@@ -96,7 +96,7 @@ class CustomPDF extends TCPDF
     {
         $margen_derecha = 10; // Ajusta este valor según necesites
 
-        $this->Image('../../../images/index.png', 15, 12, 20);
+        $this->Image('../../../../images/index.png', 15, 12, 20);
 
         // Fuente y alineación
         $this->SetFont('times', 'B', 11);

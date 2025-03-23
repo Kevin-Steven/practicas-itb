@@ -253,7 +253,7 @@ if (!$conn) {
                         <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="../estudiante/pdf/doc-dos-pdf.php" method="GET" target="_blank">
+                                    <form action="../estudiante/pdf/software/doc-dos-pdf.php" method="GET" target="_blank">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

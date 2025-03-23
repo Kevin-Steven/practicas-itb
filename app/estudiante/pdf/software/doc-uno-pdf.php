@@ -1,6 +1,6 @@
 <?php
-require '../../config/config.php';
-require_once('../../../TCPDF-main/tcpdf.php');
+require '../../../config/config.php';
+require_once('../../../../TCPDF-main/tcpdf.php');
 
 // Verificar si el ID está presente en la URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -58,7 +58,7 @@ $promedio = $estudiante['promedio_notas'] ?: 'N/A';
 $foto_perfil_path = $estudiante['foto_perfil'] ?: 'Sin Foto';
 $periodoAcademico = $estudiante['periodo'] ?: 'N/A';
 $nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
-$foto_perfil = '../' . $foto_perfil_path;
+$foto_perfil = '../../' . $foto_perfil_path;
 
 
 class CustomPDF extends TCPDF
@@ -67,7 +67,7 @@ class CustomPDF extends TCPDF
     {
         $margen_derecha = 10; // Ajusta este valor según necesites
 
-        $this->Image('../../../images/index.png', 15, 12, 20);
+        $this->Image('../../../../images/index.png', 15, 12, 20);
 
         // Fuente y alineación
         $this->SetFont('times', 'B', 11);

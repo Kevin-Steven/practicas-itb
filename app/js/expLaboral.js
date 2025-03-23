@@ -29,12 +29,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return; // No continúa con el clon
         }
 
-        // Clona la última experiencia que estaba agregada (puede ser la primera si es la inicial)
+        // Clona la última experiencia que estaba agregada
         const nuevaExperiencia = ultimaExperiencia.cloneNode(true);
 
-        // Limpia los campos del clon
+        // Limpia los campos del clon y les agrega el required
         const inputs = nuevaExperiencia.querySelectorAll('input, textarea');
-        inputs.forEach(input => input.value = '');
+        inputs.forEach(input => {
+            input.value = '';
+            input.required = true; // 👈 Aquí le colocamos el required
+        });
 
         // Agrega encabezado dinámico si no existe
         let encabezado = nuevaExperiencia.querySelector('.titulo-experiencia');
@@ -81,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (encabezado) {
                     encabezado.textContent = `Nueva experiencia ${experiencias.length - 1}`;
-                    ultima.style.border = '2px dashed #007bff';
+                    ultima.style.border = '2px dashed #df1f1f';
                     ultima.style.backgroundColor = '#f0f8ff';
                 } else {
                     ultima.style.border = '';

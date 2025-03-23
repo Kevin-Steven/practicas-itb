@@ -1,8 +1,8 @@
 <?php
 session_start();
-require '../../config/config.php'; // Ajusta si tu config está en otra ruta
+require '../../config/config.php';
 
-// 1. Verificar la sesión activa
+// 1. Verificar sesión activa
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -10,68 +10,61 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id_session = $_SESSION['usuario_id'];
 
-// 2. Verificar que el usuario_id enviado en el formulario coincida con el de la sesión
+// 2. Verificar que el usuario_id del formulario coincida con el de sesión
 $usuario_id_form = intval($_POST['usuario_id'] ?? 0);
-
 if ($usuario_id_form !== $usuario_id_session) {
     header("Location: ../for-cinco.php?status=invalid_user");
     exit();
 }
 
-// 3. Recibir y validar los datos del formulario
-$nombre_entidad = trim($_POST['nombre_entidad'] ?? '');
+// 3. Recibir los datos del formulario
 $ruc = trim($_POST['ruc'] ?? '');
 $direccion_entidad = trim($_POST['direccion-entidad'] ?? '');
-$nombre_ciudad = trim($_POST['ciudad'] ?? '');
-$nombre_representante = trim($_POST['nombres-representante-rrhh'] ?? '');
-$correo_representante = trim($_POST['correo-entidad'] ?? '');
-$numero_representante_rrhh = trim($_POST['numero_representante_rrhh'] ?? '');
+$nombre_representante_rrhh = trim($_POST['nombres-representante-rrhh'] ?? '');
+$correo_institucional = trim($_POST['correo-institucional'] ?? '');
+$numero_institucional = trim($_POST['numero_institucional'] ?? '');
 $estado = 'Pendiente';
 
-$nombre_representante = mb_strtolower($nombre_representante, 'UTF-8');
-$nombre_representante = mb_convert_case($nombre_representante, MB_CASE_TITLE, "UTF-8");
+$nombre_representante_rrhh = mb_strtolower($nombre_representante_rrhh, 'UTF-8');
+$nombre_representante_rrhh = mb_convert_case($nombre_representante_rrhh, MB_CASE_TITLE, "UTF-8");
 
-// Validaciones básicas
+// 4. Validaciones básicas
 if (
-    empty($nombre_entidad) ||
     empty($ruc) ||
     empty($direccion_entidad) ||
-    empty($nombre_ciudad) ||
-    empty($nombre_representante) ||
-    empty($correo_representante) ||
-    empty($numero_representante_rrhh)
+    empty($nombre_representante_rrhh) ||
+    empty($correo_institucional) ||
+    empty($numero_institucional)
 ) {
     header("Location: ../for-cinco.php?status=missing_data");
     exit();
 }
 
-// Validación del RUC: debe tener exactamente 13 dígitos
+// Validación de RUC: 13 dígitos numéricos
 if (!preg_match('/^\d{13}$/', $ruc)) {
     header("Location: ../for-cinco.php?status=invalid_ruc");
     exit();
 }
 
-// Validación del correo electrónico
-if (!filter_var($correo_representante, FILTER_VALIDATE_EMAIL)) {
+// Validación de correo electrónico
+if (!filter_var($correo_institucional, FILTER_VALIDATE_EMAIL)) {
     header("Location: ../for-cinco.php?status=invalid_email");
     exit();
 }
 
-// Validación del número de teléfono
-if (!preg_match('/^\d{10}$/', $numero_representante_rrhh)) {
+// Validación de número de teléfono: 10 dígitos numéricos
+if (!preg_match('/^\d{10}$/', $numero_institucional)) {
     header("Location: ../for-cinco.php?status=invalid_phone");
     exit();
 }
 
-// 4. Manejo del archivo logo de la entidad
+// 5. Manejo del archivo (logo de la entidad)
 if (isset($_FILES['logo-entidad']) && $_FILES['logo-entidad']['error'] === UPLOAD_ERR_OK) {
-
     $archivo_tmp = $_FILES['logo-entidad']['tmp_name'];
     $nombre_original = $_FILES['logo-entidad']['name'];
 
-    // Extensión del archivo
-    $extension = pathinfo($nombre_original, PATHINFO_EXTENSION);
-    $extension = strtolower($extension);
+    // Obtener extensión y convertir a minúscula
+    $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
 
     // Extensiones permitidas
     $extensiones_permitidas = ['png', 'jpg', 'jpeg', 'gif'];
@@ -81,15 +74,13 @@ if (isset($_FILES['logo-entidad']) && $_FILES['logo-entidad']['error'] === UPLOA
         exit();
     }
 
-    // Ruta de guardado
+    // Ruta donde se guardará el logo
     $ruta_destino = '../../uploads/logo-entidad/';
-    
-    // Crear el directorio si no existe
     if (!is_dir($ruta_destino)) {
         mkdir($ruta_destino, 0775, true);
     }
 
-    // Nombre final del archivo (ejemplo: logo-1234567890123.png)
+    // Nombre final del archivo
     $nombre_archivo_logo = 'logo-' . $ruc . '.' . $extension;
     $ruta_completa_logo = $ruta_destino . $nombre_archivo_logo;
 
@@ -104,19 +95,18 @@ if (isset($_FILES['logo-entidad']) && $_FILES['logo-entidad']['error'] === UPLOA
     exit();
 }
 
-// 5. Insertar los datos en la tabla documento_cinco
+// 6. Insertar los datos en la tabla documento_cinco
 $sql_insert = "INSERT INTO documento_cinco (
     usuario_id, 
-    nombre_entidad_receptora, 
+    nombre_doc,
     ruc, 
     direccion_entidad_receptora, 
     logo_entidad_receptora, 
-    nombre_ciudad, 
     nombre_representante_rrhh, 
-    numero_representante_rrhh, 
-    correo_representante, 
+    numero_institucional, 
+    correo_institucional, 
     estado
-) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+) VALUES (?, '5 CARTA DE COMPROMISO', ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt_insert = $conn->prepare($sql_insert);
 
@@ -125,23 +115,19 @@ if (!$stmt_insert) {
     exit();
 }
 
-// Datos que vas a insertar
-$nombre_doc_default = '5 CARTA DE COMPROMISO.pdf';
-
 $stmt_insert->bind_param(
-    "isssssssss",
+    "isssssss",
     $usuario_id_session,
-    $nombre_entidad,
     $ruc,
     $direccion_entidad,
     $nombre_archivo_logo,
-    $nombre_ciudad,
-    $nombre_representante,
-    $numero_representante_rrhh,
-    $correo_representante,
+    $nombre_representante_rrhh,
+    $numero_institucional,
+    $correo_institucional,
     $estado
 );
 
+// Ejecutar el insert
 if ($stmt_insert->execute()) {
     header("Location: ../for-cinco.php?status=success");
     exit();
@@ -152,5 +138,4 @@ if ($stmt_insert->execute()) {
 
 $stmt_insert->close();
 $conn->close();
-
 ?>

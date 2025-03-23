@@ -1,6 +1,6 @@
 <?php
-require '../../config/config.php';
-require_once('../../../TCPDF-main/tcpdf.php');
+require '../../../config/config.php';
+require_once('../../../../TCPDF-main/tcpdf.php');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
@@ -14,15 +14,23 @@ if ($id <= 0) {
 
 // Consulta para obtener los datos del estudiante
 $sql = "SELECT 
-            u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, c.carrera AS carrera,
-            cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
-            d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
-            d2.estado, d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico
-        FROM documento_dos d2
-        JOIN usuarios u ON d2.usuario_id = u.id
-        INNER JOIN carrera c ON u.carrera_id = c.id
-        LEFT JOIN cursos cu ON u.curso_id = cu.id  
-        WHERE d2.id = $id";
+    u.nombres, 
+    u.apellidos, 
+    u.cedula, 
+    c.carrera AS carrera,
+    d2.fecha_inicio, 
+    d2.fecha_fin,
+    d2.hora_practicas, 
+    d2.nombre_tutor_academico, 
+    d3.nombres_tutor_receptor, 
+    d3.cargo_tutor_receptor, 
+    d3.nombre_entidad_receptora, 
+    d3.ciudad_entidad_receptora
+FROM documento_tres d3
+JOIN usuarios u ON d3.usuario_id = u.id
+LEFT JOIN documento_dos d2 ON d3.usuario_id = d2.usuario_id
+INNER JOIN carrera c ON u.carrera_id = c.id
+WHERE d3.id = $id;";
 
 $result = $conn->query($sql);
 
@@ -37,36 +45,34 @@ $estudiante = $result->fetch_assoc();
 // Extraer variables
 $nombres = $estudiante['apellidos'] . ' ' . $estudiante['nombres'];
 $cedula = $estudiante['cedula'] ?: 'N/A';
-$direccion = $estudiante['direccion'] ?: 'N/A';
-$telefono = $estudiante['telefono'] ?: 'N/A';
-$convencional = $estudiante['convencional'] ?: 'NO APLICA';
-$email = $estudiante['email'] ?: 'N/A';
 $carrera = $estudiante['carrera'] ?: 'N/A';
-$paralelo = $estudiante['paralelo'] ?: 'N/A';
-$periodoAcademico = $estudiante['periodo'] ?: 'N/A';
-$estado = $estudiante['estado'] ?: 'N/A';
 $hora_practicas = $estudiante['hora_practicas'] ?: 'N/A';
-$calificacion = $estudiante['nota_eva_s'] ?: 'N/A';
-$eva_s = $estudiante['documento_eva_s'] ?: 'N/A';
 $nombre_tutor_academico = $estudiante['nombre_tutor_academico'] ?: 'N/A';
-$cedula_tutor_academico = $estudiante['cedula_tutor_academico'] ?: 'N/A';
-$correo_tutor_academico = $estudiante['correo_tutor_academico'] ?: 'N/A';
-
+$nombre_tutor_receptor = $estudiante['nombres_tutor_receptor'] ?: 'N/A';
+$cargo_tutor_receptor = $estudiante['cargo_tutor_receptor'] ?: 'N/A';
+$ciudad_entidad_receptora = $estudiante['ciudad_entidad_receptora'] ?: 'N/A';
+$nombre_entidad_receptora = $estudiante['nombre_entidad_receptora'] ?: 'N/A';
 
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
 $fecha_inicio_corta = $estudiante['fecha_inicio'] ? formato_fecha_corta($estudiante['fecha_inicio']) : 'N/A';
 
 $fecha_fin_larga = $estudiante['fecha_fin'] ? formato_fecha_larga($estudiante['fecha_fin']) : 'N/A';
-$fecha_fin_corta = $estudiante['fecha_fin'] ? formato_fecha_corta($estudiante['fecha_fin']) : 'N/A';
-
-$hora_inicio = $estudiante['hora_inicio'] ? formato_hora($estudiante['hora_inicio']) : 'N/A';
-$hora_fin = $estudiante['hora_fin'] ? formato_hora($estudiante['hora_fin']) : 'N/A';
 
 function formato_fecha_larga($fecha)
 {
     $meses = [
-        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
     ];
 
     $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha);
@@ -102,15 +108,13 @@ function formato_hora($hora)
     return $hora_obj->format('H:i');
 }
 
-
-
 class CustomPDF extends TCPDF
 {
     public function Header()
     {
         $margen_derecha = 10; // Ajusta este valor según necesites
 
-        $this->Image('../../../images/index.png', 15, 12, 20);
+        $this->Image('../../../../images/index.png', 15, 12, 20);
 
         // Fuente y alineación
         $this->SetFont('times', 'B', 11);
@@ -142,10 +146,7 @@ class CustomPDF extends TCPDF
         }
     }
 
-    public function Footer()
-    {
-        // Dejamos vacío para no tener pie de página
-    }
+    public function Footer() {}
 
     // Helper para filas de 2 celdas
     public function MultiCellRow($data, $widths, $height)
@@ -186,29 +187,29 @@ $pdf->SetY(38);
 
 $pdf->SetFont('times', 'B', 14);
 $pdf->Cell(0, 1, 'ASIGNACIÓN DE ESTUDIANTE A PRÁCTICAS LABORALES', 0, 1, 'C');
-$pdf->Ln(3);
+$pdf->Ln(2);
 $pdf->SetFont('times', '', 11);
-$pdf->Cell(0, 1, 'Guayaquil, '. $fecha_inicio_larga, 0, 1, 'R');
-$pdf->Ln(3);
+$pdf->Cell(0, 1, 'Guayaquil, ' . $fecha_inicio_larga, 0, 1, 'R');
+$pdf->Ln(2);
 
 $pdf->SetFont('times', 'B', 11);
-$pdf->Cell(0, 1, 'Ing. Johanna Maritza Cornejo González', 0, 1, 'L');
-$pdf->Cell(0, 1, 'Jefe Administrativo.', 0, 1, 'L');
-$pdf->Cell(0, 1, 'Cooperativa de Transporte Brisas de Santay Panorama', 0, 1, 'L');
-$pdf->Cell(0, 1, 'Durán', 0, 1, 'L');
+$pdf->Cell(0, 1, 'Ing. ' . $nombre_tutor_receptor, 0, 1, 'L');
+$pdf->Cell(0, 1, $cargo_tutor_receptor, 0, 1, 'L');
+$pdf->Cell(0, 1, $nombre_entidad_receptora, 0, 1, 'L');
+$pdf->Cell(0, 1, $ciudad_entidad_receptora, 0, 1, 'L');
 $pdf->Ln(5);
 
 $pdf->SetFont('times', '', 11);
 $html_parrafo = '
 <p style="font-size: 11px; line-height: 0.1;">En su despacho.</p>
 <p style=" font-size: 11px; line-height: 1.3;">De mis consideraciones:<br>Reciba un cordial saludo de quienes conforman el Instituto Superior Bolivariano de Tecnología (ITB), de la
-Facultad de Ciencias Empresariales y Sistemas, y su carrera <strong>'. $carrera .'</strong>.
-Se detalla los datos de nuestro estudiante <strong>'. $nombres .'</strong>, con cédula de identidad número
-<strong>'. $cedula .'</strong>, que estará bajo la supervisión del: <strong>Ing. '. $nombre_tutor_academico .'</strong>, con una
-duración de <strong>'. $hora_practicas .'</strong>, comenzando el día <strong>'. $fecha_inicio_larga .'</strong> y terminando el día <strong>'. $fecha_fin_larga .'</strong>. 
+Facultad de Ciencias Empresariales y Sistemas, y su carrera <strong>' . $carrera . '</strong>.
+Se detalla los datos de nuestro estudiante <strong>' . $nombres . '</strong>, con cédula de identidad número
+<strong>' . $cedula . '</strong>, que estará bajo la supervisión del: <strong>Ing. ' . $nombre_tutor_academico . '</strong>, con una
+duración de <strong>' . $hora_practicas . '</strong>, comenzando el día <strong>' . $fecha_inicio_larga . '</strong> y terminando el día <strong>' . $fecha_fin_larga . '</strong>. 
 </p>';
 
-$pdf->writeHTMLCell('','','','',$html_parrafo,0, 1, 0,true,'J', true);
+$pdf->writeHTMLCell('', '', '', '', $html_parrafo, 0, 1, 0, true, 'J', true);
 $pdf->Ln(7);
 
 
@@ -228,7 +229,7 @@ $html_parrafo_2 = '
     <li>Implementar y monitorear servicios de redes LAN.</li>  
    </ul>';
 
-$pdf->writeHTMLCell('','','','',$html_parrafo_2,0, 1, 0,true,'J', true);
+$pdf->writeHTMLCell('', '', '', '', $html_parrafo_2, 0, 1, 0, true, 'J', true);
 $pdf->Ln(7);
 
 $html_parrafo_3 = '
@@ -237,7 +238,7 @@ que se le dé a la presente, en función del mejoramiento de la calidad de la Ed
 Con sentimientos de estima y respeto, me suscribo de usted.
 Atentamente, </p>';
 
-$pdf->writeHTMLCell('','','','',$html_parrafo_3,0, 1, 0,true,'J', true);
+$pdf->writeHTMLCell('', '', '', '', $html_parrafo_3, 0, 1, 0, true, 'J', true);
 $pdf->Ln(6);
 
 $pdf->Ln(30);

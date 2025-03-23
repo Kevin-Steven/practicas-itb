@@ -19,14 +19,12 @@ $usuario_id = $_SESSION['usuario_id'];
 $sql_doc_cinco = "SELECT 
        d5.id,
        d5.estado, 
-       d5.nombre_entidad_receptora,
        d5.ruc,
        d5.direccion_entidad_receptora,
        d5.logo_entidad_receptora,
-       d5.nombre_ciudad,
        d5.nombre_representante_rrhh,
-       d5.numero_representante_rrhh,
-       d5.correo_representante
+       d5.numero_institucional,
+       d5.correo_institucional
 FROM documento_cinco d5
 WHERE d5.usuario_id = ?
 ORDER BY d5.id DESC";
@@ -39,15 +37,12 @@ $result_doc_cinco = $stmt_doc_cinco->get_result();
 while ($row = $result_doc_cinco->fetch_assoc()) {
     $id = $row['id'] ?? null;
     $estado = $row['estado'] ?? null;
-    $nombre_entidad_receptora = $row['nombre_entidad_receptora'] ?? null;
     $ruc = $row['ruc'] ?? null;
     $direccion_entidad_receptora = $row['direccion_entidad_receptora'] ?? null;
     $logo_entidad_receptora = $row['logo_entidad_receptora'] ?? null;
-    $nombre_ciudad = $row['nombre_ciudad'] ?? null;
     $nombre_representante_rrhh = $row['nombre_representante_rrhh'] ?? null;
-    $numero_representante_rrhh = $row['numero_representante_rrhh'] ?? null;
-    $correo_representante = $row['correo_representante'] ?? null;
-    $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
+    $numero_institucional = $row['numero_institucional'] ?? null;
+    $correo_institucional = $row['correo_institucional'] ?? null;
 }
 
 $stmt_doc_cinco->close();
@@ -95,14 +90,6 @@ if (!$conn) {
                                     </a>
                                 </div>
                                 <div class="mb-2">
-                                    <label for="ciudad" class="form-label fw-bold">Ciudad:</label>
-                                    <input type="text" class="form-control" id="ciudad" name="ciudad" value="<?php echo $nombre_ciudad; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <label for="nombre_entidad" class="form-label fw-bold">Nombre entidad receptora:</label>
-                                    <input type="text" class="form-control" id="nombre_entidad" name="nombre_entidad" value="<?php echo $nombre_entidad_receptora; ?>">
-                                </div>
-                                <div class="mb-2">
                                     <label for="ruc" class="form-label fw-bold">RUC:</label>
                                     <input type="text" class="form-control" id="ruc" name="ruc" value="<?php echo $ruc; ?>">
                                 </div>
@@ -118,12 +105,12 @@ if (!$conn) {
                                     <input type="text" class="form-control" id="nombres-representante-rrhh" name="nombres-representante-rrhh" value="<?php echo $nombre_representante_rrhh; ?>">
                                 </div>
                                 <div class="mb-2">
-                                    <label for="correo-entidad" class="form-label fw-bold">Correo electrónico de la entidad receptora:</label>
-                                    <input type="email" class="form-control" id="correo-entidad" name="correo-entidad" value="<?php echo $correo_representante; ?>">
+                                    <label for="correo-institucional" class="form-label fw-bold">Correo Institucional:</label>
+                                    <input type="email" class="form-control" id="correo-institucional" name="correo-institucional" value="<?php echo $correo_institucional; ?>">
                                 </div>
                                 <div class="mb-2">
-                                    <label for="numero_representante_rrhh" class="form-label fw-bold">Teléfono:</label>
-                                    <input type="number" class="form-control" id="numero_representante_rrhh" name="numero_representante_rrhh" value="<?php echo $numero_representante_rrhh; ?>">
+                                    <label for="numero_institucional" class="form-label fw-bold">Teléfono Institucional:</label>
+                                    <input type="text" class="form-control" id="numero_institucional" maxlength="10" name="numero_institucional" value="<?php echo $numero_institucional; ?>" oninput="validateInput(this)">
                                 </div>
                             </div>
                             <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
@@ -145,6 +132,7 @@ if (!$conn) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js"></script>
+    <script src="../js/number.js"></script>
 </body>
 
 </html>

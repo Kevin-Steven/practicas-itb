@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id_session = $_SESSION['usuario_id'];
 
-// 2. Verificar el usuario_id recibido desde el form
+// 2. Verificar el usuario_id recibido desde el formulario
 $usuario_id_form = intval($_POST['usuario_id'] ?? 0);
 
 if ($usuario_id_form !== $usuario_id_session) {
@@ -18,43 +18,56 @@ if ($usuario_id_form !== $usuario_id_session) {
     exit();
 }
 
-// 3. Recibir datos del formulario
-$nombre_entidad_receptora = trim($_POST['nombre_entidad'] ?? '');
+// 3. Recibir y limpiar datos del formulario
 $ruc = trim($_POST['ruc'] ?? '');
 $direccion_entidad_receptora = trim($_POST['direccion-entidad'] ?? '');
-$nombre_ciudad = trim($_POST['ciudad'] ?? '');
 $nombre_representante = trim($_POST['nombres-representante-rrhh'] ?? '');
-$correo_representante = trim($_POST['correo-entidad'] ?? '');
-$numero_representante_rrhh = trim($_POST['numero_representante_rrhh'] ?? '');
+$correo_institucional = trim($_POST['correo-institucional'] ?? '');
+$numero_institucional = trim($_POST['numero_institucional'] ?? '');
 
-$nombre_representante = mb_strtolower($nombre_representante, 'UTF-8');
-$nombre_representante = mb_convert_case($nombre_representante, MB_CASE_TITLE, "UTF-8");
-// Validaciones básicas (opcional, pero recomendable)
+// Formatear el nombre del representante (opcional para consistencia)
+$nombre_representante = mb_convert_case(mb_strtolower($nombre_representante, 'UTF-8'), MB_CASE_TITLE, "UTF-8");
+
+// 4. Validaciones básicas
 if (
-    empty($nombre_entidad_receptora) ||
     empty($ruc) ||
     empty($direccion_entidad_receptora) ||
-    empty($nombre_ciudad) ||
     empty($nombre_representante) ||
-    empty($correo_representante) ||
-    empty($numero_representante_rrhh)
+    empty($correo_institucional) ||
+    empty($numero_institucional)
 ) {
     header("Location: ../for-cinco.php?status=missing_data");
     exit();
 }
 
-// 4. Obtener los datos actuales de la base de datos
+// Validaciones específicas
+if (!preg_match('/^\d{13}$/', $ruc)) {
+    header("Location: ../for-cinco.php?status=invalid_ruc");
+    exit();
+}
+
+if (!filter_var($correo_institucional, FILTER_VALIDATE_EMAIL)) {
+    header("Location: ../for-cinco.php?status=invalid_email");
+    exit();
+}
+
+if (!preg_match('/^\d{10}$/', $numero_institucional)) {
+    header("Location: ../for-cinco.php?status=invalid_phone");
+    exit();
+}
+
+// 5. Obtener el último registro actual de documento_cinco para este usuario
 $sql_actual = "SELECT 
-    nombre_entidad_receptora, 
     ruc, 
     direccion_entidad_receptora, 
-    nombre_ciudad, 
     nombre_representante_rrhh, 
-    correo_representante, 
-    numero_representante_rrhh,
+    correo_institucional, 
+    numero_institucional,
     logo_entidad_receptora
 FROM documento_cinco
-WHERE usuario_id = ?";
+WHERE usuario_id = ?
+ORDER BY id DESC
+LIMIT 1";
 
 $stmt_actual = $conn->prepare($sql_actual);
 $stmt_actual->bind_param('i', $usuario_id_session);
@@ -69,11 +82,12 @@ if ($result_actual->num_rows === 0) {
 $datos_actuales = $result_actual->fetch_assoc();
 $stmt_actual->close();
 
-// 5. Manejar la subida del logo (opcional)
+// 6. Procesar el logo (si se subió uno nuevo)
 $logo_entidad_receptora_actual = $datos_actuales['logo_entidad_receptora'];
-$nombre_archivo_logo = $logo_entidad_receptora_actual; // Valor por defecto
+$nombre_archivo_logo = $logo_entidad_receptora_actual; // Si no cambia el logo, sigue el mismo archivo
 
 if (isset($_FILES['logo-entidad']) && $_FILES['logo-entidad']['error'] === UPLOAD_ERR_OK) {
+
     $archivo_tmp = $_FILES['logo-entidad']['tmp_name'];
     $nombre_original = $_FILES['logo-entidad']['name'];
     $extension = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
@@ -90,49 +104,43 @@ if (isset($_FILES['logo-entidad']) && $_FILES['logo-entidad']['error'] === UPLOA
         mkdir($ruta_destino, 0775, true);
     }
 
-    // Generar el nombre del archivo nuevo
     $nombre_archivo_logo = 'logo-' . $ruc . '.' . $extension;
     $ruta_completa_logo = $ruta_destino . $nombre_archivo_logo;
 
-    // Mover el archivo subido
     if (!move_uploaded_file($archivo_tmp, $ruta_completa_logo)) {
         header("Location: ../for-cinco.php?status=upload_error");
         exit();
     }
 }
 
-// 6. Comparar los datos recibidos con los actuales
+// 7. Verificar si hubo cambios para evitar actualizaciones innecesarias
 $hubo_cambios = false;
 
 if (
-    $nombre_entidad_receptora !== $datos_actuales['nombre_entidad_receptora'] ||
     $ruc !== $datos_actuales['ruc'] ||
     $direccion_entidad_receptora !== $datos_actuales['direccion_entidad_receptora'] ||
-    $nombre_ciudad !== $datos_actuales['nombre_ciudad'] ||
     $nombre_representante !== $datos_actuales['nombre_representante_rrhh'] ||
-    $correo_representante !== $datos_actuales['correo_representante'] ||
-    $numero_representante_rrhh !== $datos_actuales['numero_representante_rrhh'] ||
+    $correo_institucional !== $datos_actuales['correo_institucional'] ||
+    $numero_institucional !== $datos_actuales['numero_institucional'] ||
     $nombre_archivo_logo !== $datos_actuales['logo_entidad_receptora']
 ) {
     $hubo_cambios = true;
 }
 
-// 7. Si no hubo cambios, salir sin mensaje
+// 8. Si no hubo cambios, regresar sin actualizar
 if (!$hubo_cambios) {
-    header("Location: ../for-cinco.php"); // Sin status
+    header("Location: ../for-cinco.php");
     exit();
 }
 
-// 8. Si hubo cambios, actualizar
+// 9. Ejecutar el UPDATE si hubo cambios
 $sql_update = "UPDATE documento_cinco SET
-    nombre_entidad_receptora = ?,
     ruc = ?,
     direccion_entidad_receptora = ?,
     logo_entidad_receptora = ?,
-    nombre_ciudad = ?,
     nombre_representante_rrhh = ?,
-    numero_representante_rrhh = ?,
-    correo_representante = ?,
+    numero_institucional = ?,
+    correo_institucional = ?,
     estado = 'Pendiente'
 WHERE usuario_id = ?";
 
@@ -144,15 +152,13 @@ if (!$stmt_update) {
 }
 
 $stmt_update->bind_param(
-    'ssssssssi',
-    $nombre_entidad_receptora,
+    'ssssssi',
     $ruc,
     $direccion_entidad_receptora,
     $nombre_archivo_logo,
-    $nombre_ciudad,
     $nombre_representante,
-    $numero_representante_rrhh,
-    $correo_representante,
+    $numero_institucional,
+    $correo_institucional,
     $usuario_id_session
 );
 
@@ -166,3 +172,4 @@ if ($stmt_update->execute()) {
 
 $stmt_update->close();
 $conn->close();
+?>

@@ -10,59 +10,62 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id_session = $_SESSION['usuario_id'];
 
-// 2. Recibir los datos del formulario (con null coalescing operator para manejar valores vacíos)
+// 2. Recibir los datos del formulario
 $usuario_id_form = intval($_POST['usuario_id'] ?? 0);
 $actividad_economica = trim($_POST['actividad_economica'] ?? '');
 $provincia = trim($_POST['provincia'] ?? '');
-$horario_practica = trim($_POST['horario_practica'] ?? '');
+$hora_inicio = $_POST['horario_practica_inicio'] ?? '';
+$hora_fin = $_POST['horario_practica_fin'] ?? '';
 $jornada_laboral = trim($_POST['jornada_laboral'] ?? '');
-$nombres_representante = trim($_POST['nombres-representante'] ?? '');
-$cargo_tutor = trim($_POST['cargo_tutor'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
 $numero_telefono = trim($_POST['numero_telefono'] ?? '');
-$numero_institucional = trim($_POST['numero_institucional'] ?? '');
+$numero_institucional = trim($_POST['numero_institucional'] ?? 'NO APLICA');
 
-// 3. Validación de datos básicos (que no estén vacíos)
+// 3. Validación de campos obligatorios
 if (
     empty($actividad_economica) ||
     empty($provincia) ||
-    empty($horario_practica) ||
+    empty($hora_inicio) ||
+    empty($hora_fin) ||
     empty($jornada_laboral) ||
-    empty($nombres_representante) ||
-    empty($cargo_tutor) ||
     empty($numero_practicas) ||
-    empty($numero_telefono) 
+    empty($numero_telefono)
 ) {
     header("Location: ../for-seis.php?status=missing_data");
     exit();
 }
 
-// Validar el teléfono (debe tener solo números y longitud adecuada)
+// 4. Validación de número de teléfono celular
 if (!preg_match('/^[0-9]{10}$/', $numero_telefono)) {
     header("Location: ../for-seis.php?status=invalid_phone");
     exit();
 }
 
-// 5. Validar el usuario_id del formulario contra el de sesión
+// 5. Validación de número institucional si lo ingresaron
+if (!empty($numero_institucional) && !preg_match('/^[0-9]{7,20}$/', $numero_institucional)) {
+    header("Location: ../for-seis.php?status=invalid_institutional_phone");
+    exit();
+}
+
+// 6. Verificación de usuario_id del formulario
 if ($usuario_id_form !== $usuario_id_session) {
     header("Location: ../for-seis.php?status=invalid_user");
     exit();
 }
 
-// 6. Insertar datos en documento_seis
+// 7. Insertar en documento_seis
 $sql_insert = "INSERT INTO documento_seis (
     usuario_id,
     actividad_economica,
     provincia,
-    horario_practica,
     jornada_laboral,
-    nombres_representante,
-    cargo_tutor,
     numero_practicas,
     numero_telefono,
     numero_institucional,
+    hora_inicio,
+    hora_fin,
     estado
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
 
 $stmt_insert = $conn->prepare($sql_insert);
 
@@ -71,20 +74,21 @@ if (!$stmt_insert) {
     exit();
 }
 
+// 8. Vincular parámetros (9 campos en total)
 $stmt_insert->bind_param(
-    "isssssssss", // 1 entero + 9 strings
-    $usuario_id_session,       // i
-    $actividad_economica,      // s
-    $provincia,                // s
-    $horario_practica,         // s
-    $jornada_laboral,          // s
-    $nombres_representante,    // s
-    $cargo_tutor,              // s
-    $numero_practicas,         // s
-    $numero_telefono,          // s
-    $numero_institucional      // s
+    "issssssss", // i = int, s = string
+    $usuario_id_session,     // i
+    $actividad_economica,    // s
+    $provincia,              // s
+    $jornada_laboral,        // s
+    $numero_practicas,       // s
+    $numero_telefono,        // s
+    $numero_institucional,   // s
+    $hora_inicio,            // s (TIME en formato hh:mm)
+    $hora_fin                // s (TIME en formato hh:mm)
 );
 
+// 9. Ejecutar el insert
 if ($stmt_insert->execute()) {
     header("Location: ../for-seis.php?status=success");
     exit();

@@ -1,6 +1,6 @@
 <?php
-require '../../config/config.php';
-require_once('../../../TCPDF-main/tcpdf.php');
+require '../../../config/config.php';
+require_once('../../../../TCPDF-main/tcpdf.php');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
@@ -62,11 +62,22 @@ $fecha_fin_corta = $estudiante['fecha_fin'] ? formato_fecha_corta($estudiante['f
 $hora_inicio = $estudiante['hora_inicio'] ? formato_hora($estudiante['hora_inicio']) : 'N/A';
 $hora_fin = $estudiante['hora_fin'] ? formato_hora($estudiante['hora_fin']) : 'N/A';
 
+
 function formato_fecha_larga($fecha)
 {
     $meses = [
-        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
     ];
 
     $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha);
@@ -102,15 +113,13 @@ function formato_hora($hora)
     return $hora_obj->format('H:i');
 }
 
-
-
 class CustomPDF extends TCPDF
 {
     public function Header()
     {
         $margen_derecha = 10; // Ajusta este valor según necesites
 
-        $this->Image('../../../images/index.png', 15, 12, 20);
+        $this->Image('../../../../images/index.png', 15, 12, 20);
 
         // Fuente y alineación
         $this->SetFont('times', 'B', 11);
@@ -181,18 +190,17 @@ class CustomPDF extends TCPDF
 // Inicializar TCPDF
 $pdf = new CustomPDF();
 $pdf->AddPage();
-$pdf->SetY(35);
+$pdf->SetY(33);
 
-$pdf->SetFont('times', 'B', 14);
-$pdf->Cell(0, 1, 'PLAN DE APRENDIZAJE PRACTICO Y DE ROTACIÓN DEL', 0, 1, 'C');
-$pdf->Cell(0, 1, 'ESTUDIANTE EN EL ENTORNO LABORAL', 0, 1, 'C');
+$pdf->SetFont('times', 'B', 12);
+$pdf->Cell(0, 1, 'EVALUACIÓN FINAL DEL ESTUDIANTE EN EL ENTORNO LABORAL REAL', 0, 1, 'C');
 $pdf->Cell(0, 1, 'FACULTAD DE CIENCIAS EMPRESARIALES Y SISTEMAS.', 0, 1, 'C');
 $pdf->Ln(3);
 
 $pdf->SetFont('times', '', 10);
 
 $html_tabla1 = '
-    <table border="0.5" cellpadding="3" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
         <tr>
             <th colspan="2" style="text-align: center; font-size: 11px;"><strong>DATOS GENERALES DEL ESTUDIANTE</strong></th>
         </tr>
@@ -207,7 +215,7 @@ $html_tabla1 = '
     </table>';
 
 $html_tabla2 = '
-    <table border="0.5" cellpadding="3" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
         <tr>
             <td style="font-size: 10px; width: 58%;"><strong>Carrera:</strong></td>
             <td style="font-size: 10px; width: 17%;"><strong>Grupo:</strong></td>
@@ -221,7 +229,7 @@ $html_tabla2 = '
     </table>';
 
 $html_tabla3 = '
-    <table border="0.5" cellpadding="3" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
         <tr>
             <th colspan="6" style="text-align: start; font-size: 10px;"><strong>Periodo Práctica Preprofesional:</strong></th>
         </tr>
@@ -237,7 +245,7 @@ $html_tabla3 = '
     ';
 
 $html_tabla4 = '
-    <table border="0.5" cellpadding="3" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
         <tr>
             <th colspan="3" style="text-align: center; font-size: 11px;"><strong>DATOS GENERALES DE TUTOR ACADÉMICO</strong></th>
         </tr>
@@ -247,15 +255,15 @@ $html_tabla4 = '
             <td style="width: 30%;"><strong>Correo Electrónico:</strong></td>
         </tr>
         <tr>
-            <td>'.$nombre_tutor_academico.'</td>
-            <td>'.$cedula_tutor_academico.'</td>
-            <td>'.$correo_tutor_academico.'</td>
+            <td>' . $nombre_tutor_academico . '</td>
+            <td>' . $cedula_tutor_academico . '</td>
+            <td>' . $correo_tutor_academico . '</td>
         </tr>
     </table>
     ';
 
 $html_tabla5 = '
-    <table border="0.5" cellpadding="3" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
 
         <tr>
             <th colspan="6" style="text-align: center; font-size: 11px;"><strong>DATOS GENERALES DE ENTIDAD FORMADORA</strong></th>
@@ -273,7 +281,7 @@ $html_tabla5 = '
         </tr>
         <tr>
             <td><strong>Dirección:</strong></td>
-            <td colspan="3">Víctor Manuel Rendon 236 y Pedro Carbo</td>
+            <td colspan="3">Guayas/ Guayaquil/ Carbo (concepción) Víctor Manuel Rendon 236 y Pedro Carbo</td>
             <td><strong>Teléfono</strong></td>
             <td>(04) 5000175 – 1800 ITB</td>
         </tr>
@@ -282,54 +290,6 @@ $html_tabla5 = '
             <td colspan="3">Moreira Villafuerte Stiven Yiovanny</td>
             <td><strong>Teléfono</strong></td>
             <td>0968840225</td>
-        </tr>
-    </table>
-    ';
-
-$html_tabla6 = '
-    <table border="0.5" cellpadding="4" cellspacing="0">
-
-        <tr>
-            <th colspan="6" style="text-align: center; font-size: 10px;"><strong>RESULTADOS DE APRENDIZAJE ESPECÍFICO DEL ESTUDIANTE</strong></th>
-        </tr>
-        <tr>
-            <td><strong>INDICADORES</strong></td>
-            <td colspan="5"><strong>CRITERIOS</strong></td>
-        </tr>
-        <tr>
-            <td rowspan="4" ><strong><br><br><br>Conocimientos:</strong></td>
-            <td colspan="5">Diseñar e implementar algoritmos utilizando las técnicas de programación lineal, estructurada,
-                procedimental y funcional
-            </td>
-        </tr>
-        <tr>
-            <td colspan="5">Utilizar las estructuras de datos básicas y compuestas, así como estáticas y dinámicas para la entrada y
-                salida de datos, en la implementación de algoritmos que les den solución a problemas de requerimientos de
-                software
-            </td>
-        </tr>
-        <tr>
-            <td colspan="5">Brindar soporte técnico y de mantenimiento a sistemas de hardware de cómputo.</td>
-        </tr>
-        <tr>
-            <td colspan="5">Diseñar e implementar bases de datos mediante el Modelo-Entidad-Relación</td>
-        </tr>
-
-        <tr>
-            <td rowspan="5" ><strong><br><br><br>Habilidades:</strong></td>
-            <td colspan="5">Aplicar las formas normales en el diseño de bases de datos mediante el Modelo-Entidad-Relación</td>
-        </tr>
-        <tr>
-            <td colspan="5">Optimizar el diseño de bases de datos implementadas.</td>
-        </tr>
-        <tr>
-            <td colspan="5">Identificar componentes de hardware de redes LAN.</td>
-        </tr>
-        <tr>
-            <td colspan="5">Optimizar el diseño de redes LAN</td>
-        </tr>
-        <tr>
-            <td colspan="5">Implementar y monitorear servicios de redes LAN</td>
         </tr>
     </table>
     ';
@@ -349,115 +309,149 @@ $pdf->SetY($currentY - 3);
 $pdf->writeHTML($html_tabla5, true, false, true, false, '');
 $currentY = $pdf->GetY();
 $pdf->SetY($currentY - 3);
-$pdf->writeHTML($html_tabla6, true, false, true, false, '');
 
-// ! SEGUNDA PAGINA
-$pdf->SetMargins(20, 35, 20);
-$pdf->AddPage();
-$pdf->SetY(35);
-
-$pdf->SetFont('helvetica', 'B', 10.5);
-$pdf->Cell(0, 1, 'RESULTADO DE LA DIAGNÓSTICO INICIAL', 0, 1, 'C');
-$pdf->Ln(8);
-$pdf->SetFont('times', '', 12);
-$pdf->Cell(0, 1, 'Guayaquil, '. $fecha_fin_larga, 0, 1, 'R');
-$pdf->Ln(15);
-
-$pdf->SetFont('times', 'B', 12);
-$pdf->Cell(0, 1, 'Ing. Stiven Yiovanny Moreira Villafuerte', 0, 1, 'L');
-$pdf->Cell(0, 1, 'Facultad de Ciencias Empresariales y Sistema', 0, 1, 'L');
-$pdf->Cell(0, 1, 'Instituto Superior Tecnológico Bolivariano de Tecnología.', 0, 1, 'L');
-$pdf->Ln(5);
-
-$pdf->SetFont('times', '', 12);
-$html_parrafo = '
-<p style=" font-size: 12px; line-height: 1.8;">De mi consideración: <br>Por medio de la presente se da informe sobre el resultado de la evaluación inicial realizada en la
-    plataforma digital del entorno virtual de aprendizajes (eva-s) para dar inicio a la realización de las
-    prácticas laborales por parte del estudiante <strong>' . $nombres . '</strong>, con número de
-    cédula <strong>' . $cedula . '</strong>, de la carrera <strong>' . $carrera . '</strong> del
-    <strong>' . $paralelo . '</strong>, con la fecha de inicio <strong>' . $fecha_inicio_corta . '</strong>, y finaliza <strong>' . $fecha_fin_corta . '</strong>. Como se detalla a continuación:
-</p>';
-
-$pdf->writeHTMLCell(
-    '',               // Ancho del contenido (210mm ancho total - 20mm izq - 20mm der = 170mm)
-    '',                // Alto automático
-    '',                // Posición X (margen izquierdo)
-    '',                // Posición Y (automático, sigue después de lo anterior)
-    $html_parrafo,     // Contenido HTML
-    0,                 // Sin borde
-    1,                 // Salto de línea después de escribir
-    0,                 // Sin relleno
-    true,              // Reset height
-    'J',               // Alineación Justificada
-    true               // Auto padding
-);
-
-$pdf->Ln(7);
-
-
-$pdf->SetFont('helvetica', '', 8.6);
+$html_tabla6 = '
+    <table border="0.5" cellpadding="1" cellspacing="0">
+        <thead>
+            <tr>
+                <th colspan="8" align="center" style="line-height: 1;">
+                    <strong style="font-size: 11px;">ACTIVIDAD REALIZADA POR EL ESTUDIANTE (PLANIFICADA)</strong><br>
+                    <small style="font-size: 9px;">Puntuación del 1 al 5 según el grado de resultado de aprendizaje obtenido el estudiante en su desempeño laboral (descripción puntual de las actividades efectuadas durante sus prácticas preprofesionales en la entidad receptora:</small><br>
+                    <strong style="font-size: 9px; ">1.- Deficiente  2.- Regular  3.- Moderado  4.- Alta  5.- Eficiente</strong>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="2" width="80%" align="start"><strong>DESCRIPCIÓN DE ACTIVIDADES</strong></th>
+                <th width="4%" align="center"><strong>1</strong></th>
+                <th width="4%" align="center"><strong>2</strong></th>
+                <th width="4%" align="center"><strong>3</strong></th>
+                <th width="4%" align="center"><strong>4</strong></th>
+                <th width="4%" align="center"><strong>5</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Conocimientos -->
+            <tr>
+                <td rowspan="3" align="center" width="13%"><strong><br><br><br>Conocimientos</strong></td>
+                <td width="67%">Diseñar e implementar algoritmos utilizando las técnicas de programación lineal, estructurada, procedimental y funcional.</td>
+                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
+                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
+                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
+                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
+                <td width="4%" align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Utilizar las estructuras de datos básicas y compuestas, así como estáticas y dinámicas para la entrada y salida de datos, en la implementación de algoritmos que les den solución a problemas de requerimientos de software.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Brindar soporte técnico y de mantenimiento a sistemas de hardware de cómputo.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+    
+            <!-- Habilidades -->
+            <tr>
+                <td rowspan="5" align="center"><br><br><br><br><strong>Habilidades</strong></td>
+                <td>Diseñar e implementar bases de datos mediante el Modelo-Entidad-Relación.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Aplicar las formas normales en el diseño de bases de datos mediante el Modelo-Entidad-Relación.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Optimizar el diseño de bases de datos implementadas.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Identificar componentes de hardware de redes LAN.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td>Optimizar el diseño de redes LAN.</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Implementar y monitorear servicios de redes LAN</td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☐</font></td>
+                <td align="center"><font face="dejavusans">☒</font></td>
+            </tr>
+    
+            <!-- Promedio total -->
+            <tr>
+                <td colspan="2" align="right"><strong>PROMEDIO TOTAL</strong></td>
+                <td colspan="5" align="center"><strong>5</strong></td>
+            </tr>
+        </tbody>
+    </table>';
 
 $html_tabla7 = '
-    <table border="0.5" cellpadding="6" cellspacing="0">
+    <table border="0.5" cellpadding="1" cellspacing="0">
         <tr>
-            <td style="width: 25%; background-color: #8EAADB; color: white; text-align: center;"><strong>Nombres del estudiante </strong></td>
-            <td style="width: 13%; background-color: #8EAADB; color: white; text-align: center;"><strong>Cédula</strong></td>
-            <td style="width: 11%; background-color: #8EAADB; color: white; text-align: center;"><strong>Estado</strong></td>
-            <td style="width: 16%; background-color: #8EAADB; color: white; text-align: center;"><strong>Comenzado el </strong></td>
-            <td style="width: 15%; background-color: #8EAADB; color: white; text-align: center;"><strong>Finalizado</strong></td>
-            <td style="width: 20%; background-color: #8EAADB; color: white; text-align: center;"><strong>Calificación '.$calificacion.'/100</strong></td>
+            <td colspan="2" align="center"><strong>Observaciones</strong></td>
         </tr>
         <tr>
-            <td style="text-align: center;">'.$nombres.'</td>
-            <td style="text-align: center;">'.$cedula.'</td>
-            <td style="text-align: center;">Finalizado</td>
-            <td style="text-align: center;">'.$fecha_inicio_larga. ' ' . $hora_inicio.'</td>
-            <td style="text-align: center;">'.$fecha_fin_larga. ' ' . $hora_fin.'</td>
-            <td style="text-align: center;">'.$calificacion.'/100</td>
+            <td colspan="2" align="justify">En la evaluación final se puede observar que el estudiante mejoro de forma satisfactoria sus habilidades y destrezas, con la intervención del
+Docente tutor donde aplico un correcto seguimiento y control de las actividades asignadas durante sus prácticas.</td>
         </tr>
     </table>
 ';
 
-    $pdf->writeHTMLCell(
-        '',               // Ancho del contenido (210mm ancho total - 20mm izq - 20mm der = 170mm)
-        '',                // Alto automático
-        '',                // Posición X (margen izquierdo)
-        '',                // Posición Y (automático, sigue después de lo anterior)
-        $html_tabla7,     // Contenido HTML
-        0,                 // Sin borde
-        1,                 // Salto de línea después de escribir
-        0,                 // Sin relleno
-        true,              // Reset height
-        '',               // Alineación Justificada
-        ''               // Auto padding
-    );
+$firmas = '  <table width="100%" style="font-size: 11px;">
+  <tr>
+    <!-- Firma del Estudiante -->
+    <td style="text-align: center; width: 45%;">
+      <div>____________________________________</div>
+      <strong>Firma del Estudiante</strong>
+    </td>
 
-$pdf->Ln(7);
-$pdf->SetFont('times', '', 12);
-$html_parrafo_2 = '
-<p style=" font-size: 12px; line-height: 1.8;">Particular que informo para los fines pertinentes. Se adjunta documento diagnóstico de evaluación del estudiante.</p>';
+    <td style="width: 10%;"></td>
 
-$pdf->writeHTMLCell(
-    '','', '', '', $html_parrafo_2, 0, 1, 0, true, 'J', '',''
-);
+    <!-- Firma del Tutor de la Entidad Receptora -->
+    <td style="text-align: center; width: 45%;">
+      <div>____________________________________</div>
+      <strong>Firma y Sello del Docente/Tutor</strong>
+    </td>
+  </tr>
+</table>';
+$pdf->writeHTML($html_tabla6, true, false, true, false, '');
+$currentY = $pdf->GetY();
+$pdf->SetY($currentY - 3);
+$pdf->writeHTML($html_tabla7, true, false, true, false, '');
+$currentY = $pdf->GetY();
+$pdf->SetY($currentY + 5);
+$pdf->writeHTMLCell(0, 1, '', '', $firmas, 0, 1, false, true, 'C');
 
-$pdf->Ln(60);
-$pdf->SetFont('times', 'B', 12);
-$pdf->Cell(0, 1, '_________________________________', 0, 1, 'C');
-$pdf->Cell(0, 1, 'FIRMA Y SELLO DEL', 0, 1, 'C');
-$pdf->Cell(0, 1, 'COORDINADOR PRÁCTICA', 0, 1, 'C');
-
-$pdf->SetMargins(20, 35, 20);
-$pdf->AddPage();
-$pdf->SetY(35);
-
-$pdf->SetFont('helvetica', 'B', 20);
-$pdf->Cell(0, 1, 'RESULTADOS EXTRAÍDOS DEL EVA-S DEL', 0, 1, 'C');
-$pdf->Cell(0, 1, 'DIAGNÓSTICO INICIAL', 0, 1, 'C');
-$pdf->Ln(10);
-
-
-$pdf->Image('../../uploads/eva-s/'. $eva_s, 30, 60, 150, 90, '');
-
-
-$pdf->Output($nombre_doc .'.pdf', 'I');
+$pdf->Output('EVALUACIÓN FINAL DEL ESTUDIANTE.pdf', 'I');

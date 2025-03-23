@@ -20,15 +20,17 @@ $sql_doc_seis = "SELECT
        d6.id,
        d6.actividad_economica,
        d6.provincia,
-       d6.horario_practica,
+        d6.hora_inicio,
+        d6.hora_fin,
        d6.jornada_laboral,
-       d6.nombres_representante,
-       d6.cargo_tutor,
        d6.numero_practicas,
        d6.numero_telefono,
        d6.numero_institucional,
-       d6.estado 
+       d6.estado,
+       d3.nombres_tutor_receptor,
+       d3.cargo_tutor_receptor
 FROM documento_seis d6
+LEFT JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
 WHERE d6.usuario_id = ?
 ORDER BY d6.id DESC
 LIMIT 1";
@@ -43,10 +45,11 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $estado = $row['estado'];
     $actividad_economica = $row['actividad_economica'];
     $provincia = $row['provincia'];
-    $horario_practica = $row['horario_practica'];
+    $hora_inicio = $row['hora_inicio'];
+    $hora_fin = $row['hora_fin'];
     $jornada_laboral = $row['jornada_laboral'];
-    $nombres_representante = $row['nombres_representante'];
-    $cargo_tutor = $row['cargo_tutor'];
+    $nombres_tutor_receptor = $row['nombres_tutor_receptor'];
+    $cargo_tutor_receptor = $row['cargo_tutor_receptor'];
     $numero_practicas = $row['numero_practicas'];
     $numero_telefono = $row['numero_telefono'];
     $numero_institucional = $row['numero_institucional'];
@@ -194,8 +197,13 @@ if (!$conn) {
                                     </div>
                                     <div class="mb-2">
                                         <label for="horario_practica" class="form-label fw-bold">Horario de la práctica:</label>
-                                        <input type="text" class="form-control" id="horario_practica" name="horario_practica" placeholder="Ej: 08:00 - 17:00" required>
+
+                                        <div class="d-flex gap-2">
+                                            <input type="time" class="form-control" id="horario_practica_inicio" name="horario_practica_inicio" required>
+                                            <input type="time" class="form-control" id="horario_practica_fin" name="horario_practica_fin" required>
+                                        </div>
                                     </div>
+
                                     <div class="mb-2">
                                         <label for="jornada_laboral" class="form-label fw-bold">Jornada laboral:</label>
                                         <select class="form-control" id="jornada_laboral" name="jornada_laboral" required>
@@ -207,19 +215,12 @@ if (!$conn) {
                                     </div>
                                     <div class="mb-2">
                                         <label for="numero_institucional" class="form-label fw-bold">Número institucional (opcional):</label>
-                                        <input type="number" class="form-control" id="numero_institucional" name="numero_institucional" placeholder="Ej: 0987654321">
+                                        <input type="text" maxlength="10" oninput="validateInput(this)" class="form-control" id="numero_institucional" name="numero_institucional" placeholder="Ej: 0987654321">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <label for="nombres-representante" class="form-label fw-bold">Nombres y Apellidos del tutor de la entidad receptora</label>
-                                        <input type="text" class="form-control" id="nombres-representante" name="nombres-representante" placeholder="Ej: Juan Pérez" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="cargo_tutor" class="form-label fw-bold">Cargo del tutor de la entidad receptora:</label>
-                                        <input type="text" class="form-control" id="cargo_tutor" name="cargo_tutor" placeholder="Ej: Gerente" required>
-                                    </div>
+
                                     <div class="mb-2">
                                         <label for="numero_practicas" class="form-label fw-bold">Número de prácticas:</label>
                                         <select class="form-control" id="numero_practicas" name="numero_practicas" required>
@@ -229,7 +230,7 @@ if (!$conn) {
                                     </div>
                                     <div class="mb-2">
                                         <label for="numero_telefono" class="form-label fw-bold">Número de teléfono celular:</label>
-                                        <input type="number" class="form-control" id="numero_telefono" name="numero_telefono" placeholder="Ej: 0987654321" required>
+                                        <input type="text" class="form-control" id="numero_telefono" name="numero_telefono" maxlength="10" placeholder="Ej: 0987654321" oninput="validateInput(this)" required>
                                     </div>
                                 </div>
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
@@ -252,8 +253,8 @@ if (!$conn) {
                                 <th>Provincia</th>
                                 <th>Horario de la práctica</th>
                                 <th>Jornada laboral</th>
-                                <th>Nombres y Apellidos del tutor</th>
-                                <th>Cargo del tutor </th>
+                                <th>Nombres y Apellidos del tutor de la entidad receptora</th>
+                                <th>Cargo del tutor de la entidad receptora</th>
                                 <th>Número de prácticas</th>
                                 <th>Número de teléfono</th>
                                 <th>Número institucional</th>
@@ -266,14 +267,14 @@ if (!$conn) {
                                 <!-- ✅ Aquí tus datos -->
                                 <td class="text-center"><?php echo $actividad_economica; ?></td>
                                 <td class="text-center"><?php echo $provincia; ?></td>
-                                <td class="text-center"><?php echo $horario_practica; ?></td>
+                                <td class="text-center"><?php echo $hora_inicio; ?> - <?php echo $hora_fin; ?></td>
                                 <td class="text-center"><?php echo $jornada_laboral; ?></td>
-                                <td class="text-center"><?php echo $nombres_representante; ?></td>
-                                <td class="text-center"><?php echo $cargo_tutor; ?></td>
+                                <td class="text-center"><?php echo $nombres_tutor_receptor; ?></td>
+                                <td class="text-center"><?php echo $cargo_tutor_receptor; ?></td>
                                 <td class="text-center"><?php echo $numero_practicas; ?></td>
                                 <td class="text-center"><?php echo $numero_telefono; ?></td>
                                 <td class="text-center"><?php echo (!empty($numero_institucional)) ? $numero_institucional : 'NO APLICA'; ?></td>
-                                
+
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado
@@ -314,7 +315,7 @@ if (!$conn) {
                         <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="../estudiante/pdf/doc-seis-pdf.php" method="GET" target="_blank">
+                                    <form action="../estudiante/pdf/software/doc-seis-pdf.php" method="GET" target="_blank">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -344,6 +345,7 @@ if (!$conn) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js"></script>
+    <script src="../js/number.js"></script>
 </body>
 
 </html>

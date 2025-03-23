@@ -290,7 +290,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                                     <input type="text" class="form-control" name="funciones_realizadas[]">
                                                 </div>
 
-                                                <button type="button" class="btn btn-danger btn-sm eliminar-experiencia" style="display: none;">Eliminar</button>
+                                                <button type="button" class="btn btn-danger btn-sm eliminar-experiencia" style="background: #df1f1f; display: none;">Eliminar</button>
                                             </div>
                                         </div>
 
@@ -302,7 +302,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 
                                 <!-- Botones -->
                                 <div class="text-center mt-5 d-flex justify-content-center align-items-center gap-3">
-                                    <button type="submit" class="btn btn-success">Enviar Datos</button>
+                                    <button type="submit" class="btn">Enviar Datos</button>
 
                                     <?php if (!empty($motivo_rechazo)): ?>
                                         <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
@@ -379,7 +379,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
-                                                        <form action="../estudiante/pdf/doc-uno-pdf.php" method="GET" target="_blank">
+                                                        <form action="../estudiante/pdf/software/doc-uno-pdf.php" method="GET" target="_blank">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">Desea generar el siguiente documento?</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
