@@ -6,9 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nombres = trim(mysqli_real_escape_string($conn, $_POST['nombres']));
     $apellidos = trim(mysqli_real_escape_string($conn, $_POST['apellidos']));
-    $correo = mysqli_real_escape_string($conn, $_POST['correo']);
+    $correo = trim(mysqli_real_escape_string($conn, $_POST['correo']));
     $cedula = $_POST['cedula'];
-    $direccion = mysqli_real_escape_string($conn, $_POST['direccion']);
+    $direccion = trim(mysqli_real_escape_string($conn, $_POST['direccion']));
     $telefono = $_POST['telefono'];
     $convencional = $_POST['convencional'];
     $carrera_id = intval($_POST['carrera_id']);

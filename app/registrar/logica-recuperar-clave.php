@@ -2,14 +2,14 @@
 require '../PHPMailer/PHPMailer.php';
 require '../PHPMailer/SMTP.php';
 require '../PHPMailer/Exception.php';
-require '../config/config.php'; 
+require '../config/config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = mysqli_real_escape_string($conn, $_POST['recuperar-clave']);
-    
+
     // Verificar si el correo existe en la base de datos
     $sql = "SELECT id, email FROM usuarios WHERE email = ?";
     $stmt = $conn->prepare($sql);
@@ -30,28 +30,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
 
         // Crear el enlace de recuperación
-        $link = "https://wilsoncanizares.com/app/registrar/restablecer-clave.php?token=" . $token;
+        $link = "https://institutobolivariano.online/app/registrar/restablecer-clave.php?token=" . $token;
 
         // Enviar el correo electrónico
         $mail = new PHPMailer(true);
 
         try {
-            // Configuración del servidor SMTP de Gmail
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
+            // ! Configuración del servidor SMTP de Gmailc
+            $mail->isSMTP();  
+            $mail->Host       = 'smtp-relay.brevo.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'tds.titulacion.istjba@gmail.com';
-            $mail->Password   = 'ecic zfih ifqj utgv';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Username   = '88abd5001@smtp-brevo.com'; 
+            $mail->Password   = 'UqZfxKW6nbyTV1MB'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $mail->Port       = 587;
+            $mail->CharSet    = 'UTF-8';
 
-            $mail->CharSet = 'UTF-8';
+            $mail->setFrom('informacion@institutobolivariano.online', 'Recuperación de Contraseña');
+            $mail->addAddress($correo);
 
-            // Configuración del remitente y destinatario
-            $mail->setFrom('tds.titulacion.istjba@gmail.com', 'Recuperación de Contraseña');
-            $mail->addAddress($correo); // Correo del destinatario (usuario)
-
-            // Contenido del correo
             $mail->isHTML(true);
             $mail->Subject = 'Recupera credenciales de acceso';
             $mail->Body    = "
@@ -62,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <br>
                 <p><strong>Nota:</strong> El enlace estará disponible por 10 minutos.</p>
                 <p>Si no solicitaste el restablecimiento de tu contraseña, puedes ignorar este mensaje.</p>
-                <p>Saludos cordiales,<br>Instituto Tecnológico Juan Bautista Aguirre.</p>
+                <p>Saludos cordiales,<br>&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
                 <hr>
                 <p><strong>Nota:</strong> Este es un mensaje automatizado. Por favor, no responda a esta cuenta de correo.</p>
             ";

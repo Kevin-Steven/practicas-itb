@@ -3,6 +3,7 @@ session_start();
 require '../config/config.php';
 require 'sidebar-estudiante.php';
 require '../admin/sidebar-admin.php';
+
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -22,13 +23,13 @@ $sql_doc_dos = "SELECT
        d2.hora_inicio,
        d2.fecha_fin,
        d2.hora_fin,
-       d2.documento_eva_s,
        d2.hora_practicas,
-       d2.nota_eva_s,
        d2.nombre_tutor_academico,
        d2.cedula_tutor_academico,
-       d2.correo_tutor_academico
+       d2.correo_tutor_academico,
+       d3.estado as estado_doc_tres
 FROM documento_dos d2
+LEFT JOIN documento_tres d3 ON d2.usuario_id = d3.usuario_id
 WHERE d2.usuario_id = ?
 ORDER BY d2.id DESC";
 
@@ -39,17 +40,16 @@ $result_tema = $stmt_doc_dos->get_result();
 
 while ($row = $result_tema->fetch_assoc()) {
     $id = $row['id'] ?? null;
-    $estado = $row['estado'] ?? null;
+    $estado = $row['estado'] ?? 'Pendiente';
     $fecha_inicio = $row['fecha_inicio'] ?? null;
     $hora_inicio = $row['hora_inicio'] ?? null;
     $fecha_fin = $row['fecha_fin'] ?? null;
     $hora_fin = $row['hora_fin'] ?? null;
-    $documento_eva_s = $row['documento_eva_s'] ?? null;
     $horas_practicas = $row['hora_practicas'] ?? null;
-    $nota_eva_s = $row['nota_eva_s'] ?? null;
     $nombre_tutor_academico = $row['nombre_tutor_academico'] ?? null;
     $cedula_tutor_academico = $row['cedula_tutor_academico'] ?? null;
     $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
+    $estado_doc_tres = $row['estado_doc_tres'] ?? null;
 }
 
 $stmt_doc_dos->close();
@@ -66,7 +66,7 @@ if (!$conn) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Plan de Aprendizaje</title>
+    <title>Evaluación Final del Estudiante</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -75,7 +75,6 @@ if (!$conn) {
 </head>
 
 <body>
-
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
     <!-- Toast -->
@@ -148,73 +147,12 @@ if (!$conn) {
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
-            <h1 class="mb-2 text-center fw-bold">Datos Generales del Estudiante</h1>
+            <h1 class="mb-2 text-center fw-bold">Evaluación Final del Estudiante en el Entorno Laboral Real Facultad de Ciencias Empresariales y Sistemas.</h1>
 
-            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
-
-                <div class="card shadow-lg container-fluid">
-                    <div class="card-body">
-                        <form action="../estudiante/logic/documento-dos.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h2 class="card-title text-center">Periodo Práctica <br>Preprofesional</h2>
-                                    <div class="mb-2">
-                                        <label for="fecha_inicio" class="form-label fw-bold">Fecha Inicio:</label>
-                                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="hora_inicio" class="form-label fw-bold">Hora Inicio:</label>
-                                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="fecha_fin" class="form-label fw-bold">Fecha Fin:</label>
-                                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="hora_fin" class="form-label fw-bold">Hora Fin:</label>
-                                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="horas_practicas" class="form-label fw-bold">Horas Prácticas:</label>
-                                        <input type="number" class="form-control" id="horas_practicas" name="horas_practicas" step="0.01" placeholder="ej. 240" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <h2 class="card-title text-center">Resultados Extraídos del EVA-S del Diagnóstico Inicial</h2>
-                                    <div class="mb-2">
-                                        <label for="eva-s" class="form-label fw-bold">Subir EVA-S:</label>
-                                        <input type="file" class="form-control" id="eva_s" name="eva_s" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="nota_eva-s" class="form-label fw-bold">Nota EVA-S:</label>
-                                        <input type="number" min="0" max="100" class="form-control" id="nota_eva-s" name="nota_eva-s" step="0.01" placeholder="ej. 100" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="tutor_academico" class="form-label fw-bold">Tutor Académico:</label>
-                                        <input type="text" class="form-control" id="tutor_academico" name="tutor_academico" placeholder="ej. Juan Carlos Pérez Mora" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="cedula_tutor" class="form-label fw-bold">Cédula del tutor:</label>
-                                        <input type="text" class="form-control" id="cedula_tutor" name="cedula_tutor" placeholder="ej. 1234567890" required>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="correo_tutor" class="form-label fw-bold">Correo electrónico del tutor:</label>
-                                        <input type="email" class="form-control" id="correo_tutor" name="correo_tutor" placeholder="ej. tutor@gmail.com" required>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
-
-                            </div>
-
-                            <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                                <button type="submit" class="btn">Enviar Datos</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            <h3 class="text-center mt-2 mb-3">Estado del Documento</h3>
+            <?php if (empty($estado)): ?>
+                <p class="text-center mt-2 mb-3">Debe de completar el formulario del módulo de <strong>Plan de Aprendizaje Práctico y de Rotación</strong></p>
             <?php else: ?>
-                <h3 class="text-center mt-2 mb-3">Estado del Documento</h3>
                 <div class="table-responsive">
                     <table class="table table-bordered shadow-lg">
                         <thead class="table-light text-center">
@@ -224,8 +162,6 @@ if (!$conn) {
                                 <th>Fecha Fin</th>
                                 <th>Hora Fin</th>
                                 <th>Horas Prácticas</th>
-                                <th>EVA-S</th>
-                                <th>Nota EVA-S</th>
                                 <th>Tutor Académico</th>
                                 <th>Cédula del tutor</th>
                                 <th>Correo electrónico del tutor</th>
@@ -241,13 +177,6 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $fecha_fin; ?></td>
                                 <td class="text-center"><?php echo $hora_fin; ?></td>
                                 <td class="text-center"><?php echo $horas_practicas; ?></td>
-                                <td class="text-center"><?php echo $nota_eva_s; ?></td>
-                                <td class="text-center">
-                                    <a href="../uploads/eva-s/<?php echo $documento_eva_s; ?>" target="_blank">
-                                        Ver Imagen
-                                    </a>
-
-                                </td>
                                 <td class="text-center"><?php echo $nombre_tutor_academico; ?></td>
                                 <td class="text-center"><?php echo $cedula_tutor_academico; ?></td>
                                 <td class="text-center"><?php echo $correo_tutor_academico; ?></td>
@@ -256,11 +185,11 @@ if (!$conn) {
                                     // Lógica para asignar la clase de Bootstrap según el estado
                                     $badgeClass = '';
 
-                                    if ($estado === 'Pendiente') {
+                                    if ($estado_doc_tres === 'Pendiente') {
                                         $badgeClass = 'badge bg-warning text-dark'; // Amarillo
-                                    } elseif ($estado === 'Corregir') {
+                                    } elseif ($estado_doc_tres === 'Corregir') {
                                         $badgeClass = 'badge bg-danger'; // Rojo
-                                    } elseif ($estado === 'Aprobado') {
+                                    } elseif ($estado_doc_tres === 'Aprobado') {
                                         $badgeClass = 'badge bg-success'; // Verde
                                     } else {
                                         $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
@@ -268,16 +197,13 @@ if (!$conn) {
                                     ?>
 
                                     <span class="<?php echo $badgeClass; ?>">
-                                        <?php echo htmlspecialchars($estado); ?>
+                                        <?php echo htmlspecialchars($estado_doc_tres); ?>
                                     </span>
                                 </td>
 
                                 <!-- ✅ Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-dos-edit.php?id=<?php echo $id; ?>'">
-                                            <i class='bx bx-edit-alt'></i>
-                                        </button>
 
                                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
                                             <i class='bx bxs-file-pdf'></i>
@@ -291,7 +217,7 @@ if (!$conn) {
                         <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="../estudiante/pdf/doc-dos-pdf.php" method="GET" target="_blank">
+                                    <form action="../estudiante/pdf/doc-diez-pdf.php" method="GET" target="_blank">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -311,9 +237,9 @@ if (!$conn) {
 
                     </table>
                 </div>
+            <?php endif; ?>
+
         </div>
-    <?php endif; ?>
-    </div>
     </div>
 
     <?php renderFooterAdmin(); ?>

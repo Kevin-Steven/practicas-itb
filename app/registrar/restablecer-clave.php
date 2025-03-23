@@ -18,9 +18,9 @@ if (isset($_GET['token'])) {
     if ($result->num_rows > 0) {
         // Token válido, mostrar formulario para cambiar la contraseña
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nueva_clave = mysqli_real_escape_string($conn, $_POST['nueva_clave-clave']);
+            $nueva_clave = mysqli_real_escape_string($conn, $_POST['nueva_clave']);
 
-            $confirmar_clave = mysqli_real_escape_string($conn, $_POST['confirmar_clave-clave']);
+            $confirmar_clave = mysqli_real_escape_string($conn, $_POST['confirmar_clave']);
 
             if ($nueva_clave === $confirmar_clave) {
                 // Encriptar la nueva contraseña

@@ -42,6 +42,14 @@ CREATE TABLE registro (
     CONSTRAINT fk_usuario_registro FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+CREATE TABLE recuperacion_clave (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	usuario_id INT NOT NULL,
+	token VARCHAR(255) NOT NULL,
+	expira DATETIME NOT NULL,
+	FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 CREATE TABLE documento_uno (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id int(11) NOT NULL,
@@ -169,6 +177,31 @@ CREATE TABLE informe_actividades (
   actividades_realizadas TEXT NULL,
   FOREIGN KEY (documento_ocho_id) REFERENCES documento_ocho(id) ON DELETE CASCADE
 );
+
+CREATE TABLE documento_nueve (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id int(11) NOT NULL,
+  nombre_doc VARCHAR(250) NOT NULL DEFAULT '9 EVALUACIÓN CONDUCTUAL DEL ESTUDIANTE',
+	opcion_uno_puntaje INT CHECK (opcion_uno_puntaje BETWEEN 1 AND 5),
+	opcion_dos_puntaje INT CHECK (opcion_dos_puntaje BETWEEN 1 AND 5),
+	opcion_tres_puntaje INT CHECK (opcion_tres_puntaje BETWEEN 1 AND 5),
+	opcion_cuatro_puntaje INT CHECK (opcion_cuatro_puntaje BETWEEN 1 AND 5),
+	opcion_cinco_puntaje INT CHECK (opcion_cinco_puntaje BETWEEN 1 AND 5),
+	opcion_seis_puntaje INT CHECK (opcion_seis_puntaje BETWEEN 1 AND 5),
+	opcion_siete_puntaje INT CHECK (opcion_siete_puntaje BETWEEN 1 AND 5),
+	opcion_ocho_puntaje INT CHECK (opcion_ocho_puntaje BETWEEN 1 AND 5),
+	opcion_nueve_puntaje INT CHECK (opcion_nueve_puntaje BETWEEN 1 AND 5),
+	opcion_diez_puntaje INT CHECK (opcion_diez_puntaje BETWEEN 1 AND 5),
+	opcion_once_puntaje INT CHECK (opcion_once_puntaje BETWEEN 1 AND 5),
+	opcion_doce_puntaje INT CHECK (opcion_doce_puntaje BETWEEN 1 AND 5),
+	opcion_trece_puntaje INT CHECK (opcion_trece_puntaje BETWEEN 1 AND 5),
+	opcion_catorce_puntaje INT CHECK (opcion_catorce_puntaje BETWEEN 1 AND 5),
+	opcion_quince_puntaje INT CHECK (opcion_quince_puntaje BETWEEN 1 AND 5),
+  motivo_rechazo TEXT NULL,
+  estado ENUM('Pendiente', 'Corregir', 'Aprobado')DEFAULT 'Pendiente',
+  fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+  );
 
   
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');

@@ -167,73 +167,6 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 <body>
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'updated'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        case 'success':
-                            echo "Los datos se han subido correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-                        case 'updated':
-                            echo "El documento se ha actualizado correctamente.";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
-                            break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
-                            break;
-                        case 'db_error':
-                            echo "Error al actualizar la base de datos.";
-                            break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
-                            break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error desconocido.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <?php if (!empty($motivo_rechazo)): ?>
         <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalMotivoRechazoLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -525,6 +458,72 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
         </div>
     </div>
 
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?php if ($_GET['status'] === 'success'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">Subida Exitosa</strong>
+                    <?php elseif ($_GET['status'] === 'deleted'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">Documento Eliminado</strong>
+                    <?php elseif ($_GET['status'] === 'updated'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">Documento Actualizado</strong>
+                    <?php else: ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Error</strong>
+                    <?php endif; ?>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <?php
+                    switch ($_GET['status']) {
+                        case 'success':
+                            echo "Los datos se han subido correctamente.";
+                            break;
+                        case 'deleted':
+                            echo "El documento se ha eliminado correctamente.";
+                            break;
+                        case 'updated':
+                            echo "El documento se ha actualizado correctamente.";
+                            break;
+                        case 'invalid_extension':
+                            echo "Solo se permiten archivos ZIP.";
+                            break;
+                        case 'too_large':
+                            echo "El archivo supera el tamaño máximo de 20 MB.";
+                            break;
+                        case 'upload_error':
+                            echo "Hubo un error al mover el archivo.";
+                            break;
+                        case 'db_error':
+                            echo "Error al actualizar la base de datos.";
+                            break;
+                        case 'no_file':
+                            echo "No se ha seleccionado ningún archivo.";
+                            break;
+                        case 'form_error':
+                            echo "Error en el envío del formulario.";
+                            break;
+                        case 'not_found':
+                            echo "No se encontraron datos del usuario.";
+                            break;
+                        case 'missing_data':
+                            echo "Faltan datos en el formulario.";
+                            break;
+                        default:
+                            echo "Ocurrió un error desconocido.";
+                            break;
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php renderFooterAdmin(); ?>
 

@@ -34,15 +34,15 @@
                     <input type="text" class="form-control" id="cedula" name="cedula" placeholder="Ingrese su Cédula / Usuario" required >
                 </div>
 
-                <div class="mb-5">
+                <div class="mb-3">
                     <label for="inputPassword5" class="form-label fw-bold">Contraseña</label>
                     <div class="input-group">
                         <input type="password" id="inputPassword5" name="password" class="form-control" placeholder="Ingrese su clave" required>
                     </div>
                 </div>
-                <!-- <div class="text-center mb-3">
+                <div class="text-center mb-3">
                     <a href="/app/registrar/recuperar-cuenta.php" class="text-decoration-none">¿Has olvidado la contraseña?</a>
-                </div> -->
+                </div> 
                 <div class="d-grid">
                     <button type="submit" class="btn">Iniciar Sesión</button>
                 </div>
