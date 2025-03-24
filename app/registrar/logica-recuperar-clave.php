@@ -1,16 +1,12 @@
 <?php
-require '../PHPMailer/PHPMailer.php';
-require '../PHPMailer/SMTP.php';
-require '../PHPMailer/Exception.php';
 require '../config/config.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require '../email/enviar-correos.php'; // Tu función enviarCorreo()
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $correo = mysqli_real_escape_string($conn, $_POST['recuperar-clave']);
 
-    // Verificar si el correo existe en la base de datos
+    // 1. Verificar si el correo existe en la base de datos
     $sql = "SELECT id, email FROM usuarios WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $correo);
@@ -18,67 +14,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // El correo existe, generar un token de recuperacin
+        // 2. El correo existe
         $usuario = $result->fetch_assoc();
-        $token = bin2hex(random_bytes(50)); // Generar un token seguro
-        $expira = date("Y-m-d H:i:s", strtotime("+10 minutes")); // El token expira en 1 hora
 
-        // Almacenar el token y la fecha de expiración en la base de datos
+        // 3. Generar un token y su tiempo de expiración
+        $token = bin2hex(random_bytes(50)); // 100 caracteres hex
+        $expira = date("Y-m-d H:i:s", strtotime("+10 minutes")); // Expira en 10 minutos
+
+        // 4. Insertar token en la tabla recuperacion_clave
         $sql = "INSERT INTO recuperacion_clave (usuario_id, token, expira) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iss", $usuario['id'], $token, $expira);
         $stmt->execute();
 
-        // Crear el enlace de recuperación
+        // 5. Crear el link de recuperación
         $link = "https://institutobolivariano.online/app/registrar/restablecer-clave.php?token=" . $token;
 
-        // Enviar el correo electrónico
-        $mail = new PHPMailer(true);
+        // 6. Datos del correo
+        $correo_destino = $correo; // Destinatario
+        $asunto = 'Recupera tus credenciales de acceso';
+        $mensaje = "
+            <h3>Hola.</h3>
+            <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+            <br>
+            <p><a href='$link' style='color: blue; text-decoration: underline;'>Restablecer contraseña</a></p>
+            <br>
+            <p><strong>Nota:</strong> El enlace estará disponible por 10 minutos.</p>
+            <p>Si no solicitaste el restablecimiento de tu contraseña, puedes ignorar este mensaje.</p>
+            <p>Saludos cordiales,<br>&copy; 2025 Gestoría de Prácticas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
+            <hr>
+            <p><strong>Nota:</strong> Este es un mensaje automatizado. Por favor, no responda a este correo.</p>
+        ";
 
-        try {
-            // ! Configuración del servidor SMTP de Gmailc
-            $mail->isSMTP();  
-            $mail->Host       = 'smtp-relay.brevo.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = '88abd5001@smtp-brevo.com'; 
-            $mail->Password   = 'UqZfxKW6nbyTV1MB'; 
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
-            $mail->Port       = 587;
-            $mail->CharSet    = 'UTF-8';
+        // 7. Enviar correo con la función reutilizable
+        $envio = enviarCorreo($correo_destino, $asunto, $mensaje);
 
-            $mail->setFrom('informacion@institutobolivariano.online', 'Recuperación de Contraseña');
-            $mail->addAddress($correo);
-
-            $mail->isHTML(true);
-            $mail->Subject = 'Recupera credenciales de acceso';
-            $mail->Body    = "
-                <h3>Hola.</h3>
-                <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-                <br>
-                <p><a href='$link' style='color: blue; text-decoration: underline;'>Restablecer contraseña</a></p>
-                <br>
-                <p><strong>Nota:</strong> El enlace estará disponible por 10 minutos.</p>
-                <p>Si no solicitaste el restablecimiento de tu contraseña, puedes ignorar este mensaje.</p>
-                <p>Saludos cordiales,<br>&copy; 2025 Gestoria de Practicas Profesionales - Instituto Superior Tecnológico Bolivariano de Tecnología.</p>
-                <hr>
-                <p><strong>Nota:</strong> Este es un mensaje automatizado. Por favor, no responda a esta cuenta de correo.</p>
-            ";
-            $mail->AltBody = "Haz clic en el siguiente enlace para restablecer tu contraseña: $link";
-
-            // Enviar el correo
-            $mail->send();
+        // 8. Validar el resultado del envío
+        if ($envio['success']) {
             header("Location: recuperar-cuenta.php?mensaje=Correo de recuperación enviado. Revisa tu bandeja de entrada.&tipo=success");
             exit();
-        } catch (Exception $e) {
-            $error = urlencode("Error al enviar el correo: {$mail->ErrorInfo}");
-            header("Location: recuperar-cuenta.php?mensaje=$error&tipo=danger");
+        } else {
+            // Mensaje de error con depuración
+            $error = urlencode($envio['debug']);
+            header("Location: recuperar-cuenta.php?mensaje=Error al enviar el correo.&debug=$error&tipo=danger");
             exit();
         }
+
     } else {
+        // 9. Correo no encontrado en base de datos
         header("Location: recuperar-cuenta.php?mensaje=El correo no está registrado.&tipo=danger");
         exit();
     }
+
 } else {
+    // 10. Acceso no permitido
     header("Location: ../../index.php");
     exit();
 }
+?>
