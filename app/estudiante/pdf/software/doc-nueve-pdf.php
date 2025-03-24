@@ -1,93 +1,103 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
-// if (!isset($_GET['id']) || empty($_GET['id'])) {
-//     die("ID no proporcionado o vacío.");
-// }
+// Validación de sesión
+if (!isset($_SESSION['usuario_id'])) {
+    die("No has iniciado sesión.");
+}
 
-// $id = intval($_GET['id']);
-// if ($id <= 0) {
-//     die("ID inválido.");
-// }
+$usuario_id = $_SESSION['usuario_id'];
 
-// $sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d8.departamento,
-//         ia.semanas_fecha, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
-//         d6.nombres_representante as tutor_entidad, d6.numero_telefono as telefono_tutor, d5.nombre_entidad_receptora as nombre_entidad,
-//         d8.nombre_doc
-//         FROM usuarios u
-//         LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
-//         LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
-//         LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
-//         LEFT JOIN documento_seis d6 ON u.id = d6.usuario_id
-//         LEFT JOIN documento_cinco d5 ON u.id = d5.usuario_id
-//         INNER JOIN carrera c ON u.carrera_id = c.id
-//         WHERE d8.id = $id";
+// Validación del ID del documento
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    die("ID no proporcionado.");
+}
 
-// $result = $conn->query($sql);
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
+    die("ID inválido.");
+}
 
-// if ($result->num_rows === 0) {
-//     die("No se encontraron datos para este estudiante.");
-// }
+// Obtener rol del usuario
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-// $actividades = [];
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
+}
 
-// // ✅ Guardamos los registros múltiples en el array $actividades
-// while ($row = $result->fetch_assoc()) {
-//     // Los datos del estudiante se guardan desde la primera fila
-//     if (empty($estudiante)) {
-//         $estudiante = $row;
-//     }
+$rol = $result_rol->fetch_assoc()['rol'];
 
-//     // Guardamos cada actividad
-//     $actividades[] = [
-//         'semanas_fecha' => $row['semanas_fecha'] ?: 'N/A',
-//         'horas_realizadas' => $row['horas_realizadas'] ?: 'N/A',
-//         'actividades_realizadas' => $row['actividades_realizadas'] ?: 'N/A'
-//     ];
-// }
+// Consulta condicional según rol
+if ($rol === 'gestor') {
+    // El gestor puede ver cualquier documento
+    $sql = "SELECT * FROM documento_nueve WHERE id = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+} else {
+    // Estudiante solo puede ver su propio documento
+    $sql = "SELECT * FROM documento_nueve WHERE id = ? AND usuario_id = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+}
 
-// // Extraer datos generales (solo se hace una vez)
-// $nombres = $estudiante['apellidos'] . ' ' . $estudiante['nombres'];
-// $cedula = $estudiante['cedula'] ?: 'N/A';
-// $carrera = $estudiante['carrera'] ?: 'N/A';
-// $periodoAcademico = $estudiante['periodo'] ?: 'N/A';
-// $horas_practicas = $estudiante['hora_practicas'] ?: 'N/A';
-// $nombre_tutor_academico = $estudiante['tutor_entidad'] ?: 'N/A';
-// $telefono_tutor = $estudiante['telefono_tutor'] ?: 'N/A';
-// $nombre_entidad = $estudiante['nombre_entidad'] ?: 'N/A';
-// $departamento = $estudiante['departamento'] ?: 'N/A';
-// $motivo_rechazo = $estudiante['motivo_rechazo'] ?: 'N/A';
-// $nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
-// $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
-// $fecha_fin_larga = $estudiante['fecha_fin'] ? formato_fecha_larga($estudiante['fecha_fin']) : 'N/A';
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    die("No tienes permiso para ver este documento.");
+}
+
+$estudiante = $result->fetch_assoc();
 
 
-function formato_fecha_larga($fecha)
+
+$nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
+$opcion_uno_puntaje = $estudiante['opcion_uno_puntaje'] ?: null;
+$opcion_dos_puntaje = $estudiante['opcion_dos_puntaje'] ?: null;
+$opcion_tres_puntaje = $estudiante['opcion_tres_puntaje'] ?: null;
+$opcion_cuatro_puntaje = $estudiante['opcion_cuatro_puntaje'] ?: null;
+$opcion_cinco_puntaje = $estudiante['opcion_cinco_puntaje'] ?: null;
+$opcion_seis_puntaje = $estudiante['opcion_seis_puntaje'] ?: null;
+$opcion_siete_puntaje = $estudiante['opcion_siete_puntaje'] ?: null;
+$opcion_ocho_puntaje = $estudiante['opcion_ocho_puntaje'] ?: null;
+$opcion_nueve_puntaje = $estudiante['opcion_nueve_puntaje'] ?: null;
+$opcion_diez_puntaje = $estudiante['opcion_diez_puntaje'] ?: null;
+$opcion_once_puntaje = $estudiante['opcion_once_puntaje'] ?: null;
+$opcion_doce_puntaje = $estudiante['opcion_doce_puntaje'] ?: null;
+$opcion_trece_puntaje = $estudiante['opcion_trece_puntaje'] ?: null;
+$opcion_catorce_puntaje = $estudiante['opcion_catorce_puntaje'] ?: null;
+$opcion_quince_puntaje = $estudiante['opcion_quince_puntaje'] ?: null;
+
+$puntajes = [
+    $opcion_uno_puntaje,
+    $opcion_dos_puntaje,
+    $opcion_tres_puntaje,
+    $opcion_cuatro_puntaje,
+    $opcion_cinco_puntaje,
+    $opcion_seis_puntaje,
+    $opcion_siete_puntaje,
+    $opcion_ocho_puntaje,
+    $opcion_nueve_puntaje,
+    $opcion_diez_puntaje,
+    $opcion_once_puntaje,
+    $opcion_doce_puntaje,
+    $opcion_trece_puntaje,
+    $opcion_catorce_puntaje,
+    $opcion_quince_puntaje
+];
+
+$promedio = round(array_sum($puntajes) / count($puntajes), 2);
+
+
+function generarChecks($puntaje, $valor)
 {
-    $meses = [
-        'enero',
-        'febrero',
-        'marzo',
-        'abril',
-        'mayo',
-        'junio',
-        'julio',
-        'agosto',
-        'septiembre',
-        'octubre',
-        'noviembre',
-        'diciembre'
-    ];
-
-    $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha);
-    if (!$fecha_obj) return 'N/A';
-
-    $dia = $fecha_obj->format('d');
-    $mes = $meses[(int)$fecha_obj->format('m') - 1];
-    $anio = $fecha_obj->format('Y');
-
-    return "$dia de $mes del $anio";
+    return ((int)$puntaje === (int)$valor) ? '☒' : '☐';
 }
 
 class CustomPDF extends TCPDF
@@ -140,9 +150,9 @@ $pdf->SetMargins(15, 35, 15);
 
 $pdf->SetFont('times', 'B', 12);
 $pdf->Cell(0, 1, 'EVALUACIÓN CONDUCTUAL DEL ESTUDIANTE', 0, 1, 'C');
-$pdf->SetFont('times', '', 12);   
+$pdf->SetFont('times', '', 12);
 $pdf->Cell(0, 1, '(SOLO PARA USO DEL SUPERVISOR ENTIDAD RECEPTORA)', 0, 1, 'C');
-$pdf->SetFont('times', '', 12);   
+$pdf->SetFont('times', '', 12);
 $pdf->Cell(0, 1, 'Indique con una “X” la evaluación que usted considere adecuada, basada en el desempeño del', 0, 1, 'C');
 $pdf->Cell(0, 1, 'estudiante durante la Práctica Pre-profesional laboral, y teniendo en cuenta la siguiente escala:', 0, 1, 'C');
 $html_title = '<table><tr><td>
@@ -164,7 +174,7 @@ $pdf->writeHTMLCell(0, 1, '', '', $html_title, 0, 1, false, true, 'C');
 
 $pdf->Ln(3);
 
-$pdf->SetFont('times', '', 11); 
+$pdf->SetFont('times', '', 11);
 
 $html_tabla = '
 <table border="0.5" cellpadding="2" cellspacing="0">
@@ -180,148 +190,148 @@ $html_tabla = '
     <tr>
         <td rowspan="4" width="20%"><br><br><br><br><strong>Disciplina</strong></td>
         <td width="50%">Asiste puntualmente a su práctica.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_uno_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Se presenta con adecuado porte y respeto en el área laboral asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_dos_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Manifiesta una actitud de servicio, cooperación y trabajo en equipo.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_tres_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Actúa siguiendo la ética profesional y normas de principios morales.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_cuatro_puntaje . '</strong></td>
     </tr>
 
     <tr>
         <td rowspan="4"><br><br><br><br><strong>Integración al ambiente laboral</strong></td>
         <td>Cumple con las Normas, Políticas, procedimientos y cultura organizacional.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_cinco_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Establece una comunicación profesional efectiva y asertiva en el área asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_seis_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Trabaja en iniciativa y soluciones integrales acorde a su asignación de práctica.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_siete_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Demuestra capacidad de adaptación y desenvolvimiento al área asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_ocho_puntaje . '</strong></td>
     </tr>
 
     <tr>
         <td rowspan="7"><br><br><br><br><br><br><br><strong>Conocimientos y habilidades profesionales</strong></td>
         <td>Aplica adecuadamente los conocimientos teóricos y prácticos del perfil profesional.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_nueve_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Demuestra adecuadamente las destrezas y habilidades acordes al perfil profesional.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_diez_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_diez_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_diez_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_diez_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_diez_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_diez_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Genera soluciones y propuestas halladas en el área de asignación de práctica.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_once_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_once_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_once_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_once_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_once_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_once_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Comunica asertivamente situaciones para la mejora continua del área asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_doce_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_doce_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_doce_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_doce_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_doce_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_doce_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Demuestra capacidad resolutiva a casos reales del área asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_trece_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_trece_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_trece_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_trece_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_trece_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_trece_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Demuestra proactividad en adquirir nuevos conocimientos en el área asignada de prácticas.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_catorce_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_catorce_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_catorce_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_catorce_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_catorce_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_catorce_puntaje . '</strong></td>
     </tr>
     <tr>
         <td>Aporta destreza académica en reuniones de trabajo del área asignada.</td>
-        <td style="text-align: center;"><font face="dejavusans">☒</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><font face="dejavusans">☐</font></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_quince_puntaje, 5) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_quince_puntaje, 4) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_quince_puntaje, 3) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_quince_puntaje, 2) . '</font></td>
+        <td style="text-align: center;"><font face="dejavusans">' . generarChecks($opcion_quince_puntaje, 1) . '</font></td>
+        <td style="text-align: center;"><strong>' . $opcion_quince_puntaje . '</strong></td>
     </tr>
 
     <tr>
         <td colspan="2"></td>
         <td colspan="5" align="center";><strong>Promedio</strong></td>
-        <td style="text-align: center;"><strong>5</strong></td>
+        <td style="text-align: center;"><strong>' . $promedio . '</strong></td>
     </tr>
 </table>';
 $pdf->writeHTML($html_tabla, true, false, true, false, '');

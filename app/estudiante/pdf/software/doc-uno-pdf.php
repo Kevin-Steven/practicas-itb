@@ -1,49 +1,70 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
-// Verificar si el ID está presente en la URL
+// Verificar sesión
+if (!isset($_SESSION['usuario_id'])) {
+    die("No has iniciado sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Obtener y sanitizar el ID del documento
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-// Obtener y sanitizar el ID
-$id = intval($_GET['id']);
-if ($id <= 0) {
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
     die("ID inválido.");
 }
 
-// Consulta para obtener los datos del estudiante
-$sql = "SELECT 
-            u.nombres,
-            u.apellidos,
-            u.email,
-            u.cedula,
-            u.direccion,
-            u.telefono,
-            u.convencional,
-            c.carrera AS carrera,
-            cu.paralelo AS paralelo,         -- ✅ Aquí se obtiene paralelo desde cursos
-            u.foto_perfil,
-            u.periodo,
-            d1.estado, 
-            d1.promedio_notas,
-            d1.nombre_doc
-        FROM documento_uno d1
-        JOIN usuarios u ON d1.usuario_id = u.id
-        INNER JOIN carrera c ON u.carrera_id = c.id
-        LEFT JOIN cursos cu ON u.curso_id = cu.id   -- ✅ LEFT JOIN a cursos para obtener paralelo
-        WHERE d1.id = $id";
+// Consultar el rol del usuario
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
+$usuario = $result_rol->fetch_assoc();
 
-$result = $conn->query($sql);
-
-// Verificar si hay resultados
-if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+if (!$usuario) {
+    die("Usuario no encontrado.");
 }
 
-// Obtener los datos
+$rol = $usuario['rol'];
+
+// Si el rol es estudiante, validar que el documento le pertenece
+if ($rol === 'estudiante') {
+    $sql = "SELECT d1.*, u.*, c.carrera AS carrera, cu.paralelo AS paralelo
+            FROM documento_uno d1
+            JOIN usuarios u ON d1.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            LEFT JOIN cursos cu ON u.curso_id = cu.id
+            WHERE d1.id = ? AND d1.usuario_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+} else {
+    // Si es gestor o administrador, puede acceder a cualquier documento
+    $sql = "SELECT d1.*, u.*, c.carrera AS carrera, cu.paralelo AS paralelo
+            FROM documento_uno d1
+            JOIN usuarios u ON d1.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            LEFT JOIN cursos cu ON u.curso_id = cu.id
+            WHERE d1.id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    die("No tienes permiso para ver este documento.");
+}
+
 $estudiante = $result->fetch_assoc();
+
 
 // Extraer variables
 $nombres = $estudiante['nombres'] . ' ' . $estudiante['apellidos'];

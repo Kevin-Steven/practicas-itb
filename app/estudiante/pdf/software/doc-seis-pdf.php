@@ -1,60 +1,124 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
+// Verificar sesión activa
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acceso no autorizado. Por favor, inicia sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Verificar si el ID del documento está presente
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-// Obtener y sanitizar el ID
-$id = intval($_GET['id']);
-if ($id <= 0) {
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
     die("ID inválido.");
 }
 
-// Consulta para obtener los datos del estudiante
-$sql = "SELECT
-       d6.id,
-       d6.actividad_economica,
-       d6.provincia,
-       d6.hora_inicio,
-       d6.hora_fin,
-       d6.jornada_laboral,
-       d6.numero_practicas,
-       d6.numero_institucional,
-       d6.estado,
-       d3.nombres_tutor_receptor,
-       d3.cargo_tutor_receptor,
-       d3.nombre_entidad_receptora,
-       d3.ciudad_entidad_receptora ,
-       d3.numero_telefono_tutor_receptor,
-       u.nombres, 
-       u.apellidos, 
-       d5.ruc, 
-       d5.direccion_entidad_receptora, 
-       d5.logo_entidad_receptora, 
-       d5.nombre_representante_rrhh, 
-       d5.correo_institucional as correo_representante,
-       d2.fecha_inicio, 
-       d2.fecha_fin
-FROM documento_seis d6
-JOIN usuarios u ON d6.usuario_id = u.id
-JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
-JOIN documento_dos d2 ON d6.usuario_id = d2.usuario_id
-JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
-WHERE d6.id = $id
-LIMIT 1
-";
+// Obtener el rol del usuario logueado
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-$result = $conn->query($sql);
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
+}
 
-// Verificar si hay resultados
+$usuario = $result_rol->fetch_assoc();
+$rol = $usuario['rol'];
+
+// Consulta según el rol
+if ($rol === 'estudiante') {
+    $sql = "SELECT
+               d6.id,
+               d6.actividad_economica,
+               d6.provincia,
+               d6.hora_inicio,
+               d6.hora_fin,
+               d6.jornada_laboral,
+               d6.numero_practicas,
+               d6.numero_institucional,
+               d6.estado,
+               d3.nombres_tutor_receptor,
+               d3.cargo_tutor_receptor,
+               d3.nombre_entidad_receptora,
+               d3.ciudad_entidad_receptora,
+               d3.numero_telefono_tutor_receptor,
+               u.nombres, 
+               u.apellidos, 
+               d5.ruc, 
+               d5.direccion_entidad_receptora, 
+               d5.logo_entidad_receptora, 
+               d5.nombre_representante_rrhh, 
+               d5.correo_institucional as correo_representante,
+               d2.fecha_inicio, 
+               d2.fecha_fin
+        FROM documento_seis d6
+        JOIN usuarios u ON d6.usuario_id = u.id
+        JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
+        JOIN documento_dos d2 ON d6.usuario_id = d2.usuario_id
+        JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+        WHERE d6.id = ? AND d6.usuario_id = ?
+        LIMIT 1";
+        
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+} else {
+    // Gestor puede ver cualquier documento
+    $sql = "SELECT
+               d6.id,
+               d6.actividad_economica,
+               d6.provincia,
+               d6.hora_inicio,
+               d6.hora_fin,
+               d6.jornada_laboral,
+               d6.numero_practicas,
+               d6.numero_institucional,
+               d6.estado,
+               d3.nombres_tutor_receptor,
+               d3.cargo_tutor_receptor,
+               d3.nombre_entidad_receptora,
+               d3.ciudad_entidad_receptora,
+               d3.numero_telefono_tutor_receptor,
+               u.nombres, 
+               u.apellidos, 
+               d5.ruc, 
+               d5.direccion_entidad_receptora, 
+               d5.logo_entidad_receptora, 
+               d5.nombre_representante_rrhh, 
+               d5.correo_institucional as correo_representante,
+               d2.fecha_inicio, 
+               d2.fecha_fin
+        FROM documento_seis d6
+        JOIN usuarios u ON d6.usuario_id = u.id
+        JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
+        JOIN documento_dos d2 ON d6.usuario_id = d2.usuario_id
+        JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+        WHERE d6.id = ?
+        LIMIT 1";
+        
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Validar si hay datos
 if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+    die("No tienes permiso para ver este documento o no existe.");
 }
 
 // Obtener los datos
 $estudiante = $result->fetch_assoc();
+
 
 $actividad_economica = $estudiante['actividad_economica'] ?? 'N/A';
 $provincia = $estudiante['provincia'] ?? 'N/A';

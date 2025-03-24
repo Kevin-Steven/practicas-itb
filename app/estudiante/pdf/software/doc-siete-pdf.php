@@ -1,36 +1,76 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
+// Verificar si el usuario ha iniciado sesión
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acceso no autorizado. Por favor, inicia sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Verificar si el ID del documento está presente
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-// Obtener y sanitizar el ID
-$id = intval($_GET['id']);
-if ($id <= 0) {
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
     die("ID inválido.");
 }
 
-// Consulta para obtener los datos del estudiante
-$sql = "SELECT 
-            u.nombres, u.apellidos, u.cedula, c.carrera AS carrera,
-            d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
-            d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s
-        FROM documento_dos d2
-        JOIN usuarios u ON d2.usuario_id = u.id
-        INNER JOIN carrera c ON u.carrera_id = c.id
-        WHERE d2.id = $id";
+// Obtener el rol del usuario logueado
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-$result = $conn->query($sql);
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
+}
 
-// Verificar si hay resultados
+$usuario = $result_rol->fetch_assoc();
+$rol = $usuario['rol'];
+
+// Consulta segura dependiendo del rol
+if ($rol === 'estudiante') {
+    $sql = "SELECT 
+                u.nombres, u.apellidos, u.cedula, c.carrera AS carrera,
+                d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
+                d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s
+            FROM documento_dos d2
+            JOIN usuarios u ON d2.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d2.id = ? AND d2.usuario_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+} else {
+    // El gestor puede ver cualquier documento
+    $sql = "SELECT 
+                u.nombres, u.apellidos, u.cedula, c.carrera AS carrera,
+                d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
+                d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s
+            FROM documento_dos d2
+            JOIN usuarios u ON d2.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d2.id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Validar si hay datos
 if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+    die("No tienes permiso para ver este documento o no existe.");
 }
 
 // Obtener los datos
 $estudiante = $result->fetch_assoc();
+
 
 // Extraer variables
 $nombres = $estudiante['apellidos'] . ' ' . $estudiante['nombres'];
@@ -359,7 +399,7 @@ $html_parrafo_16 = '
 conocer, comprender y aceptar los términos establecidos por la Guía de Compromiso Ético de
 Responsabilidad y Normas de Seguridad para el cumplimiento de Prácticas en el entorno laboral real
 y me comprometo a llevar adelante mis prácticas laborales bajo sus lineamientos”.<br><br>
-Dado en Guayaquil, a los ' . $fecha_inicio_larga .'.
+Dado en Guayaquil, a los ' . $fecha_inicio_larga . '.
 </p>';
 
 $pdf->writeHTMLCell('', '', '', '', $html_parrafo_16, 0, 1, 0, true, '', true);

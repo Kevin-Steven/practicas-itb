@@ -1,38 +1,84 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
+// Validación de sesión
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acceso no autorizado. Por favor, inicia sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Verificar si el ID del documento está presente
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-// Obtener y sanitizar el ID
-$id = intval($_GET['id']);
-if ($id <= 0) {
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
     die("ID inválido.");
 }
 
-// Consulta para obtener los datos del estudiante
-$sql = "SELECT 
-            u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, c.carrera AS carrera,
-            cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
-            d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
-            d2.estado, d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc
-        FROM documento_dos d2
-        JOIN usuarios u ON d2.usuario_id = u.id
-        INNER JOIN carrera c ON u.carrera_id = c.id
-        LEFT JOIN cursos cu ON u.curso_id = cu.id  
-        WHERE d2.id = $id";
+// Obtener rol del usuario
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-$result = $conn->query($sql);
-
-// Verificar si hay resultados
-if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
 }
 
-// Obtener los datos
+$rol = $result_rol->fetch_assoc()['rol'];
+
+// Consulta condicional según rol
+if ($rol === 'gestor') {
+    // El gestor puede ver cualquier documento
+    $sql = "SELECT 
+                u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, 
+                c.carrera AS carrera, cu.paralelo AS paralelo, u.periodo, 
+                d2.estado, d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
+                d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
+                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc
+            FROM documento_dos d2
+            JOIN usuarios u ON d2.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            LEFT JOIN cursos cu ON u.curso_id = cu.id  
+            WHERE d2.id = ? 
+            LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+} else {
+    // Estudiante solo puede ver su propio documento
+    $sql = "SELECT 
+                u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, 
+                c.carrera AS carrera, cu.paralelo AS paralelo, u.periodo, 
+                d2.estado, d2.fecha_inicio, d2.hora_inicio, d2.fecha_fin, d2.hora_fin,
+                d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
+                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc
+            FROM documento_dos d2
+            JOIN usuarios u ON d2.usuario_id = u.id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            LEFT JOIN cursos cu ON u.curso_id = cu.id  
+            WHERE d2.id = ? AND d2.usuario_id = ? 
+            LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Verificar si se encontraron datos
+if ($result->num_rows === 0) {
+    die("No tienes permiso para ver este documento o no existe.");
+}
+
+// Obtener los datos del estudiante
 $estudiante = $result->fetch_assoc();
+
 
 // Extraer variables
 $nombres = $estudiante['apellidos'] . ' ' . $estudiante['nombres'];

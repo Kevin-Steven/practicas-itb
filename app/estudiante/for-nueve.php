@@ -92,100 +92,6 @@ $stmt_doc_nueve->close();
 <body>
 
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
-
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php
-                    // Determinar el tipo de icono según el estado
-                    $success_status = ['success', 'update', 'deleted'];
-                    if (in_array($_GET['status'], $success_status)) : ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">
-                            <?php
-                            switch ($_GET['status']) {
-                                case 'success':
-                                    echo 'Registro Exitoso';
-                                    break;
-                                case 'update':
-                                    echo 'Actualización Exitosa';
-                                    break;
-                                case 'deleted':
-                                    echo 'Eliminación Exitosa';
-                                    break;
-                            }
-                            ?>
-                        </strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        // Éxitos
-                        case 'success':
-                            echo "Los datos de la entidad receptora se han registrado correctamente.";
-                            break;
-                        case 'update':
-                            echo "Los datos se han actualizado correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-
-                        // Errores específicos
-                        case 'invalid_user':
-                            echo "Usuario inválido. Debes iniciar sesión nuevamente.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario. Revisa que todos los campos estén completos.";
-                            break;
-                        case 'invalid_ruc':
-                            echo "El RUC ingresado no es válido. Debe contener exactamente 13 dígitos.";
-                            break;
-                        case 'invalid_email':
-                            echo "El correo electrónico del representante no es válido.";
-                            break;
-                        case 'invalid_phone':
-                            echo "El número institucional no es válido. Debe contener solo números (7-15 dígitos).";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos de imagen: PNG, JPG, JPEG o GIF para el logo.";
-                            break;
-                        case 'no_logo_file':
-                            echo "Debes seleccionar el logo de la entidad receptora.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al subir el logo. Intenta nuevamente.";
-                            break;
-                        case 'db_error':
-                            echo "Error al guardar los datos en la base de datos.";
-                            break;
-                        case 'prepare_error':
-                            echo "Error en la preparación de la consulta SQL.";
-                            break;
-
-                        // Otros casos
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error inesperado. Intenta nuevamente.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
@@ -468,6 +374,81 @@ $stmt_doc_nueve->close();
 
         </div>
     </div>
+
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?php
+                    // Estados que son exitosos
+                    $success_status = ['success', 'updated', 'deleted'];
+
+                    if (in_array($_GET['status'], $success_status)) : ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">
+                            <?php
+                            switch ($_GET['status']) {
+                                case 'success':
+                                    echo 'Evaluación Registrada';
+                                    break;
+                                case 'updated':
+                                    echo 'Evaluación Actualizada';
+                                    break;
+                                case 'deleted':
+                                    echo 'Evaluación Eliminada';
+                                    break;
+                            }
+                            ?>
+                        </strong>
+                    <?php else: ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Error</strong>
+                    <?php endif; ?>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+
+                <div class="toast-body">
+                    <?php
+                    switch ($_GET['status']) {
+                        // Éxitos
+                        case 'success':
+                            echo "La evaluación conductual se ha registrado correctamente.";
+                            break;
+                        case 'updated':
+                            echo "La evaluación conductual se ha actualizado correctamente.";
+                            break;
+                        case 'deleted':
+                            echo "La evaluación conductual se ha eliminado correctamente.";
+                            break;
+
+                        // Errores
+                        case 'missing_data':
+                            echo "Debes responder todas las preguntas para enviar la evaluación.";
+                            break;
+                        case 'invalid_value':
+                            echo "Uno de los valores seleccionados no es válido. Revisa tus respuestas.";
+                            break;
+                        case 'invalid_user':
+                            echo "Usuario no válido. Por favor, inicia sesión nuevamente.";
+                            break;
+                        case 'prepare_error':
+                            echo "Error en la preparación de la consulta SQL. Intenta nuevamente.";
+                            break;
+                        case 'db_error':
+                            echo "Error al guardar los datos en la base de datos.";
+                            break;
+                        default:
+                            echo "Ocurrió un error inesperado. Por favor, inténtalo más tarde.";
+                            break;
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 
     <?php renderFooterAdmin(); ?>
 

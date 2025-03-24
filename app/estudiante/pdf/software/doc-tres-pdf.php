@@ -1,46 +1,98 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
+// Verificar si el usuario ha iniciado sesión
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acceso no autorizado. Por favor, inicia sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Verificar si el ID del documento está presente
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-// Obtener y sanitizar el ID
+// Sanitizar el ID
 $id = intval($_GET['id']);
 if ($id <= 0) {
     die("ID inválido.");
 }
 
-// Consulta para obtener los datos del estudiante
-$sql = "SELECT 
-    u.nombres, 
-    u.apellidos, 
-    u.cedula, 
-    c.carrera AS carrera,
-    d2.fecha_inicio, 
-    d2.fecha_fin,
-    d2.hora_practicas, 
-    d2.nombre_tutor_academico, 
-    d3.nombres_tutor_receptor, 
-    d3.cargo_tutor_receptor, 
-    d3.nombre_entidad_receptora, 
-    d3.ciudad_entidad_receptora
-FROM documento_tres d3
-JOIN usuarios u ON d3.usuario_id = u.id
-LEFT JOIN documento_dos d2 ON d3.usuario_id = d2.usuario_id
-INNER JOIN carrera c ON u.carrera_id = c.id
-WHERE d3.id = $id;";
+// Consultar el rol del usuario
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-$result = $conn->query($sql);
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
+}
 
-// Verificar si hay resultados
+$usuario = $result_rol->fetch_assoc();
+$rol = $usuario['rol'];
+
+// Consultar el documento dependiendo del rol
+if ($rol === 'estudiante') {
+    // El estudiante solo puede ver sus propios documentos
+    $sql = "SELECT 
+                u.nombres, 
+                u.apellidos, 
+                u.cedula, 
+                c.carrera AS carrera,
+                d2.fecha_inicio, 
+                d2.fecha_fin,
+                d2.hora_practicas, 
+                d2.nombre_tutor_academico, 
+                d3.nombres_tutor_receptor, 
+                d3.cargo_tutor_receptor, 
+                d3.nombre_entidad_receptora, 
+                d3.ciudad_entidad_receptora
+            FROM documento_tres d3
+            JOIN usuarios u ON d3.usuario_id = u.id
+            LEFT JOIN documento_dos d2 ON d3.usuario_id = d2.usuario_id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d3.id = ? AND d3.usuario_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $id, $usuario_id);
+} else {
+    // El gestor puede ver cualquier documento
+    $sql = "SELECT 
+                u.nombres, 
+                u.apellidos, 
+                u.cedula, 
+                c.carrera AS carrera,
+                d2.fecha_inicio, 
+                d2.fecha_fin,
+                d2.hora_practicas, 
+                d2.nombre_tutor_academico, 
+                d3.nombres_tutor_receptor, 
+                d3.cargo_tutor_receptor, 
+                d3.nombre_entidad_receptora, 
+                d3.ciudad_entidad_receptora
+            FROM documento_tres d3
+            JOIN usuarios u ON d3.usuario_id = u.id
+            LEFT JOIN documento_dos d2 ON d3.usuario_id = d2.usuario_id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d3.id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Validar si hay datos
 if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+    die("No tienes permiso para ver este documento o no existe.");
 }
 
 // Obtener los datos
 $estudiante = $result->fetch_assoc();
+
 
 // Extraer variables
 $nombres = $estudiante['apellidos'] . ' ' . $estudiante['nombres'];

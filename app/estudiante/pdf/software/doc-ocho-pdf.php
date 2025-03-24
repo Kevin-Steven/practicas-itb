@@ -1,34 +1,81 @@
 <?php
+session_start();
 require '../../../config/config.php';
 require_once('../../../../TCPDF-main/tcpdf.php');
 
+// Verificar sesión activa
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acceso no autorizado. Por favor, inicia sesión.");
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Verificar y sanitizar el ID del documento
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID no proporcionado o vacío.");
 }
 
-$id = intval($_GET['id']);
-if ($id <= 0) {
+$documento_id = intval($_GET['id']);
+if ($documento_id <= 0) {
     die("ID inválido.");
 }
 
-$sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d3.departamento_entidad_receptora,
-        ia.semana_inicio, ia.semana_fin, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
-        d3.nombres_tutor_receptor as tutor_entidad, d3.numero_telefono_tutor_receptor, d3.nombre_entidad_receptora as nombre_entidad,
-        d8.nombre_doc
-        FROM usuarios u
-        LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
-        LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
-        LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
-        LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
-        LEFT JOIN documento_seis d6 ON u.id = d6.usuario_id
-        LEFT JOIN documento_cinco d5 ON u.id = d5.usuario_id
-        INNER JOIN carrera c ON u.carrera_id = c.id
-        WHERE d8.id = $id";
+// Obtener el rol del usuario
+$sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
+$stmt_rol = $conn->prepare($sql_rol);
+$stmt_rol->bind_param("i", $usuario_id);
+$stmt_rol->execute();
+$result_rol = $stmt_rol->get_result();
 
-$result = $conn->query($sql);
+if ($result_rol->num_rows === 0) {
+    die("Usuario no encontrado.");
+}
+
+$rol = $result_rol->fetch_assoc()['rol'];
+
+// Consulta: depende del rol (estudiante solo puede ver su documento)
+if ($rol === 'estudiante') {
+    $sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d3.departamento_entidad_receptora,
+            ia.semana_inicio, ia.semana_fin, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
+            d3.nombres_tutor_receptor as tutor_entidad, d3.numero_telefono_tutor_receptor, d3.nombre_entidad_receptora as nombre_entidad,
+            d8.nombre_doc
+            FROM usuarios u
+            LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
+            LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
+            LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
+            LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
+            LEFT JOIN documento_seis d6 ON u.id = d6.usuario_id
+            LEFT JOIN documento_cinco d5 ON u.id = d5.usuario_id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d8.id = ? AND u.id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $documento_id, $usuario_id);
+} else {
+    // El gestor puede ver cualquier documento
+    $sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d3.departamento_entidad_receptora,
+            ia.semana_inicio, ia.semana_fin, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
+            d3.nombres_tutor_receptor as tutor_entidad, d3.numero_telefono_tutor_receptor, d3.nombre_entidad_receptora as nombre_entidad,
+            d8.nombre_doc
+            FROM usuarios u
+            LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
+            LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
+            LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
+            LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
+            LEFT JOIN documento_seis d6 ON u.id = d6.usuario_id
+            LEFT JOIN documento_cinco d5 ON u.id = d5.usuario_id
+            INNER JOIN carrera c ON u.carrera_id = c.id
+            WHERE d8.id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $documento_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    die("No se encontraron datos para este estudiante.");
+    die("No tienes permiso para ver este documento o no existe.");
 }
 
 $actividades = [];
