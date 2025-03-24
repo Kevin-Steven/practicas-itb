@@ -11,14 +11,15 @@ if ($id <= 0) {
     die("ID inválido.");
 }
 
-$sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d8.departamento,
-        ia.semanas_fecha, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
-        d6.nombres_representante as tutor_entidad, d6.numero_telefono as telefono_tutor, d5.nombre_entidad_receptora as nombre_entidad,
+$sql = "SELECT u.nombres, u.apellidos, u.cedula, c.carrera AS carrera, u.periodo, d8.motivo_rechazo, d3.departamento_entidad_receptora,
+        ia.semana_inicio, ia.semana_fin, ia.horas_realizadas, ia.actividades_realizadas, d2.fecha_inicio, d2.fecha_fin, d2.hora_practicas,
+        d3.nombres_tutor_receptor as tutor_entidad, d3.numero_telefono_tutor_receptor, d3.nombre_entidad_receptora as nombre_entidad,
         d8.nombre_doc
         FROM usuarios u
         LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
         LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
         LEFT JOIN documento_dos d2 ON u.id = d2.usuario_id
+        LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
         LEFT JOIN documento_seis d6 ON u.id = d6.usuario_id
         LEFT JOIN documento_cinco d5 ON u.id = d5.usuario_id
         INNER JOIN carrera c ON u.carrera_id = c.id
@@ -41,7 +42,8 @@ while ($row = $result->fetch_assoc()) {
 
     // Guardamos cada actividad
     $actividades[] = [
-        'semanas_fecha' => $row['semanas_fecha'] ?: 'N/A',
+        'semana_inicio' => $row['semana_inicio'] ?: 'N/A',
+        'semana_fin' => $row['semana_fin'] ?: 'N/A',
         'horas_realizadas' => $row['horas_realizadas'] ?: 'N/A',
         'actividades_realizadas' => $row['actividades_realizadas'] ?: 'N/A'
     ];
@@ -54,9 +56,9 @@ $carrera = $estudiante['carrera'] ?: 'N/A';
 $periodoAcademico = $estudiante['periodo'] ?: 'N/A';
 $horas_practicas = $estudiante['hora_practicas'] ?: 'N/A';
 $nombre_tutor_academico = $estudiante['tutor_entidad'] ?: 'N/A';
-$telefono_tutor = $estudiante['telefono_tutor'] ?: 'N/A';
+$telefono_tutor = $estudiante['numero_telefono_tutor_receptor'] ?: 'N/A';
 $nombre_entidad = $estudiante['nombre_entidad'] ?: 'N/A';
-$departamento = $estudiante['departamento'] ?: 'N/A';
+$departamento = $estudiante['departamento_entidad_receptora'] ?: 'N/A';
 $motivo_rechazo = $estudiante['motivo_rechazo'] ?: 'N/A';
 $nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
@@ -210,11 +212,37 @@ $html_tabla1 = '
         <td style="width: 50%;">Actividades realizadas</td>
     </tr>
 ';
+$meses_es = [
+    1  => 'enero',
+    2  => 'febrero',
+    3  => 'marzo',
+    4  => 'abril',
+    5  => 'mayo',
+    6  => 'junio',
+    7  => 'julio',
+    8  => 'agosto',
+    9  => 'septiembre',
+    10 => 'octubre',
+    11 => 'noviembre',
+    12 => 'diciembre'
+];
 
 foreach ($actividades as $actividad) {
+    // Crear objetos DateTime desde los valores que ya tienes
+    $inicio = new DateTime($actividad['semana_inicio']);
+    $fin = new DateTime($actividad['semana_fin']);
+
+    // Mes de la fecha final para el texto
+    $numero_mes_fin = (int) $fin->format('n');
+    $mes_nombre = $meses_es[$numero_mes_fin];
+
+    // Formatear el texto de la fecha como "Fecha 03 al 07, Marzo de 2025"
+    $formato_fecha = 'Fecha ' . $inicio->format('d') . ' al ' . $fin->format('d') . ', ' . ucfirst($mes_nombre) . ' de ' . $fin->format('Y');
+
+    // Ahora generas la fila de la tabla con el formato bonito
     $html_tabla1 .= '
     <tr>
-        <td>' . htmlspecialchars($actividad['semanas_fecha']) . '</td>
+        <td>' . htmlspecialchars($formato_fecha) . '</td>
         <td style="text-align: center;">' . htmlspecialchars($actividad['horas_realizadas']) . ' horas</td>
         <td>' . htmlspecialchars($actividad['actividades_realizadas']) . '</td>
     </tr>

@@ -19,7 +19,6 @@ $hora_inicio = trim($_POST['horario_practica_inicio'] ?? '');
 $hora_fin = trim($_POST['horario_practica_fin'] ?? '');
 $jornada_laboral = trim($_POST['jornada_laboral'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
-$numero_telefono = trim($_POST['numero_telefono'] ?? '');
 $numero_institucional = trim($_POST['numero_institucional'] ?? '');
 
 // 3. Validaciones básicas
@@ -29,18 +28,12 @@ if (
     empty($hora_inicio) ||
     empty($hora_fin) ||
     empty($jornada_laboral) ||
-    empty($numero_practicas) ||
-    empty($numero_telefono)
+    empty($numero_practicas)
 ) {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=missing_data");
     exit();
 }
 
-// 4. Validaciones específicas
-if (!preg_match('/^[0-9]{10}$/', $numero_telefono)) {
-    header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=invalid_phone");
-    exit();
-}
 
 if ($usuario_id_form !== $usuario_id_session) {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=invalid_user");
@@ -48,7 +41,7 @@ if ($usuario_id_form !== $usuario_id_session) {
 }
 
 // 5. Obtener el ID del último documento_seis de este usuario
-$sql_select = "SELECT id, actividad_economica, provincia, hora_inicio, hora_fin, jornada_laboral, numero_practicas, numero_telefono, numero_institucional 
+$sql_select = "SELECT id, actividad_economica, provincia, hora_inicio, hora_fin, jornada_laboral, numero_practicas, numero_institucional 
 FROM documento_seis 
 WHERE usuario_id = ? 
 ORDER BY id DESC 
@@ -76,7 +69,6 @@ $hubo_cambios = (
     $hora_fin !== $datos_actuales['hora_fin'] ||
     $jornada_laboral !== $datos_actuales['jornada_laboral'] ||
     $numero_practicas !== $datos_actuales['numero_practicas'] ||
-    $numero_telefono !== $datos_actuales['numero_telefono'] ||
     $numero_institucional !== $datos_actuales['numero_institucional']
 );
 
@@ -94,7 +86,6 @@ $sql_update = "UPDATE documento_seis SET
     hora_fin = ?, 
     jornada_laboral = ?, 
     numero_practicas = ?, 
-    numero_telefono = ?, 
     numero_institucional = ?, 
     estado = 'Pendiente' 
 WHERE id = ?";
@@ -107,14 +98,13 @@ if (!$stmt_update) {
 }
 
 $stmt_update->bind_param(
-    "ssssssssi",
+    "sssssssi",
     $actividad_economica,
     $provincia,
     $hora_inicio,
     $hora_fin,
     $jornada_laboral,
     $numero_practicas,
-    $numero_telefono,
     $numero_institucional,
     $id_documento_seis
 );

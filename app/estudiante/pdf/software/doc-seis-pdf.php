@@ -13,34 +13,35 @@ if ($id <= 0) {
 }
 
 // Consulta para obtener los datos del estudiante
-$sql = "SELECT d6.id, 
-       d6.actividad_economica, 
-       d6.provincia, 
-       d6.horario_practica, 
+$sql = "SELECT
+       d6.id,
+       d6.actividad_economica,
+       d6.provincia,
+       d6.hora_inicio,
+       d6.hora_fin,
        d6.jornada_laboral,
-       d6.nombres_representante, 
-       d6.cargo_tutor, 
-       d6.numero_practicas, 
-       d6.numero_telefono, 
-       d6.estado, 
-       d6.nombre_doc,
+       d6.numero_practicas,
        d6.numero_institucional,
+       d6.estado,
+       d3.nombres_tutor_receptor,
+       d3.cargo_tutor_receptor,
+       d3.nombre_entidad_receptora,
+       d3.ciudad_entidad_receptora ,
+       d3.numero_telefono_tutor_receptor,
        u.nombres, 
        u.apellidos, 
-       d5.nombre_entidad_receptora,
        d5.ruc, 
        d5.direccion_entidad_receptora, 
        d5.logo_entidad_receptora, 
-       d5.nombre_ciudad, 
        d5.nombre_representante_rrhh, 
-       d5.numero_representante_rrhh, 
-       d5.correo_representante,
+       d5.correo_institucional as correo_representante,
        d2.fecha_inicio, 
        d2.fecha_fin
 FROM documento_seis d6
 JOIN usuarios u ON d6.usuario_id = u.id
 JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
 JOIN documento_dos d2 ON d6.usuario_id = d2.usuario_id
+JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
 WHERE d6.id = $id
 LIMIT 1
 ";
@@ -57,15 +58,27 @@ $estudiante = $result->fetch_assoc();
 
 $actividad_economica = $estudiante['actividad_economica'] ?? 'N/A';
 $provincia = $estudiante['provincia'] ?? 'N/A';
-$horario_practica = $estudiante['horario_practica'] ?? 'N/A';
+$hora_inicio = $estudiante['hora_inicio'] ?? 'N/A';
+$hora_fin = $estudiante['hora_fin'] ?? 'N/A';
+
+// Formatear las horas si no están vacías o en N/A
+if ($hora_inicio !== 'N/A') {
+    $hora_inicio = date('H:i', strtotime($hora_inicio));
+}
+
+if ($hora_fin !== 'N/A') {
+    $hora_fin = date('H:i', strtotime($hora_fin));
+}
 $jornada_laboral = $estudiante['jornada_laboral'] ?? 'N/A';
 
 $nombres_tutor = $estudiante['nombres_representante'] ?? 'N/A';
 $cargo_tutor = $estudiante['cargo_tutor'] ?? 'N/A';
 $numero_practicas = $estudiante['numero_practicas'] ?? 'N/A';
-$numero_telefono = $estudiante['numero_telefono'] ?? 'N/A';
+$numero_telefono = $estudiante['numero_telefono_tutor_receptor'] ?? 'N/A';
 $nombre_doc = $estudiante['nombre_doc'] ?? 'N/A';
 $numero_institucional = $estudiante['numero_institucional'];
+$cargo_tutor_receptor = $estudiante['cargo_tutor_receptor'] ?? 'N/A';
+$nombres_tutor_receptor = $estudiante['nombres_tutor_receptor'] ?? 'N/A';
 
 $estado = $estudiante['estado'] ?? 'N/A';
 
@@ -77,10 +90,8 @@ $nombre_entidad_receptora = $estudiante['nombre_entidad_receptora'] ?? 'N/A';
 $ruc = $estudiante['ruc'] ?? 'N/A';
 $direccion_entidad_receptora = $estudiante['direccion_entidad_receptora'] ?? 'N/A';
 $logo_entidad_receptora = $estudiante['logo_entidad_receptora'] ?? 'N/A';
-$nombre_ciudad = $estudiante['nombre_ciudad'] ?? 'N/A';
+$nombre_ciudad_entidad_receptora = $estudiante['ciudad_entidad_receptora'] ?? 'N/A';
 
-$nombre_representante_legal = $estudiante['nombre_representante'] ?? 'N/A';
-$numero_representante_rrhh = $estudiante['numero_representante_rrhh'] ?? 'N/A';
 $correo_representante = $estudiante['correo_representante'] ?? 'N/A';
 
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
@@ -249,7 +260,7 @@ $tabla5 = '
     <tr>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Ciudad:</strong><br>
-            ' . $nombre_ciudad . '
+            ' . $nombre_ciudad_entidad_receptora . '
         </td>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Provincia:</strong><br>
@@ -279,7 +290,7 @@ $tabla7 = '
     <tr>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Horario de la práctica:</strong><br>
-            ' . $horario_practica . '
+            ' . $hora_inicio . ' a ' . $hora_fin . '
         </td>
         <td style="width: 50%; font-size: 12px; line-height: 1.7;">
             <strong>Jornada laboral:</strong><br>
@@ -294,7 +305,7 @@ $tabla8 = '
     <tr>
         <td style="font-size: 12px; line-height: 1.7;">
                 <strong>Nombres y Apellidos del tutor de la entidad receptora:</strong><br>
-                ' . $nombres_tutor . '
+                ' . $nombres_tutor_receptor . '
         </td>
     </tr>
 </table>
@@ -305,7 +316,7 @@ $tabla9 = '
     <tr>
         <td style="width: 50%; font-size: 12px;">
             <strong>Cargo del tutor de la entidad receptora:</strong><br>
-            ' . $cargo_tutor . '
+            ' . $cargo_tutor_receptor . '
         </td>
         <td style="width: 50%; font-size: 12px;">
             <strong>Número de prácticas:</strong><br>
@@ -341,34 +352,34 @@ $tabla11 = '
 </table>
 ';
 
-$pdf->writeHTMLCell('','', '', '', $tabla1, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla1, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla2, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla2, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla3, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla3, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla4, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla4, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla5, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla5, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla6, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla6, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla7, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla7, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla8, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla8, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla9, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla9, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla10, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla10, 0, 1, 0, true, 'J', '', '');
 $pdf->Ln(4);
-$pdf->writeHTMLCell('','', '', '', $tabla11, 0, 1, 0, true, 'J', '','');
+$pdf->writeHTMLCell('', '', '', '', $tabla11, 0, 1, 0, true, 'J', '', '');
 
 
 $pdf->Ln(7);
 
 $pdf->Ln(10);
 $pdf->SetFont('times', 'B', 12);
-$pdf->Cell(0, 1, $nombre_completo_estudiante , 0, 1, 'C');
+$pdf->Cell(0, 1, $nombre_completo_estudiante, 0, 1, 'C');
 $pdf->Cell(0, 1, '_____________________________________', 0, 1, 'C');
 
 $pdf->Output($nombre_doc . '.pdf', 'I');

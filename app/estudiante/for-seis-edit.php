@@ -24,11 +24,11 @@ $sql_doc_seis = "SELECT
         d6.hora_fin,
        d6.jornada_laboral,
        d6.numero_practicas,
-       d6.numero_telefono,
        d6.numero_institucional,
        d6.estado,
        d3.nombres_tutor_receptor,
-       d3.cargo_tutor_receptor
+       d3.cargo_tutor_receptor,
+       d3.numero_telefono_tutor_receptor
 FROM documento_seis d6
 LEFT JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
 WHERE d6.usuario_id = ?
@@ -51,7 +51,7 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $nombres_tutor_receptor = $row['nombres_tutor_receptor'];
     $cargo_tutor_receptor = $row['cargo_tutor_receptor'];
     $numero_practicas = $row['numero_practicas'];
-    $numero_telefono = $row['numero_telefono'];
+    $numero_telefono = $row['numero_telefono_tutor_receptor'];
     $numero_institucional = $row['numero_institucional'];
 }
 
@@ -155,10 +155,10 @@ if (!$conn) {
 
                                 <!-- Número de teléfono celular -->
                                 <div class="mb-2">
-                                    <label for="numero_telefono" class="form-label fw-bold">Número de teléfono celular:</label>
+                                    <label for="numero_telefono" class="form-label fw-bold">Número de teléfono tutor:</label>
                                     <input type="text" class="form-control" id="numero_telefono" name="numero_telefono"
-                                        maxlength="10" placeholder="Ej: 0987654321" oninput="validateInput(this)" required
-                                        value="<?php echo htmlspecialchars($numero_telefono ?? '', ENT_QUOTES); ?>">
+                                        maxlength="10" placeholder="Ej: 0987654321" oninput="validateInput(this)" 
+                                        value="<?php echo htmlspecialchars($numero_telefono ?? '', ENT_QUOTES); ?>" disabled>
                                 </div>
                             </div>
 

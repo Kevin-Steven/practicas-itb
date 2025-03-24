@@ -91,7 +91,7 @@ if (!$conn) {
                                 </div>
                                 <div class="mb-2">
                                     <label for="ruc" class="form-label fw-bold">RUC:</label>
-                                    <input type="text" class="form-control" id="ruc" name="ruc" value="<?php echo $ruc; ?>">
+                                    <input type="text" class="form-control" maxlength="13" oninput="validateInput(this)" id="ruc" name="ruc" value="<?php echo $ruc; ?>">
                                 </div>
                                 <div class="mb-2">
                                     <label for="direccion-entidad" class="form-label fw-bold">Dirección de la entidad receptora:</label>

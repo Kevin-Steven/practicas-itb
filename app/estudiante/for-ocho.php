@@ -26,15 +26,17 @@ $sql_doc_ocho = "SELECT
     d8.id AS documento_ocho_id,
     d8.estado, 
     d8.motivo_rechazo,
-    d8.departamento,
+    d3.departamento_entidad_receptora,
 
-    ia.semanas_fecha,
+    ia.semana_inicio,
+    ia.semana_fin,
     ia.horas_realizadas,
     ia.actividades_realizadas
 
 FROM usuarios u
 LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
 LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
+LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
 WHERE u.id = ?
 ORDER BY d8.id DESC";
 
@@ -57,15 +59,17 @@ while ($row = $result_doc_ocho->fetch_assoc()) {
             'documento_ocho_id' => $row['documento_ocho_id'],
             'estado' => $row['estado'],
             'motivo_rechazo' => $row['motivo_rechazo'],
-            'departamento' => $row['departamento']
+            'departamento' => $row['departamento_entidad_receptora']
         ];
     }
 
-    if (!empty($row['semanas_fecha'])) {
+    if (!empty($row['semana_inicio'])) {
         $informe_actividades[] = [
-            'semanas_fecha' => $row['semanas_fecha'],
+            'semana_inicio' => $row['semana_inicio'],
+            'semana_fin' => $row['semana_fin'],
             'horas_realizadas' => $row['horas_realizadas'],
             'actividades_realizadas' => $row['actividades_realizadas']
+
         ];
     }
 }
@@ -95,7 +99,7 @@ $departamento = $usuario_info['departamento'] ?? null;
     <title>Informe de Actividades</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" href="../../images/favicon.png" type="image/png">
 
 </head>
@@ -241,7 +245,7 @@ $departamento = $usuario_info['departamento'] ?? null;
 
                                     <div class="mb-3">
                                         <label for="departamento" class="form-label fw-bold">Departamento</label>
-                                        <input type="text" class="form-control" id="departamento" name="departamento" placeholder="ej. Departamento de Sistemas" required>
+                                        <input type="text" class="form-control" id="departamento" name="departamento" placeholder="ej. Departamento de Sistemas" value="<?php echo htmlspecialchars($departamento); ?>" disabled>
                                     </div>
 
                                     <input type="hidden" name="usuario_id" value="<?php echo $usuario_info['id']; ?>">
@@ -255,7 +259,10 @@ $departamento = $usuario_info['departamento'] ?? null;
                                         <div class="semana border p-3 mb-3">
                                             <div class="mb-2">
                                                 <label for="semana" class="form-label fw-bold">Semanas/Fecha:</label>
-                                                <input type="text" class="form-control" name="semana[]" placeholder="ej. Fecha 28 al 01, noviembre de 2024" required>
+                                                <div class="d-flex gap-2">
+                                                    <input type="date" class="form-control" name="semana_inicio[]" required>
+                                                    <input type="date" class="form-control" name="semana_fin[]" required>
+                                                </div>
                                             </div>
 
                                             <div class="mb-2">
@@ -310,7 +317,33 @@ $departamento = $usuario_info['departamento'] ?? null;
                         <tbody>
                             <?php if (!empty($informe_actividades)): ?>
 
-                                <?php foreach ($informe_actividades as $index => $ia): ?>
+                                <?php
+                                $meses_es = [
+                                    1  => 'enero',
+                                    2  => 'febrero',
+                                    3  => 'marzo',
+                                    4  => 'abril',
+                                    5  => 'mayo',
+                                    6  => 'junio',
+                                    7  => 'julio',
+                                    8  => 'agosto',
+                                    9  => 'septiembre',
+                                    10 => 'octubre',
+                                    11 => 'noviembre',
+                                    12 => 'diciembre'
+                                ];
+                                foreach ($informe_actividades as $index => $ia):
+                                    // Convertimos las fechas a objetos DateTime
+                                    $inicio = new DateTime($ia['semana_inicio']);
+                                    $fin = new DateTime($ia['semana_fin']);
+
+                                    // Obtenemos el número del mes (para buscar en el array)
+                                    $numero_mes_fin = (int) $fin->format('n');
+                                    $mes_nombre = $meses_es[$numero_mes_fin];
+
+                                    // Formateamos el texto de la fecha
+                                    $formato_fecha = 'Fecha ' . $inicio->format('d') . ' al ' . $fin->format('d') . ', ' . ucfirst($mes_nombre) . ' de ' . $fin->format('Y');
+                                ?>
                                     <tr>
                                         <!-- ✅ Solo en la primera fila mostramos Departamento, Estado y Acciones con rowspan -->
                                         <?php if ($index === 0): ?>
@@ -320,7 +353,7 @@ $departamento = $usuario_info['departamento'] ?? null;
                                         <?php endif; ?>
 
                                         <!-- ✅ Semanas/Fecha siempre cambia -->
-                                        <td><?= htmlspecialchars($ia['semanas_fecha'] ?? 'No aplica'); ?></td>
+                                        <td><?= htmlspecialchars($formato_fecha); ?></td>
 
                                         <!-- ✅ Horas realizadas -->
                                         <td class="text-center"><?= htmlspecialchars($ia['horas_realizadas'] ?? 'No aplica'); ?></td>

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const botonAgregarSemana = document.getElementById('agregar-semana');
     const modalCamposIncompletos = new bootstrap.Modal(document.getElementById('modalCamposIncompletos'));
 
-    let contadorSemanas = 1;
+    let contadorSemanas = contenedorActividades.querySelectorAll('.semana').length || 1;
 
     botonAgregarSemana.addEventListener('click', function() {
         const semanas = contenedorActividades.querySelectorAll('.semana');
@@ -24,24 +24,33 @@ document.addEventListener('DOMContentLoaded', function() {
             return; // ✅ Evita agregar otra semana
         }
 
-        // ✅ Ocultar todas las semanas existentes
-        semanas.forEach(semana => semana.style.display = 'none');
-
         // ✅ Clona la última semana
         const nuevaSemana = ultimaSemana.cloneNode(true);
 
-        // ✅ Limpia los campos del clon
-        const inputsNuevaSemana = nuevaSemana.querySelectorAll('input, textarea');
-        inputsNuevaSemana.forEach(input => input.value = '');
+        // ✅ Limpia los campos específicos (fechas y demás)
+        const inputFechaInicio = nuevaSemana.querySelector('input[name="semana_inicio[]"]');
+        const inputFechaFin = nuevaSemana.querySelector('input[name="semana_fin[]"]');
+        const inputHorasRealizadas = nuevaSemana.querySelector('input[name="horas_realizadas[]"]');
+        const textareaActividades = nuevaSemana.querySelector('textarea[name="actividades_realizadas[]"]');
 
-        // ✅ Agregar encabezado dinámico si no existe
+        if (inputFechaInicio) inputFechaInicio.value = '';
+        if (inputFechaFin) inputFechaFin.value = '';
+        if (inputHorasRealizadas) inputHorasRealizadas.value = '';
+        if (textareaActividades) textareaActividades.value = '';
+
+        // ✅ Agregar encabezado dinámico o actualizarlo
         let encabezado = nuevaSemana.querySelector('.titulo-semana');
         if (!encabezado) {
             encabezado = document.createElement('h5');
             encabezado.classList.add('titulo-semana', 'mb-3');
             nuevaSemana.prepend(encabezado);
         }
-        encabezado.textContent = `Semana ${contadorSemanas + 1}`;
+        contadorSemanas++;
+        encabezado.textContent = `Semana ${contadorSemanas}`;
+
+        // ✅ Mostrar el botón de eliminar en el clon
+        const botonEliminar = nuevaSemana.querySelector('.eliminar-semana');
+        botonEliminar.style.display = 'inline-block';
 
         // ✅ Aplica estilos visuales al clon
         nuevaSemana.style.border = '2px dashed #007bff';
@@ -49,15 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
         nuevaSemana.style.backgroundColor = '#f0f8ff';
         nuevaSemana.style.marginBottom = '15px';
 
-        // ✅ Muestra el botón de eliminar en el clon
-        const botonEliminar = nuevaSemana.querySelector('.eliminar-semana');
-        botonEliminar.style.display = 'inline-block';
-
-        nuevaSemana.style.display = 'block';
-
+        // ✅ Agregar el clon al final del contenedor (debajo de todo)
         contenedorActividades.appendChild(nuevaSemana);
-
-        contadorSemanas++;
     });
 
     // ✅ Delegación de eventos para eliminar una semana
@@ -68,38 +70,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const semanas = contenedorActividades.querySelectorAll('.semana');
 
-            if (semanas.length > 1) {
-                // ✅ Oculta todas menos la última
-                semanas.forEach((semana, index) => {
-                    semana.style.display = (index === semanas.length - 1) ? 'block' : 'none';
-                });
+            // ✅ Recalcular contador de semanas y actualizar encabezados
+            contadorSemanas = semanas.length;
 
-                // ✅ Actualiza el encabezado y estilos
-                const ultima = semanas[semanas.length - 1];
-                const encabezado = ultima.querySelector('.titulo-semana');
+            semanas.forEach((semana, index) => {
+                const encabezado = semana.querySelector('.titulo-semana');
                 if (encabezado) {
-                    encabezado.textContent = `Semana ${semanas.length}`;
-                    ultima.style.border = '2px dashed #007bff';
-                    ultima.style.backgroundColor = '#f0f8ff';
-                } else {
-                    ultima.style.border = '';
-                    ultima.style.backgroundColor = '';
+                    encabezado.textContent = `Semana ${index + 1}`;
                 }
 
-                contadorSemanas = semanas.length;
-            } else {
-                // ✅ Si solo queda una semana
-                semanas[0].style.display = 'block';
-                semanas[0].style.border = '';
-                semanas[0].style.backgroundColor = '';
-                contadorSemanas = 1;
-            }
+                if (index === 0) {
+                    // ✅ Oculta el botón eliminar de la primera semana
+                    const btnEliminar = semana.querySelector('.eliminar-semana');
+                    btnEliminar.style.display = 'none';
+                    semana.style.border = '';
+                    semana.style.backgroundColor = '';
+                } else {
+                    // ✅ Estilos para las semanas restantes
+                    semana.style.border = '2px dashed #007bff';
+                    semana.style.backgroundColor = '#f0f8ff';
+                }
+            });
         }
     });
 
-    // ✅ Oculta el botón de eliminar en la primera semana
+    // ✅ Inicial: Oculta el botón de eliminar en la primera semana
     const primeraSemana = contenedorActividades.querySelector('.semana');
     if (primeraSemana) {
-        primeraSemana.querySelector('.eliminar-semana').style.display = 'none';
+        const btnEliminar = primeraSemana.querySelector('.eliminar-semana');
+        if (btnEliminar) btnEliminar.style.display = 'none';
     }
 });

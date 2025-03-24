@@ -181,7 +181,7 @@ if (!$conn) {
 
                                     <div class="mb-2">
                                         <label for="numero_telefono_tutor_receptor" class="form-label fw-bold">Número de Teléfono Tutor Entidad Receptora:</label>
-                                        <input type="text" class="form-control" id="numero_telefono_tutor_receptor" name="numero_telefono_tutor_receptor" placeholder="Ej. 0987654321" pattern="[0-9]{10}" title="Debe contener 10 dígitos numéricos" required>
+                                        <input type="text" class="form-control" id="numero_telefono_tutor_receptor" name="numero_telefono_tutor_receptor" placeholder="Ej. 0987654321" maxlength="10" oninput="validateInput(this)" title="Debe contener 10 dígitos numéricos" required>
                                     </div>
                                 </div>
 
@@ -196,13 +196,15 @@ if (!$conn) {
                     </div>
                 </div>
             <?php else: ?>
+                <h2 class="text-center mb-4">Estado del Documento</h2>
                 <div class="table-responsive">
                     <table class="table table-bordered shadow-lg">
                         <thead class="table-light text-center">
-                            <h2 class="text-center mb-4">Estado del Documento</h2>
                             <tr>
                                 <th>Nombre Entidad Receptora</th>
                                 <th>Nombres Tutor Entidad Receptora</th>
+                                <th>Número de Teléfono Tutor Entidad Receptora</th>
+                                <th>Departamento Entidad Receptora</th>
                                 <th>Cargo Tutor Entidad Receptora</th>
                                 <th>Ciudad Entidad Receptora</th>
                                 <th>Estado</th>
@@ -214,6 +216,8 @@ if (!$conn) {
                                 <!-- ✅ Aquí tus datos -->
                                 <td class="text-center"><?php echo $nombre_entidad_receptora; ?></td>
                                 <td class="text-center"><?php echo $nombres_tutor_receptor; ?></td>
+                                <td class="text-center"><?php echo $numero_telefono_tutor_receptor; ?></td>
+                                <td class="text-center"><?php echo $departamento_entidad_receptora; ?></td>
                                 <td class="text-center"><?php echo $cargo_tutor_receptor; ?></td>
                                 <td class="text-center"><?php echo $ciudad_entidad_receptora; ?></td>
                                 <td class="text-center">
@@ -287,6 +291,7 @@ if (!$conn) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js"></script>
+    <script src="../js/number.js"></script>
 </body>
 
 </html>

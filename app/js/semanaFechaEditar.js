@@ -34,12 +34,15 @@ document.addEventListener('DOMContentLoaded', function () {
         tituloSemana.textContent = `Semana ${contadorSemanas + 1}`;
         nuevaSemana.appendChild(tituloSemana);
 
-        // ✅ Semanas/Fecha
+        // ✅ Semanas/Fecha INICIO y FIN
         const semanasFechaDiv = document.createElement('div');
         semanasFechaDiv.classList.add('mb-2');
         semanasFechaDiv.innerHTML = `
             <label class="form-label fw-bold">Semanas/Fecha:</label>
-            <input type="text" class="form-control" name="semana[]" placeholder="ej. Fecha 28 al 01, noviembre de 2024" required>
+            <div class="d-flex gap-2">
+                <input type="date" class="form-control" name="semana_inicio[]" required>
+                <input type="date" class="form-control" name="semana_fin[]" required>
+            </div>
         `;
         nuevaSemana.appendChild(semanasFechaDiv);
 
@@ -64,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // ✅ Botón eliminar
         const btnEliminar = document.createElement('button');
         btnEliminar.type = 'button';
-        btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-semana');
+        btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-semana', 'mt-2');
         btnEliminar.textContent = 'Eliminar';
         btnEliminar.style.backgroundColor = '#df1f1f';
         btnEliminar.style.color = '#ffffff';
@@ -89,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 contadorSemanas--;
             }
 
-            // ✅ Actualizar el nombre de las semanas
             actualizarNumeracionSemanas();
             actualizarBotonesEliminar();
         }
@@ -123,16 +125,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const semanas = contenedorActividades.querySelectorAll('.semana');
 
         semanas.forEach((semana, index) => {
-            const btnEliminar = semana.querySelector('.eliminar-semana');
+            let btnEliminar = semana.querySelector('.eliminar-semana');
 
             if (!btnEliminar) {
-                const nuevoBtn = document.createElement('button');
-                nuevoBtn.type = 'button';
-                nuevoBtn.classList.add('btn', 'btn-sm', 'eliminar-semana');
-                nuevoBtn.textContent = 'Eliminar';
-                nuevoBtn.style.backgroundColor = '#df1f1f';
-                nuevoBtn.style.color = '#ffffff';
-                semana.appendChild(nuevoBtn);
+                btnEliminar = document.createElement('button');
+                btnEliminar.type = 'button';
+                btnEliminar.classList.add('btn', 'btn-sm', 'eliminar-semana', 'mt-2');
+                btnEliminar.textContent = 'Eliminar';
+                btnEliminar.style.backgroundColor = '#df1f1f';
+                btnEliminar.style.color = '#ffffff';
+                semana.appendChild(btnEliminar);
             }
 
             if (semanas.length === 1) {

@@ -196,7 +196,7 @@ if (!$conn) {
                                     </div>
                                     <div class="mb-2">
                                         <label for="cedula_tutor" class="form-label fw-bold">Cédula del tutor:</label>
-                                        <input type="text" class="form-control" id="cedula_tutor" name="cedula_tutor" placeholder="ej. 1234567890" required>
+                                        <input type="text" maxlength="10" oninput="validateInput(this)" class="form-control" id="cedula_tutor" name="cedula_tutor" placeholder="ej. 1234567890" required>
                                     </div>
                                     <div class="mb-2">
                                         <label for="correo_tutor" class="form-label fw-bold">Correo electrónico del tutor:</label>
@@ -321,6 +321,7 @@ if (!$conn) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js"></script>
+    <script src="../js/number.js"></script>
 </body>
 
 </html>

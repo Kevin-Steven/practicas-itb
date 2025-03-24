@@ -18,7 +18,6 @@ $hora_inicio = $_POST['horario_practica_inicio'] ?? '';
 $hora_fin = $_POST['horario_practica_fin'] ?? '';
 $jornada_laboral = trim($_POST['jornada_laboral'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
-$numero_telefono = trim($_POST['numero_telefono'] ?? '');
 $numero_institucional = trim($_POST['numero_institucional'] ?? 'NO APLICA');
 
 // 3. Validación de campos obligatorios
@@ -28,18 +27,12 @@ if (
     empty($hora_inicio) ||
     empty($hora_fin) ||
     empty($jornada_laboral) ||
-    empty($numero_practicas) ||
-    empty($numero_telefono)
+    empty($numero_practicas)
 ) {
     header("Location: ../for-seis.php?status=missing_data");
     exit();
 }
 
-// 4. Validación de número de teléfono celular
-if (!preg_match('/^[0-9]{10}$/', $numero_telefono)) {
-    header("Location: ../for-seis.php?status=invalid_phone");
-    exit();
-}
 
 // 5. Validación de número institucional si lo ingresaron
 if (!empty($numero_institucional) && !preg_match('/^[0-9]{7,20}$/', $numero_institucional)) {
@@ -60,12 +53,11 @@ $sql_insert = "INSERT INTO documento_seis (
     provincia,
     jornada_laboral,
     numero_practicas,
-    numero_telefono,
     numero_institucional,
     hora_inicio,
     hora_fin,
     estado
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
 
 $stmt_insert = $conn->prepare($sql_insert);
 
@@ -76,13 +68,12 @@ if (!$stmt_insert) {
 
 // 8. Vincular parámetros (9 campos en total)
 $stmt_insert->bind_param(
-    "issssssss", // i = int, s = string
+    "isssssss", // i = int, s = string
     $usuario_id_session,     // i
     $actividad_economica,    // s
     $provincia,              // s
     $jornada_laboral,        // s
     $numero_practicas,       // s
-    $numero_telefono,        // s
     $numero_institucional,   // s
     $hora_inicio,            // s (TIME en formato hh:mm)
     $hora_fin                // s (TIME en formato hh:mm)

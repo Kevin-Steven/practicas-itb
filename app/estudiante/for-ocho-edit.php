@@ -26,15 +26,17 @@ $sql_doc_ocho = "SELECT
     d8.id AS documento_ocho_id,
     d8.estado, 
     d8.motivo_rechazo,
-    d8.departamento,
+    d3.departamento_entidad_receptora,
 
-    ia.semanas_fecha,
+    ia.semana_inicio,
+    ia.semana_fin,
     ia.horas_realizadas,
     ia.actividades_realizadas
 
 FROM usuarios u
 LEFT JOIN documento_ocho d8 ON d8.usuario_id = u.id
 LEFT JOIN informe_actividades ia ON d8.id = ia.documento_ocho_id
+LEFT JOIN documento_tres d3 ON u.id = d3.usuario_id
 WHERE u.id = ?
 ORDER BY d8.id DESC";
 
@@ -57,13 +59,14 @@ while ($row = $result_doc_ocho->fetch_assoc()) {
             'documento_ocho_id' => $row['documento_ocho_id'],
             'estado' => $row['estado'],
             'motivo_rechazo' => $row['motivo_rechazo'],
-            'departamento' => $row['departamento']
+            'departamento' => $row['departamento_entidad_receptora']
         ];
     }
 
-    if (!empty($row['semanas_fecha'])) {
+    if (!empty($row['semana_inicio'])) {
         $informe_actividades[] = [
-            'semanas_fecha' => $row['semanas_fecha'],
+            'semana_inicio' => $row['semana_inicio'],
+            'semana_fin' => $row['semana_fin'],
             'horas_realizadas' => $row['horas_realizadas'],
             'actividades_realizadas' => $row['actividades_realizadas']
         ];
@@ -150,7 +153,7 @@ $departamento = $usuario_info['departamento'] ?? null;
 
                                 <div class="mb-3">
                                     <label for="departamento" class="form-label fw-bold">Departamento</label>
-                                    <input type="text" class="form-control" id="departamento" name="departamento" placeholder="ej. Departamento de Sistemas" value="<?php echo htmlspecialchars($usuario_info['departamento']); ?>">
+                                    <input type="text" class="form-control" id="departamento" name="departamento" placeholder="ej. Departamento de Sistemas" value="<?php echo htmlspecialchars($usuario_info['departamento']); ?>" disabled>
                                 </div>
 
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_info['id']; ?>">
@@ -166,7 +169,10 @@ $departamento = $usuario_info['departamento'] ?? null;
                                             <div class="semana border p-3 mb-3 rounded">
                                                 <div class="mb-2">
                                                     <label for="semana" class="form-label fw-bold">Semanas/Fecha:</label>
-                                                    <input type="text" class="form-control" name="semana[]" placeholder="ej. Fecha 28 al 01, noviembre de 2024" required value="<?php echo htmlspecialchars($exp['semanas_fecha']); ?>">
+                                                    <div class="d-flex gap-2">
+                                                        <input type="date" class="form-control" name="semana_inicio[]" required value="<?php echo htmlspecialchars($exp['semana_inicio']); ?>">
+                                                        <input type="date" class="form-control" name="semana_fin[]" required value="<?php echo htmlspecialchars($exp['semana_fin']); ?>">
+                                                    </div>
                                                 </div>
 
                                                 <div class="mb-2">
