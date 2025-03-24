@@ -56,7 +56,6 @@ if ($result->num_rows === 0) {
 $estudiante = $result->fetch_assoc();
 
 
-
 $nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
 $opcion_uno_puntaje = $estudiante['opcion_uno_puntaje'] ?: null;
 $opcion_dos_puntaje = $estudiante['opcion_dos_puntaje'] ?: null;

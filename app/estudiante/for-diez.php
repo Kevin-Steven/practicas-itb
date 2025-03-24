@@ -11,53 +11,58 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
-
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
-
 $usuario_id = $_SESSION['usuario_id'];
-
-$sql_doc_dos = "SELECT 
-       d2.id,
-       d2.estado, 
-       d2.fecha_inicio,
-       d2.hora_inicio,
-       d2.fecha_fin,
-       d2.hora_fin,
-       d2.hora_practicas,
-       d2.nombre_tutor_academico,
-       d2.cedula_tutor_academico,
-       d2.correo_tutor_academico,
-       d3.estado as estado_doc_tres
-FROM documento_dos d2
-LEFT JOIN documento_tres d3 ON d2.usuario_id = d3.usuario_id
-WHERE d2.usuario_id = ?
-ORDER BY d2.id DESC";
-
-$stmt_doc_dos = $conn->prepare($sql_doc_dos);
-$stmt_doc_dos->bind_param("i", $usuario_id);
-$stmt_doc_dos->execute();
-$result_tema = $stmt_doc_dos->get_result();
-
-while ($row = $result_tema->fetch_assoc()) {
-    $id = $row['id'] ?? null;
-    $estado = $row['estado'] ?? 'Pendiente';
-    $fecha_inicio = $row['fecha_inicio'] ?? null;
-    $hora_inicio = $row['hora_inicio'] ?? null;
-    $fecha_fin = $row['fecha_fin'] ?? null;
-    $hora_fin = $row['hora_fin'] ?? null;
-    $horas_practicas = $row['hora_practicas'] ?? null;
-    $nombre_tutor_academico = $row['nombre_tutor_academico'] ?? null;
-    $cedula_tutor_academico = $row['cedula_tutor_academico'] ?? null;
-    $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
-    $estado_doc_tres = $row['estado_doc_tres'] ?? null;
-}
-
-$stmt_doc_dos->close();
-
 
 if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
+
+$sql_doc_diez = "SELECT 
+       dd.id,
+       dd.opcion_uno_puntaje,
+       dd.opcion_dos_puntaje,
+       dd.opcion_tres_puntaje,
+       dd.opcion_cuatro_puntaje,
+       dd.opcion_cinco_puntaje,
+       dd.opcion_seis_puntaje,
+       dd.opcion_siete_puntaje,
+       dd.opcion_ocho_puntaje,
+       dd.opcion_nueve_puntaje,
+       dd.opcion_diez_puntaje,
+       dd.motivo_rechazo,
+       dd.estado
+FROM documento_diez dd
+WHERE dd.usuario_id = ?
+ORDER BY dd.id DESC
+LIMIT 1";
+
+$stmt_doc_diez = $conn->prepare($sql_doc_diez);
+$stmt_doc_diez->bind_param("i", $usuario_id);
+$stmt_doc_diez->execute();
+$result_doc_diez = $stmt_doc_diez->get_result();
+
+$estado = null;
+
+if ($row = $result_doc_diez->fetch_assoc()) {
+    $id = $row['id'];
+    $estado = $row['estado'] ?? null;
+    $motivo_rechazo = $row['motivo_rechazo'] ?? null;
+    // Puntajes de cada pregunta
+    $opcion_uno_puntaje = $row['opcion_uno_puntaje'];
+    $opcion_dos_puntaje = $row['opcion_dos_puntaje'];
+    $opcion_tres_puntaje = $row['opcion_tres_puntaje'];
+    $opcion_cuatro_puntaje = $row['opcion_cuatro_puntaje'];
+    $opcion_cinco_puntaje = $row['opcion_cinco_puntaje'];
+    $opcion_seis_puntaje = $row['opcion_seis_puntaje'];
+    $opcion_siete_puntaje = $row['opcion_siete_puntaje'];
+    $opcion_ocho_puntaje = $row['opcion_ocho_puntaje'];
+    $opcion_nueve_puntaje = $row['opcion_nueve_puntaje'];
+    $opcion_diez_puntaje = $row['opcion_diez_puntaje'];
+}
+
+$stmt_doc_diez->close();
+
 ?>
 
 <!doctype html>
@@ -77,133 +82,191 @@ if (!$conn) {
 <body>
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        case 'success':
-                            echo "Los datos se han subido correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-                        case 'update':
-                            echo "El documento se ha actualizado correctamente.";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
-                            break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
-                            break;
-                        case 'db_error':
-                            echo "Error al actualizar la base de datos.";
-                            break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
-                            break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error desconocido.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Evaluación Final del Estudiante en el Entorno Laboral Real Facultad de Ciencias Empresariales y Sistemas.</h1>
 
-            <h3 class="text-center mt-2 mb-3">Estado del Documento</h3>
-            <?php if (empty($estado)): ?>
-                <p class="text-center mt-2 mb-3">Debe de completar el formulario del módulo de <strong>Plan de Aprendizaje Práctico y de Rotación</strong></p>
+            <?php if ($estado === 'Corregir' || $estado === null): ?>
+
+                <form action="../estudiante/logic/documento-diez.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+
+                    <p class="text-center">
+                        Puntuación del 1 al 5 según el grado de resultado de aprendizaje obtenido el estudiante en su desempeño laboral descripción puntual de las actividades efectuadas durante sus prácticas preprofesionales en la entidad receptora:
+                    </p>
+                    <p class="text-center">
+                        <strong>5</strong> - Eficiente. &nbsp;&nbsp;
+                        <strong>4</strong> - Alta. &nbsp;&nbsp;
+                        <strong>3</strong> - Moderado. &nbsp;&nbsp;
+                        <strong>2</strong> - Regular. &nbsp;&nbsp;
+                        <strong>1</strong> - Deficiente.
+                    </p>
+
+
+                    <!-- Campo oculto -->
+                    <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center" colspan="2">INDICADORES:</th>
+                                    <th>5</th>
+                                    <th>4</th>
+                                    <th>3</th>
+                                    <th>2</th>
+                                    <th>1</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- DISCIPLINA -->
+                                <tr>
+                                    <td rowspan="3" class="fw-bold align-middle">Conocimientos</td>
+                                    <td class="text-start">Diseñar e implementar algoritmos utilizando las técnicas de programación lineal, estructurada, procedimental y funcional.</td>
+                                    <td><input type="radio" name="pregunta1" value="5" required></td>
+                                    <td><input type="radio" name="pregunta1" value="4"></td>
+                                    <td><input type="radio" name="pregunta1" value="3"></td>
+                                    <td><input type="radio" name="pregunta1" value="2"></td>
+                                    <td><input type="radio" name="pregunta1" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Utilizar las estructuras de datos básicas y compuestas, así como estáticas y dinámicas para la entrada y salida de datos, en la implementación de algoritmos que les den solución a problemas de requerimientos de software</td>
+                                    <td><input type="radio" name="pregunta2" value="5" required></td>
+                                    <td><input type="radio" name="pregunta2" value="4"></td>
+                                    <td><input type="radio" name="pregunta2" value="3"></td>
+                                    <td><input type="radio" name="pregunta2" value="2"></td>
+                                    <td><input type="radio" name="pregunta2" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Brindar soporte técnico y de mantenimiento a sistemas de hardware de cómputo.</td>
+                                    <td><input type="radio" name="pregunta3" value="5" required></td>
+                                    <td><input type="radio" name="pregunta3" value="4"></td>
+                                    <td><input type="radio" name="pregunta3" value="3"></td>
+                                    <td><input type="radio" name="pregunta3" value="2"></td>
+                                    <td><input type="radio" name="pregunta3" value="1"></td>
+                                </tr>
+
+                                <!-- INTEGRACIÓN AL AMBIENTE LABORAL -->
+                                <tr>
+                                    <td rowspan="6" class="fw-bold align-middle">Habilidades</td>
+                                    <td class="text-start">Diseñar e implementar bases de datos mediante el Modelo-Entidad-Relación</td>
+                                    <td><input type="radio" name="pregunta5" value="5" required></td>
+                                    <td><input type="radio" name="pregunta5" value="4"></td>
+                                    <td><input type="radio" name="pregunta5" value="3"></td>
+                                    <td><input type="radio" name="pregunta5" value="2"></td>
+                                    <td><input type="radio" name="pregunta5" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Aplicar las formas normales en el diseño de bases de datos mediante el Modelo-Entidad-Relación. </td>
+                                    <td><input type="radio" name="pregunta6" value="5" required></td>
+                                    <td><input type="radio" name="pregunta6" value="4"></td>
+                                    <td><input type="radio" name="pregunta6" value="3"></td>
+                                    <td><input type="radio" name="pregunta6" value="2"></td>
+                                    <td><input type="radio" name="pregunta6" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Optimizar el diseño de bases de datos implementadas.</td>
+                                    <td><input type="radio" name="pregunta7" value="5" required></td>
+                                    <td><input type="radio" name="pregunta7" value="4"></td>
+                                    <td><input type="radio" name="pregunta7" value="3"></td>
+                                    <td><input type="radio" name="pregunta7" value="2"></td>
+                                    <td><input type="radio" name="pregunta7" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Identificar componentes de hardware de redes LAN.</td>
+                                    <td><input type="radio" name="pregunta8" value="5" required></td>
+                                    <td><input type="radio" name="pregunta8" value="4"></td>
+                                    <td><input type="radio" name="pregunta8" value="3"></td>
+                                    <td><input type="radio" name="pregunta8" value="2"></td>
+                                    <td><input type="radio" name="pregunta8" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Optimizar el diseño de redes LAN.</td>
+                                    <td><input type="radio" name="pregunta9" value="5" required></td>
+                                    <td><input type="radio" name="pregunta9" value="4"></td>
+                                    <td><input type="radio" name="pregunta9" value="3"></td>
+                                    <td><input type="radio" name="pregunta9" value="2"></td>
+                                    <td><input type="radio" name="pregunta9" value="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-start">Implementar y monitorear servicios de redes LAN </td>
+                                    <td><input type="radio" name="pregunta10" value="5" required></td>
+                                    <td><input type="radio" name="pregunta10" value="4"></td>
+                                    <td><input type="radio" name="pregunta10" value="3"></td>
+                                    <td><input type="radio" name="pregunta10" value="2"></td>
+                                    <td><input type="radio" name="pregunta10" value="1"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botón de Enviar -->
+                    <div class="container-fluid text-center mt-4 d-flex justify-content-center align-items-center gap-3">
+                        <button type="submit" class="btn btn-primary">Enviar Datos</button>
+                    </div>
+
+                </form>
             <?php else: ?>
+                <h3 class="text-center mt-2 mb-3">Estado del Formulario</h3>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered shadow-lg">
-                        <thead class="table-light text-center">
+                    <table class="table table-bordered shadow-lg text-center align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <th>Fecha Inicio</th>
-                                <th>Hora Inicio</th>
-                                <th>Fecha Fin</th>
-                                <th>Hora Fin</th>
-                                <th>Horas Prácticas</th>
-                                <th>Tutor Académico</th>
-                                <th>Cédula del tutor</th>
-                                <th>Correo electrónico del tutor</th>
+                                <th>Pregunta 1</th>
+                                <th>Pregunta 2</th>
+                                <th>Pregunta 3</th>
+                                <th>Pregunta 4</th>
+                                <th>Pregunta 5</th>
+                                <th>Pregunta 6</th>
+                                <th>Pregunta 7</th>
+                                <th>Pregunta 8</th>
+                                <th>Pregunta 9</th>
+                                <th>Pregunta 10</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <!-- ✅ Aquí tus datos -->
-                                <td class="text-center"><?php echo $fecha_inicio; ?></td>
-                                <td class="text-center"><?php echo $hora_inicio; ?></td>
-                                <td class="text-center"><?php echo $fecha_fin; ?></td>
-                                <td class="text-center"><?php echo $hora_fin; ?></td>
-                                <td class="text-center"><?php echo $horas_practicas; ?></td>
-                                <td class="text-center"><?php echo $nombre_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $cedula_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $correo_tutor_academico; ?></td>
+                                <td><?php echo htmlspecialchars($opcion_uno_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_dos_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_tres_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_cuatro_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_cinco_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_seis_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_siete_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_ocho_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_nueve_puntaje ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($opcion_diez_puntaje ?? '-'); ?></td>
+
+                                <!-- Estado con badge dinámico -->
                                 <td class="text-center">
                                     <?php
-                                    // Lógica para asignar la clase de Bootstrap según el estado
                                     $badgeClass = '';
 
-                                    if ($estado_doc_tres === 'Pendiente') {
-                                        $badgeClass = 'badge bg-warning text-dark'; // Amarillo
-                                    } elseif ($estado_doc_tres === 'Corregir') {
-                                        $badgeClass = 'badge bg-danger'; // Rojo
-                                    } elseif ($estado_doc_tres === 'Aprobado') {
-                                        $badgeClass = 'badge bg-success'; // Verde
+                                    if ($estado === 'Pendiente') {
+                                        $badgeClass = 'badge bg-warning text-dark';
+                                    } elseif ($estado === 'Corregir') {
+                                        $badgeClass = 'badge bg-danger';
+                                    } elseif ($estado === 'Aprobado') {
+                                        $badgeClass = 'badge bg-success';
                                     } else {
-                                        $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
+                                        $badgeClass = 'badge bg-secondary';
                                     }
                                     ?>
-
                                     <span class="<?php echo $badgeClass; ?>">
-                                        <?php echo htmlspecialchars($estado_doc_tres); ?>
+                                        <?php echo htmlspecialchars($estado); ?>
                                     </span>
                                 </td>
 
-                                <!-- ✅ Acciones -->
+                                <!-- Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-diez-edit.php?id=<?php echo $id; ?>'">
+                                            <i class='bx bx-edit-alt'></i>
+                                        </button>
 
                                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
                                             <i class='bx bxs-file-pdf'></i>
@@ -212,35 +275,87 @@ if (!$conn) {
                                 </td>
                             </tr>
                         </tbody>
-
-                        <!-- ✅ Modal fuera de la tabla -->
-                        <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <form action="../estudiante/pdf/software/doc-diez-pdf.php" method="GET" target="_blank">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Se generará un documento en formato PDF.</p>
-                                            <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
                     </table>
+                </div>
+
+                <!-- ✅ Modal fuera de la tabla -->
+                <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="../estudiante/pdf/software/doc-diez-pdf.php" method="GET" target="_blank">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Se generará un documento en formato PDF.</p>
+                                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             <?php endif; ?>
 
         </div>
     </div>
+
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <?php
+        $status = $_GET['status'];
+
+        // Icono + Título según el estado
+        if ($status === 'success') {
+            $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+            $title = "Formulario enviado";
+        } elseif ($status === 'deleted') {
+            $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+            $title = "Documento Eliminado";
+        } elseif ($status === 'update') {
+            $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+            $title = "Documento Actualizado";
+        } elseif ($status === 'missing_data') {
+            $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+            $title = "Campos incompletos";
+        } elseif ($status === 'db_error') {
+            $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+            $title = "Error de Base de Datos";
+        } else {
+            $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+            $title = "Error";
+        }
+
+        // Mensaje del cuerpo del toast
+        $message = match ($status) {
+            'success' => "Evaluación final enviada correctamente.",
+            'deleted' => "El documento se ha eliminado correctamente.",
+            'update' => "El documento se ha actualizado correctamente.",
+            'missing_data' => "Debes responder todas las preguntas antes de enviar.",
+            'db_error' => "Hubo un error al guardar los datos en la base de datos.",
+            default => "Ocurrió un error inesperado."
+        };
+        ?>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?= $icon ?>
+                    <strong class="me-auto"><?= $title ?></strong>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <?= $message ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 
     <?php renderFooterAdmin(); ?>
 

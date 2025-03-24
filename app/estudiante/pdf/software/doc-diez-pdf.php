@@ -40,12 +40,25 @@ if ($rol === 'gestor') {
                 u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, 
                 c.carrera AS carrera, cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, 
                 d2.hora_inicio, d2.fecha_fin, d2.hora_fin, d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
-                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc
-            FROM documento_dos d2
+                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc, dd.id,
+                dd.opcion_uno_puntaje,
+                dd.opcion_dos_puntaje,
+                dd.opcion_tres_puntaje,
+                dd.opcion_cuatro_puntaje,
+                dd.opcion_cinco_puntaje,
+                dd.opcion_seis_puntaje,
+                dd.opcion_siete_puntaje,
+                dd.opcion_ocho_puntaje,
+                dd.opcion_nueve_puntaje,
+                dd.opcion_diez_puntaje,
+                dd.motivo_rechazo,
+                dd.estado
+            FROM documento_diez dd
+            JOIN documento_dos d2
             JOIN usuarios u ON d2.usuario_id = u.id
             INNER JOIN carrera c ON u.carrera_id = c.id
             LEFT JOIN cursos cu ON u.curso_id = cu.id  
-            WHERE d2.id = ?";
+            WHERE dd.id = ? AND dd.usuario_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $documento_id);
 } else {
@@ -54,12 +67,25 @@ if ($rol === 'gestor') {
                 u.nombres, u.apellidos, u.email, u.cedula, u.direccion, u.telefono, u.convencional, 
                 c.carrera AS carrera, cu.paralelo AS paralelo, u.periodo, d2.estado, d2.fecha_inicio, 
                 d2.hora_inicio, d2.fecha_fin, d2.hora_fin, d2.hora_practicas, d2.documento_eva_s, d2.nota_eva_s,
-                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc
-            FROM documento_dos d2
+                d2.nombre_tutor_academico, d2.cedula_tutor_academico, d2.correo_tutor_academico, d2.nombre_doc, dd.id,
+                dd.opcion_uno_puntaje,
+                dd.opcion_dos_puntaje,
+                dd.opcion_tres_puntaje,
+                dd.opcion_cuatro_puntaje,
+                dd.opcion_cinco_puntaje,
+                dd.opcion_seis_puntaje,
+                dd.opcion_siete_puntaje,
+                dd.opcion_ocho_puntaje,
+                dd.opcion_nueve_puntaje,
+                dd.opcion_diez_puntaje,
+                dd.motivo_rechazo,
+                dd.estado
+            FROM documento_diez dd
+            JOIN documento_dos d2
             JOIN usuarios u ON d2.usuario_id = u.id
             INNER JOIN carrera c ON u.carrera_id = c.id
             LEFT JOIN cursos cu ON u.curso_id = cu.id  
-            WHERE d2.id = ? AND d2.usuario_id = ?";
+            WHERE dd.id = ? AND dd.usuario_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $documento_id, $usuario_id);
 }
@@ -95,15 +121,41 @@ $nombre_tutor_academico = $estudiante['nombre_tutor_academico'] ?: 'N/A';
 $cedula_tutor_academico = $estudiante['cedula_tutor_academico'] ?: 'N/A';
 $correo_tutor_academico = $estudiante['correo_tutor_academico'] ?: 'N/A';
 $nombre_doc = $estudiante['nombre_doc'] ?: 'N/A';
-
 $fecha_inicio_larga = $estudiante['fecha_inicio'] ? formato_fecha_larga($estudiante['fecha_inicio']) : 'N/A';
-$fecha_inicio_corta = $estudiante['fecha_inicio'] ? formato_fecha_corta($estudiante['fecha_inicio']) : 'N/A';
-
 $fecha_fin_larga = $estudiante['fecha_fin'] ? formato_fecha_larga($estudiante['fecha_fin']) : 'N/A';
-$fecha_fin_corta = $estudiante['fecha_fin'] ? formato_fecha_corta($estudiante['fecha_fin']) : 'N/A';
-
 $hora_inicio = $estudiante['hora_inicio'] ? formato_hora($estudiante['hora_inicio']) : 'N/A';
 $hora_fin = $estudiante['hora_fin'] ? formato_hora($estudiante['hora_fin']) : 'N/A';
+
+$opcion_uno_puntaje = $estudiante['opcion_uno_puntaje'] ?: null;
+$opcion_dos_puntaje = $estudiante['opcion_dos_puntaje'] ?: null;
+$opcion_tres_puntaje = $estudiante['opcion_tres_puntaje'] ?: null;
+$opcion_cuatro_puntaje = $estudiante['opcion_cuatro_puntaje'] ?: null;
+$opcion_cinco_puntaje = $estudiante['opcion_cinco_puntaje'] ?: null;
+$opcion_seis_puntaje = $estudiante['opcion_seis_puntaje'] ?: null;
+$opcion_siete_puntaje = $estudiante['opcion_siete_puntaje'] ?: null;
+$opcion_ocho_puntaje = $estudiante['opcion_ocho_puntaje'] ?: null;
+$opcion_nueve_puntaje = $estudiante['opcion_nueve_puntaje'] ?: null;
+$opcion_diez_puntaje = $estudiante['opcion_diez_puntaje'] ?: null;
+
+$puntajes = [
+    $opcion_uno_puntaje,
+    $opcion_dos_puntaje,
+    $opcion_tres_puntaje,
+    $opcion_cuatro_puntaje,
+    $opcion_cinco_puntaje,
+    $opcion_seis_puntaje,
+    $opcion_siete_puntaje,
+    $opcion_ocho_puntaje,
+    $opcion_nueve_puntaje,
+    $opcion_diez_puntaje,
+];
+
+$promedio = round(array_sum($puntajes) / count($puntajes), 2);
+
+function generarChecks($puntaje, $valor)
+{
+    return ((int)$puntaje === (int)$valor) ? '☒' : '☐';
+}
 
 
 function formato_fecha_larga($fecha)
@@ -133,15 +185,6 @@ function formato_fecha_larga($fecha)
     return "$dia de $mes del $anio";
 }
 
-// Formato corto: "28/10/2024"
-function formato_fecha_corta($fecha)
-{
-    $fecha_obj = DateTime::createFromFormat('Y-m-d', $fecha);
-    if (!$fecha_obj) return 'N/A';
-
-    return $fecha_obj->format('d/m/Y');
-}
-
 
 // Función para convertir hora a "18:16"
 function formato_hora($hora)
@@ -160,7 +203,7 @@ class CustomPDF extends TCPDF
 {
     public function Header()
     {
-        $margen_derecha = 10; // Ajusta este valor según necesites
+        $margen_derecha = 10;
 
         $this->Image('../../../../images/index.png', 15, 12, 20);
 
@@ -377,85 +420,85 @@ $html_tabla6 = '
             <tr>
                 <td rowspan="3" align="center" width="13%"><strong><br><br><br>Conocimientos</strong></td>
                 <td width="67%">Diseñar e implementar algoritmos utilizando las técnicas de programación lineal, estructurada, procedimental y funcional.</td>
-                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
-                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
-                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
-                <td width="4%" align="center"><font face="dejavusans">☐</font></td>
-                <td width="4%" align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_uno_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Utilizar las estructuras de datos básicas y compuestas, así como estáticas y dinámicas para la entrada y salida de datos, en la implementación de algoritmos que les den solución a problemas de requerimientos de software.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_dos_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Brindar soporte técnico y de mantenimiento a sistemas de hardware de cómputo.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_tres_puntaje, 1) . '</font></td>
             </tr>
     
             <!-- Habilidades -->
             <tr>
                 <td rowspan="5" align="center"><br><br><br><br><strong>Habilidades</strong></td>
                 <td>Diseñar e implementar bases de datos mediante el Modelo-Entidad-Relación.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cuatro_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Aplicar las formas normales en el diseño de bases de datos mediante el Modelo-Entidad-Relación.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_cinco_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Optimizar el diseño de bases de datos implementadas.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_seis_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Identificar componentes de hardware de redes LAN.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_siete_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td>Optimizar el diseño de redes LAN.</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_ocho_puntaje, 1) . '</font></td>
             </tr>
             <tr>
                 <td></td>
                 <td>Implementar y monitorear servicios de redes LAN</td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☐</font></td>
-                <td align="center"><font face="dejavusans">☒</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 5) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 4) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 3) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 2) . '</font></td>
+                <td width="4%" align="center"><font face="dejavusans">' . generarChecks($opcion_nueve_puntaje, 1) . '</font></td>
             </tr>
     
             <!-- Promedio total -->
             <tr>
                 <td colspan="2" align="right"><strong>PROMEDIO TOTAL</strong></td>
-                <td colspan="5" align="center"><strong>5</strong></td>
+                <td colspan="5" align="center"><strong>' . $promedio . '</strong></td>
             </tr>
         </tbody>
     </table>';
