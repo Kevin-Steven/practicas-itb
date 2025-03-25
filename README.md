@@ -17,22 +17,23 @@ Este sistema permite la gestión digital del proceso de prácticas preprofesiona
 ---
 
 ## 🧱 Estructura del Proyecto
-📂 **TCPDF-main** → Generación de archivos PDF
-📂 **PHPMailer** → Envío de correos electrónicos 
-📂 **app** → Código principal de la aplicación 
-📂 **admin** → Panel de administración
-📂 **cerrar-sesion** → Lógica para cerrar sesión
-📂 **config** → Configuración de la base de datos y constantes del sistema
-📂 **email** → Envío de correos personalizados (opcional)
-📂 **estudiante** → Módulo para el estudiante (gestión de documentos, formularios, etc.)
-📂 **gestor** → Módulo de gestión de prácticas para usuarios con rol gestor
-📂 **js** → Scripts JavaScript personalizados
-📂 **photos** → Fotos de perfil de los usuarios
-📂 **registrar** → Registro y validación de nuevos estudiantes
-📂 **uploads** → Archivos subidos por los usuarios
-📂 **database** → Script SQL de creación de tablas y relaciones (itb_practicas.sql) 
-📂 **images** → Archivos e imágenes del sistema (logos, íconos, etc.) 
-📜 **index.php** → Página principal del sistema (login y redirección por rol) 
+
+- 📂 **TCPDF-main** → Generación de archivos PDF
+- 📂 **PHPMailer** → Envío de correos electrónicos 
+- 📂 **app** → Código principal de la aplicación 
+- 📂 **admin** → Panel de administración
+- 📂 **cerrar-sesion** → Lógica para cerrar sesión
+- 📂 **config** → Configuración de la base de datos y constantes del sistema
+- 📂 **email** → Envío de correos personalizados (opcional)
+- 📂 **estudiante** → Módulo para el estudiante (gestión de documentos, formularios, etc.)
+- 📂 **gestor** → Módulo de gestión de prácticas para usuarios con rol gestor
+- 📂 **js** → Scripts JavaScript personalizados
+- 📂 **photos** → Fotos de perfil de los usuarios
+- 📂 **registrar** → Registro y validación de nuevos estudiantes
+- 📂 **uploads** → Archivos subidos por los usuarios
+- 📂 **database** → Script SQL de creación de tablas y relaciones (itb_practicas.sql) 
+- 📂 **images** → Archivos e imágenes del sistema (logos, íconos, etc.) 
+- 📜 **index.php** → Página principal del sistema (login y redirección por rol) 
 
 
 ---
