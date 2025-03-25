@@ -141,7 +141,7 @@ $stmt_doc_once->close();
 
                     <!-- Botón de Enviar -->
                     <div class="container-fluid text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                        <button type="submit" class="btn btn-primary">Enviar Datos</button>
+                        <button type="submit" class="btn btn-primary">Actualizar Datos</button>
                     </div>
 
                 </form>
