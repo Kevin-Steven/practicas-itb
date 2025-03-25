@@ -1,12 +1,18 @@
 # 📌 Sistema de Prácticas Profesionales para el ITB
 
 📄 **Descripción**  
-Este sistema permite la gestión digital del proceso de prácticas preprofesionales en el **Instituto Superior Tecnológico Bolivariano de Tecnología (ITB)**. Desarrollado con PHP y MySQL, facilita a estudiantes, gestores y administradores el manejo completo de documentos y seguimiento del avance.
+Este sistema permite la gestión digital del proceso de prácticas preprofesionales en el **Instituto Superior Tecnológico Bolivariano de Tecnología (ITB)**. Desarrollado con PHP y MySQL, facilita a estudiantes, gestores y administradores el manejo completo de documentos y seguimiento del avance.  
+Incluye funcionalidades como generación automática de PDFs, asignación de cursos, revisión de documentos y recuperación de cuentas mediante correo electrónico.
+
+🚧 **Estado del proyecto**  
+En desarrollo — Se continúan agregando módulos y funcionalidades.
 
 ---
 
 ## 🚀 Funcionalidades principales
 
+- 🗂️ Creación de cursos por parte del gestor para asignación de estudiantes
+- 🔁 Recuperación de cuenta vía correo/cedula con token temporal (válido por 10 minutos)
 - 🔐 Autenticación de usuarios (estudiantes, gestores, administradores)
 - 📄 Registro y carga de documentos por parte del estudiante
 - ✅ Aprobación, corrección o rechazo de documentos por parte de los gestores
@@ -47,6 +53,14 @@ Este sistema permite la gestión digital del proceso de prácticas preprofesiona
 - **TCPDF** – Para generación de documentos PDF
 - **PHPMailer** – (opcional) Para envío de correos
 
+
+---
+
+## 🧪 Cómo instalar  
+1. Clona el repositorio  
+2. Crea una base de datos `itb_practicas` y ejecuta el archivo `itb_practicas.sql`  
+3. Configura tu archivo de conexión en `config/config.php`  
+4. Abre `index.php` en tu navegador local  
 
 
 ---
