@@ -50,9 +50,7 @@ $sql_update = "UPDATE documento_once SET
     opcion_tres = ?,
     opcion_cuatro = ?,
     opcion_cinco = ?,
-    opcion_seis = ?,
-    estado = 'Pendiente',
-    motivo_rechazo = NULL
+    opcion_seis = ?
 WHERE id = ? AND usuario_id = ?";
 
 $stmt_update = $conn->prepare($sql_update);

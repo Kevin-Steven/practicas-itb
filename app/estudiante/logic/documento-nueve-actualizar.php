@@ -58,9 +58,8 @@ if ($result_check->num_rows === 0) {
         opcion_doce_puntaje,
         opcion_trece_puntaje,
         opcion_catorce_puntaje,
-        opcion_quince_puntaje,
-        estado
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+        opcion_quince_puntaje
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt_insert = $conn->prepare($sql_insert);
     $stmt_insert->bind_param(
@@ -110,9 +109,7 @@ if ($result_check->num_rows === 0) {
     opcion_doce_puntaje = ?,
     opcion_trece_puntaje = ?,
     opcion_catorce_puntaje = ?,
-    opcion_quince_puntaje = ?,
-    estado = 'Pendiente',
-    motivo_rechazo = NULL
+    opcion_quince_puntaje = ?
 WHERE id = ?";
 
     $stmt_update = $conn->prepare($sql_update);

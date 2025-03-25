@@ -16,47 +16,28 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 
 $usuario_id = $_SESSION['usuario_id'];
 
-$sql_doc_dos = "SELECT 
-       d2.id,
-       d2.estado, 
-       d2.fecha_inicio,
-       d2.hora_inicio,
-       d2.fecha_fin,
-       d2.hora_fin,
-       d2.documento_eva_s,
-       d2.hora_practicas,
-       d2.nota_eva_s,
-       d2.nombre_tutor_academico,
-       d2.cedula_tutor_academico,
-       d2.correo_tutor_academico,
-       d4.estado as estado_doc_cuatro
-FROM documento_dos d2
-LEFT JOIN documento_cuatro d4 ON d2.usuario_id = d4.usuario_id
-WHERE d2.usuario_id = ?
-ORDER BY d2.id DESC";
+$sql_doc_cuatro = "SELECT 
+       dc.id,
+       dc.estado,
+       dc.pdf_escaneado,
+       dc.motivo_rechazo
+FROM documento_cuatro dc
+WHERE dc.usuario_id = ?
+ORDER BY dc.id DESC";
 
-$stmt_doc_dos = $conn->prepare($sql_doc_dos);
-$stmt_doc_dos->bind_param("i", $usuario_id);
-$stmt_doc_dos->execute();
-$result_tema = $stmt_doc_dos->get_result();
+$stmt_doc_cuatro = $conn->prepare($sql_doc_cuatro);
+$stmt_doc_cuatro->bind_param("i", $usuario_id);
+$stmt_doc_cuatro->execute();
+$result_tema = $stmt_doc_cuatro->get_result();
 
 while ($row = $result_tema->fetch_assoc()) {
     $id = $row['id'] ?? null;
     $estado = $row['estado'] ?? null;
-    $fecha_inicio = $row['fecha_inicio'] ?? null;
-    $hora_inicio = $row['hora_inicio'] ?? null;
-    $fecha_fin = $row['fecha_fin'] ?? null;
-    $hora_fin = $row['hora_fin'] ?? null;
-    $documento_eva_s = $row['documento_eva_s'] ?? null;
-    $horas_practicas = $row['hora_practicas'] ?? null;
-    $nota_eva_s = $row['nota_eva_s'] ?? null;
-    $nombre_tutor_academico = $row['nombre_tutor_academico'] ?? null;
-    $cedula_tutor_academico = $row['cedula_tutor_academico'] ?? null;
-    $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
-    $estado_doc_cuatro = $row['estado_doc_cuatro'] ?? null;
+    $pdf_escaneado = $row['pdf_escaneado'] ?? null;
+    $motivo_rechazo = $row['motivo_rechazo'] ?? null;
 }
 
-$stmt_doc_dos->close();
+$stmt_doc_cuatro->close();
 
 
 if (!$conn) {
@@ -81,93 +62,25 @@ if (!$conn) {
 <body>
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-
-    <!-- Toast -->
-    <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Subida Exitosa</strong>
-                    <?php elseif ($_GET['status'] === 'deleted'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Eliminado</strong>
-                    <?php elseif ($_GET['status'] === 'update'): ?>
-                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                        <strong class="me-auto">Documento Actualizado</strong>
-                    <?php else: ?>
-                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                        <strong class="me-auto">Error</strong>
-                    <?php endif; ?>
-                    <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    <?php
-                    switch ($_GET['status']) {
-                        case 'success':
-                            echo "Los datos se han subido correctamente.";
-                            break;
-                        case 'deleted':
-                            echo "El documento se ha eliminado correctamente.";
-                            break;
-                        case 'update':
-                            echo "El documento se ha actualizado correctamente.";
-                            break;
-                        case 'invalid_extension':
-                            echo "Solo se permiten archivos ZIP.";
-                            break;
-                        case 'too_large':
-                            echo "El archivo supera el tamaño máximo de 20 MB.";
-                            break;
-                        case 'upload_error':
-                            echo "Hubo un error al mover el archivo.";
-                            break;
-                        case 'db_error':
-                            echo "Error al actualizar la base de datos.";
-                            break;
-                        case 'no_file':
-                            echo "No se ha seleccionado ningún archivo.";
-                            break;
-                        case 'form_error':
-                            echo "Error en el envío del formulario.";
-                            break;
-                        case 'not_found':
-                            echo "No se encontraron datos del usuario.";
-                            break;
-                        case 'missing_data':
-                            echo "Faltan datos en el formulario.";
-                            break;
-                        default:
-                            echo "Ocurrió un error desconocido.";
-                            break;
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Perfil de Egreso Desarrollo de Software</h1>
 
-            <?php if (empty($estado_doc_cuatro)): ?>
+            <?php if (empty($estado)): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
-                        <form action="../estudiante/logic/documento-dos.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                        <form action="../estudiante/logic/documento-cuatro.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-12">
                                     <h2 class="card-title text-center">Subir Documento Escaneado</h2>
-                                    
+
                                     <div class="mb-2">
                                         <label for="pdf-escaneado" class="form-label fw-bold">Subir PDF Escaneado:</label>
-                                        <input type="file" class="form-control" id="pdf-escaneado" name="pdf-escaneado" required>
+                                        <input type="file" class="form-control" id="pdf-escaneado" name="pdf-escaneado" accept="application/pdf" required>
                                     </div>
-                                    
+
                                 </div>
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
 
@@ -185,16 +98,8 @@ if (!$conn) {
                     <table class="table table-bordered shadow-lg">
                         <thead class="table-light text-center">
                             <tr>
-                                <th>Fecha Inicio</th>
-                                <th>Hora Inicio</th>
-                                <th>Fecha Fin</th>
-                                <th>Hora Fin</th>
-                                <th>Horas Prácticas</th>
-                                <th>EVA-S</th>
-                                <th>Nota EVA-S</th>
-                                <th>Tutor Académico</th>
-                                <th>Cédula del tutor</th>
-                                <th>Correo electrónico del tutor</th>
+                                <th>PDF Escaneado</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -202,75 +107,45 @@ if (!$conn) {
                         <tbody>
                             <tr>
                                 <!-- ✅ Aquí tus datos -->
-                                <td class="text-center"><?php echo $fecha_inicio; ?></td>
-                                <td class="text-center"><?php echo $hora_inicio; ?></td>
-                                <td class="text-center"><?php echo $fecha_fin; ?></td>
-                                <td class="text-center"><?php echo $hora_fin; ?></td>
-                                <td class="text-center"><?php echo $horas_practicas; ?></td>
-                                <td class="text-center"><?php echo $nota_eva_s; ?></td>
                                 <td class="text-center">
-                                    <a href="../uploads/eva-s/<?php echo $documento_eva_s; ?>" target="_blank">
-                                        Ver Imagen
-                                    </a>
-
+                                    <a href="<?php echo $pdf_escaneado; ?>" target="_blank">Ver PDF</a>
                                 </td>
-                                <td class="text-center"><?php echo $nombre_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $cedula_tutor_academico; ?></td>
-                                <td class="text-center"><?php echo $correo_tutor_academico; ?></td>
+                                <td class="text-center">
+                                    <?php echo !empty($row['motivo_rechazo'])
+                                        ? htmlspecialchars($row['motivo_rechazo'])
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
+
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado
                                     $badgeClass = '';
 
-                                    if ($estado_doc_cuatro === 'Pendiente') {
+                                    if ($estado === 'Pendiente') {
                                         $badgeClass = 'badge bg-warning text-dark'; // Amarillo
-                                    } elseif ($estado_doc_cuatro === 'Corregir') {
+                                    } elseif ($estado === 'Corregir') {
                                         $badgeClass = 'badge bg-danger'; // Rojo
-                                    } elseif ($estado_doc_cuatro === 'Aprobado') {
+                                    } elseif ($estado === 'Aprobado') {
                                         $badgeClass = 'badge bg-success'; // Verde
                                     } else {
                                         $badgeClass = 'badge bg-secondary'; // Gris si el estado no es reconocido
                                     }
                                     ?>
-
                                     <span class="<?php echo $badgeClass; ?>">
-                                        <?php echo htmlspecialchars($estado_doc_cuatro); ?>
+                                        <?php echo htmlspecialchars($estado); ?>
                                     </span>
                                 </td>
 
                                 <!-- ✅ Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
-                                            <i class='bx bxs-file-pdf'></i>
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-cuatro-edit.php?id=<?php echo $id; ?>'">
+                                            <i class='bx bx-edit-alt'></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
-
-                        <!-- ✅ Modal fuera de la tabla -->
-                        <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <form action="../estudiante/pdf/software/doc-dos-pdf.php" method="GET" target="_blank">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Se generará un documento en formato PDF.</p>
-                                            <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
                     </table>
                 </div>
         </div>
@@ -278,8 +153,87 @@ if (!$conn) {
     </div>
     </div>
 
-    <?php renderFooterAdmin(); ?>
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <?php
+        $status = $_GET['status'];
+        $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+        $title = "Error";
+        $message = "Ocurrió un error desconocido.";
 
+        switch ($status) {
+            case 'success':
+                $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+                $title = "Documento Enviado";
+                $message = "Los datos se han subido correctamente.";
+                break;
+            case 'update':
+                $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+                $title = "Documento Actualizado";
+                $message = "El documento se ha actualizado correctamente.";
+                break;
+            case 'deleted':
+                $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+                $title = "Documento Eliminado";
+                $message = "El documento se ha eliminado correctamente.";
+                break;
+            case 'no_changes':
+                $icon = "<i class='bx bx-info-circle fs-4 me-2 text-secondary'></i>";
+                $title = "Sin Cambios";
+                $message = "No se realizaron cambios al documento.";
+                break;
+            case 'missing_data':
+                $message = "Faltan datos en el formulario.";
+                break;
+            case 'missing_pdf':
+                $message = "Debes seleccionar un archivo PDF.";
+                break;
+            case 'invalid_format':
+                $message = "Solo se permite subir archivos PDF.";
+                break;
+            case 'invalid_extension':
+                $message = "Solo se permiten archivos ZIP.";
+                break;
+            case 'too_large':
+                $message = "El archivo supera el tamaño máximo permitido (20 MB).";
+                break;
+            case 'upload_error':
+                $message = "Hubo un error al mover el archivo.";
+                break;
+            case 'db_error':
+                $message = "Error al actualizar la base de datos.";
+                break;
+            case 'no_file':
+                $message = "No se ha seleccionado ningún archivo.";
+                break;
+            case 'form_error':
+                $message = "Error en el envío del formulario.";
+                break;
+            case 'not_found':
+                $message = "No se encontraron datos del documento.";
+                break;
+            case 'invalid_user':
+                $message = "No tienes permiso para editar este documento.";
+                break;
+        }
+        ?>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?= $icon ?>
+                    <strong class="me-auto"><?= $title ?></strong>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <?= $message ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php renderFooterAdmin(); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>

@@ -67,8 +67,6 @@ $sql_update = "UPDATE documento_tres SET
     cargo_tutor_receptor = ?,
     numero_telefono_tutor_receptor = ?,
     ciudad_entidad_receptora = ?,
-    estado = 'Pendiente', -- Reinicia el estado
-    motivo_rechazo = NULL, -- Limpia el motivo si lo hubo antes
     fecha_subida = NOW()
 WHERE id = ?";
 

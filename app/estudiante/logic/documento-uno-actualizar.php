@@ -117,7 +117,7 @@ $conn->begin_transaction();
 try {
     // 10.1 Actualizar el documento_uno
     $sql_update_doc = "UPDATE documento_uno 
-                       SET promedio_notas = ?, estado = 'Pendiente' 
+                       SET promedio_notas = ?
                        WHERE id = ?";
     $stmt_update_doc = $conn->prepare($sql_update_doc);
     $stmt_update_doc->bind_param("di", $promedio, $documento_id);

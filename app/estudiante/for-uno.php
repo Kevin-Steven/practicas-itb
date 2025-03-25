@@ -195,7 +195,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Ficha de Estudiante</h1>
 
-            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
+            <?php if (empty($estado)): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">

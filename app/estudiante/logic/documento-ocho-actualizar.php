@@ -36,7 +36,7 @@ $result_check = $stmt_check->get_result();
 
 if ($result_check->num_rows === 0) {
     // ✅ Si no existe el documento, se crea uno nuevo
-    $sql_insert_doc = "INSERT INTO documento_ocho (usuario_id, estado) VALUES (?, 'Pendiente')";
+    $sql_insert_doc = "INSERT INTO documento_ocho (usuario_id) VALUES (?)";
     $stmt_insert_doc = $conn->prepare($sql_insert_doc);
     $stmt_insert_doc->bind_param("i", $usuario_id);
     $stmt_insert_doc->execute();
@@ -145,13 +145,6 @@ if (!$hubo_cambios) {
 $conn->begin_transaction();
 
 try {
-    // 11.1 Actualizar el estado a Pendiente
-    $sql_update_doc = "UPDATE documento_ocho SET estado = 'Pendiente' WHERE id = ?";
-    $stmt_update_doc = $conn->prepare($sql_update_doc);
-    $stmt_update_doc->bind_param("i", $documento_ocho_id);
-    $stmt_update_doc->execute();
-    $stmt_update_doc->close();
-
     // 11.2 Eliminar las actividades anteriores
     $sql_delete_actividades = "DELETE FROM informe_actividades WHERE documento_ocho_id = ?";
     $stmt_delete_actividades = $conn->prepare($sql_delete_actividades);

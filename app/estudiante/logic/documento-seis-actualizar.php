@@ -81,9 +81,7 @@ $sql_update = "UPDATE documento_seis SET
     hora_inicio = ?, 
     hora_fin = ?, 
     jornada_laboral = ?, 
-    numero_practicas = ?, 
-    estado = 'Pendiente', 
-    motivo_rechazo = NULL
+    numero_practicas = ?
 WHERE id = ?";
 
 $stmt_update = $conn->prepare($sql_update);

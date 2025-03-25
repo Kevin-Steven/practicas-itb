@@ -97,7 +97,7 @@ $stmt_doc_nueve->close();
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Evaluación Conductual del Estudiante</h1>
 
-            <?php if ($estado === 'Corregir' || $estado === null): ?>
+            <?php if (empty($estado)): ?>
                 <form action="../estudiante/logic/documento-nueve.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
 
                     <p class="text-center">

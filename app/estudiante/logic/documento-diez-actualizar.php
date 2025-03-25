@@ -56,9 +56,7 @@ $sql_update = "UPDATE documento_diez SET
     opcion_siete_puntaje = ?, 
     opcion_ocho_puntaje = ?, 
     opcion_nueve_puntaje = ?, 
-    opcion_diez_puntaje = ?, 
-    estado = 'Pendiente',
-    motivo_rechazo = NULL
+    opcion_diez_puntaje = ?
 WHERE id = ? AND usuario_id = ?";
 
 $stmt_update = $conn->prepare($sql_update);
@@ -68,7 +66,7 @@ if (!$stmt_update) {
     exit();
 }
 
-$stmt_update->bind_param("iiiiiiiiiiii", $p1, $p2, $p3, $p5, $p6, $p7, $p8, $p9, $p10, $p10, $documento_id, $usuario_id);
+$stmt_update->bind_param("iiiiiiiiiiii", $p1, $p2, $p3, $p5, $p6, $p7, $p8, $p9, $p10, $documento_id, $usuario_id);
 
 if ($stmt_update->execute()) {
     header("Location: ../for-diez.php?status=update");

@@ -220,7 +220,7 @@ $departamento = $usuario_info['departamento'] ?? null;
                 </div>
             </div>
 
-            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
+            <?php if (empty($estado)): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">

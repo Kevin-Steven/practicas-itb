@@ -74,9 +74,7 @@ $update = "UPDATE documento_doce SET
     opcion_tres = ?, 
     opcion_cuatro = ?, 
     opcion_cinco = ?, 
-    opcion_seis = ?, 
-    estado = 'Pendiente', 
-    motivo_rechazo = NULL";
+    opcion_seis = ?";
 
 $params = [$p1, $p2, $p3, $p4, $p5, $p6];
 $types = "iiiiii";

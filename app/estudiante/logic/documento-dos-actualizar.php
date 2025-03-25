@@ -78,7 +78,7 @@ if (isset($_FILES['eva_s']) && $_FILES['eva_s']['error'] === 0) {
 }
 
 $sql_update = "UPDATE documento_dos 
-               SET fecha_inicio = ?, hora_inicio = ?, fecha_fin = ?, hora_fin = ?, hora_practicas = ?, documento_eva_s = ?, nota_eva_s = ?, nombre_tutor_academico = ?, cedula_tutor_academico = ?, correo_tutor_academico = ?, estado = 'Pendiente'
+               SET fecha_inicio = ?, hora_inicio = ?, fecha_fin = ?, hora_fin = ?, hora_practicas = ?, documento_eva_s = ?, nota_eva_s = ?, nombre_tutor_academico = ?, cedula_tutor_academico = ?, correo_tutor_academico = ?
                WHERE id = ?";
 
 $stmt_update = $conn->prepare($sql_update);

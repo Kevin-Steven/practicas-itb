@@ -276,6 +276,17 @@ CREATE TABLE documento_trece (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 
+CREATE TABLE documento_catorce (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id int(11) NOT NULL,
+  nombre_doc VARCHAR(250) NOT NULL DEFAULT '14 BASE LEGAL DE LAS PRACTICAS LABORALES PDF FIRMADO',
+  pdf_escaneado VARCHAR(255) NOT NULL,
+  motivo_rechazo TEXT NULL,
+  estado ENUM('Pendiente', 'Corregir', 'Aprobado')DEFAULT 'Pendiente',
+  fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+  );
+
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');
 INSERT INTO carrera (carrera) VALUES ('Tecnología Superior en Desarrollo de software');
   

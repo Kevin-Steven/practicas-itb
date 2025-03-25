@@ -169,7 +169,7 @@ if (!$conn) {
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Carta de Compromiso</h1>
 
-            <?php if (empty($estado) || $estado === 'Corregir'): ?>
+            <?php if (empty($estado)): ?>
 
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">

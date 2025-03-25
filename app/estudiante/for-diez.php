@@ -87,7 +87,7 @@ $stmt_doc_diez->close();
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Evaluación Final del Estudiante en el Entorno Laboral Real Facultad de Ciencias Empresariales y Sistemas.</h1>
 
-            <?php if ($estado === 'Corregir' || $estado === null): ?>
+            <?php if (empty($estado)): ?>
 
                 <form action="../estudiante/logic/documento-diez.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
 

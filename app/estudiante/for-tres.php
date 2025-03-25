@@ -144,7 +144,7 @@ if (!$conn) {
     <div class="content" id="content">
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Asignación de Estudiante a Prácticas Laborales</h1>
-            <?php if (empty($estado)  || $estado === 'Corregir'): ?>
+            <?php if (empty($estado)): ?>
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
                         <form action="../estudiante/logic/documento-tres.php" class="enviar-tema" method="POST">

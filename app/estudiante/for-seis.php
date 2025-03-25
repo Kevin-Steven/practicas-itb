@@ -179,7 +179,7 @@ if (!$conn) {
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Ficha de la Entidad Receptora</h1>
 
-            <?php if (empty($estado) || $estado === 'Corregir'): ?>
+            <?php if (empty($estado)): ?>
                 <div class="card shadow-lg container-fluid">
                     <div class="card-body">
                         <form action="../estudiante/logic/documento-seis.php" class="enviar-tema" method="POST" enctype="multipart/form-data">

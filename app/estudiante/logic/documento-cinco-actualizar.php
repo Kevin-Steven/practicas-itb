@@ -140,8 +140,7 @@ $sql_update = "UPDATE documento_cinco SET
     logo_entidad_receptora = ?,
     nombre_representante_rrhh = ?,
     numero_institucional = ?,
-    correo_institucional = ?,
-    estado = 'Pendiente'
+    correo_institucional = ?
 WHERE usuario_id = ?";
 
 $stmt_update = $conn->prepare($sql_update);
