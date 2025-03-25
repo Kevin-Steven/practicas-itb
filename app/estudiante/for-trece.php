@@ -19,6 +19,7 @@ $usuario_id = $_SESSION['usuario_id'];
 $sql_doc_trece = "SELECT 
     dt.id,
     dt.estado,
+    dt.motivo_rechazo,
 
     d3.nombre_entidad_receptora,
     d3.ciudad_entidad_receptora,
@@ -117,6 +118,7 @@ if (!$conn) {
                                 <th>Nombres del representante de RRHH</th>
                                 <th>Correo Institucional</th>
                                 <th>Teléfono Institucional</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -138,6 +140,11 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $nombre_representante_rrhh; ?></td>
                                 <td class="text-center"><?php echo $correo_institucional; ?></td>
                                 <td class="text-center"><?php echo $numero_institucional; ?></td>
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

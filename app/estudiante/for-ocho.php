@@ -310,6 +310,7 @@ $departamento = $usuario_info['departamento'] ?? null;
                                 <th>Semanas/Fecha</th>
                                 <th>Horas realizadas</th>
                                 <th>Actividades realizadas</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -360,6 +361,14 @@ $departamento = $usuario_info['departamento'] ?? null;
 
                                         <!-- ✅ Actividades realizadas -->
                                         <td><?= htmlspecialchars($ia['actividades_realizadas'] ?? 'No aplica'); ?></td>
+
+                                        <?php if ($index === 0): ?>
+                                            <td class="text-center" rowspan="<?= count($informe_actividades) ?>">
+                                                <?php echo !empty($motivo_rechazo)
+                                                    ? htmlspecialchars($motivo_rechazo)
+                                                    : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                            </td>
+                                        <?php endif; ?>
 
                                         <?php if ($index === 0): ?>
                                             <td class="text-center" rowspan="<?= count($informe_actividades) ?>">

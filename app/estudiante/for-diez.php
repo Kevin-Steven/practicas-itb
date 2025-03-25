@@ -224,6 +224,7 @@ $stmt_doc_diez->close();
                                 <th>Pregunta 8</th>
                                 <th>Pregunta 9</th>
                                 <th>Pregunta 10</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -240,7 +241,11 @@ $stmt_doc_diez->close();
                                 <td><?php echo htmlspecialchars($opcion_ocho_puntaje ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($opcion_nueve_puntaje ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($opcion_diez_puntaje ?? '-'); ?></td>
-
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <!-- Estado con badge dinámico -->
                                 <td class="text-center">
                                     <?php

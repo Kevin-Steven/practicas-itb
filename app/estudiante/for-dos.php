@@ -27,7 +27,8 @@ $sql_doc_dos = "SELECT
        d2.nota_eva_s,
        d2.nombre_tutor_academico,
        d2.cedula_tutor_academico,
-       d2.correo_tutor_academico
+       d2.correo_tutor_academico,
+       d2.motivo_rechazo
 FROM documento_dos d2
 WHERE d2.usuario_id = ?
 ORDER BY d2.id DESC";
@@ -50,6 +51,7 @@ while ($row = $result_tema->fetch_assoc()) {
     $nombre_tutor_academico = $row['nombre_tutor_academico'] ?? null;
     $cedula_tutor_academico = $row['cedula_tutor_academico'] ?? null;
     $correo_tutor_academico = $row['correo_tutor_academico'] ?? null;
+    $motivo_rechazo = $row['motivo_rechazo'] ?? null;
 }
 
 $stmt_doc_dos->close();
@@ -229,6 +231,7 @@ if (!$conn) {
                                 <th>Tutor Académico</th>
                                 <th>Cédula del tutor</th>
                                 <th>Correo electrónico del tutor</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -251,6 +254,11 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $nombre_tutor_academico; ?></td>
                                 <td class="text-center"><?php echo $cedula_tutor_academico; ?></td>
                                 <td class="text-center"><?php echo $correo_tutor_academico; ?></td>
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

@@ -167,29 +167,6 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
 <body>
     <?php renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil); ?>
 
-    <?php if (!empty($motivo_rechazo)): ?>
-        <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalMotivoRechazoLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalMotivoRechazoLabel">Motivo de Rechazo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <p><?php echo htmlspecialchars($motivo_rechazo); ?></p>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <!-- Content -->
     <div class="content" id="content">
         <div class="container">
@@ -303,12 +280,6 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                 <!-- Botones -->
                                 <div class="text-center mt-5 d-flex justify-content-center align-items-center gap-3">
                                     <button type="submit" class="btn">Enviar Datos</button>
-
-                                    <?php if (!empty($motivo_rechazo)): ?>
-                                        <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
-                                            Ver Motivo de Rechazo
-                                        </a>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </form>
@@ -325,6 +296,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                 <th>Lugar Laborado</th>
                                 <th>Periodo de tiempo</th>
                                 <th>Funciones realizadas</th>
+                                <th>Motivo de rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -348,6 +320,16 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                             <td class="text-center"><?php echo htmlspecialchars($exp['lugar_laborado']); ?></td>
                                             <td class="text-center"><?php echo htmlspecialchars($exp['periodo_tiempo_meses']); ?></td>
                                             <td class="text-center"><?php echo htmlspecialchars($exp['funciones_realizadas']); ?></td>
+
+                                            <!-- ✅ Motivo de rechazo con rowspan -->
+                                            <td class="text-center" rowspan="<?= max(1, count($experiencia_laboral)) ?>">
+                                                <?php echo htmlspecialchars($motivo_rechazo ?? 'No aplica'); ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <?php echo !empty($row['motivo_rechazo'])
+                                                    ? htmlspecialchars($row['motivo_rechazo'])
+                                                    : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                            </td>
 
                                             <!-- ✅ Estado con rowspan -->
                                             <td class="text-center" rowspan="<?= max(1, count($experiencia_laboral)) ?>">

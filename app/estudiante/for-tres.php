@@ -207,6 +207,7 @@ if (!$conn) {
                                 <th>Departamento Entidad Receptora</th>
                                 <th>Cargo Tutor Entidad Receptora</th>
                                 <th>Ciudad Entidad Receptora</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -220,6 +221,11 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $departamento_entidad_receptora; ?></td>
                                 <td class="text-center"><?php echo $cargo_tutor_receptor; ?></td>
                                 <td class="text-center"><?php echo $ciudad_entidad_receptora; ?></td>
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

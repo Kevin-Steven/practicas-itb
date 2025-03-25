@@ -24,6 +24,7 @@ $sql_doc_seis = "SELECT
        d6.hora_fin,
        d6.jornada_laboral,
        d6.numero_practicas,
+       d6.motivo_rechazo,
        d5.numero_institucional,
        d6.estado,
        d3.nombres_tutor_receptor,
@@ -54,6 +55,7 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $numero_practicas = $row['numero_practicas'];
     $numero_telefono = $row['numero_telefono_tutor_receptor'];
     $numero_institucional = $row['numero_institucional'];
+    $motivo_rechazo = $row['motivo_rechazo'];
 }
 
 $stmt_doc_seis->close();
@@ -244,11 +246,12 @@ if (!$conn) {
                                 <th>Provincia</th>
                                 <th>Horario de la práctica</th>
                                 <th>Jornada laboral</th>
-                                <th>Nombres y Apellidos del tutor de la entidad receptora</th>
-                                <th>Cargo del tutor de la entidad receptora</th>
+                                <th>Nombres tutor entidad receptora</th>
+                                <th>Cargo tutor entidad receptora</th>
                                 <th>Número de prácticas</th>
                                 <th>Número de teléfono tutor</th>
                                 <th>Número institucional</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -265,7 +268,11 @@ if (!$conn) {
                                 <td class="text-center"><?php echo $numero_practicas; ?></td>
                                 <td class="text-center"><?php echo $numero_telefono; ?></td>
                                 <td class="text-center"><?php echo (!empty($numero_institucional)) ? $numero_institucional : 'NO APLICA'; ?></td>
-
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <td class="text-center">
                                     <?php
                                     // Lógica para asignar la clase de Bootstrap según el estado

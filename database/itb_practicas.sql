@@ -287,6 +287,20 @@ CREATE TABLE documento_catorce (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
 
+
+ CREATE TABLE documento_quince (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	usuario_id INT(11) NOT NULL,
+	nombre_doc VARCHAR(250) NOT NULL DEFAULT '15 EVIDENCIAS DEL ESTUDIANTE EN LA EJECUCIÓN DE PRÁCTICAS',
+	img_estudiante_area_trabajo VARCHAR(255),
+	img_estudiante_area_trabajo_herramientas VARCHAR(255),
+	img_estudiante_supervisor_entidad VARCHAR(255),
+	motivo_rechazo TEXT NULL,
+	estado ENUM('Pendiente', 'Corregir', 'Aprobado') DEFAULT 'Pendiente',
+	fecha_subida TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');
 INSERT INTO carrera (carrera) VALUES ('Tecnología Superior en Desarrollo de software');
   

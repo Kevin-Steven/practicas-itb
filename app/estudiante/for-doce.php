@@ -193,6 +193,7 @@ $stmt_doc_doce->close();
                                 <th>Evidencia 2</th>
                                 <th>Evidencia 3</th>
                                 <th>Evidencia 4</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -217,6 +218,12 @@ $stmt_doc_doce->close();
                                 <td>
                                     <a href="<?php echo $img_cierre_practicas; ?>" target="_blank">Ver imagen</a>
                                 </td>
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
+
 
                                 <!-- Estado con badge dinámico -->
                                 <td class="text-center">

@@ -160,6 +160,7 @@ $stmt_doc_once->close();
                                 <th>Pregunta 4</th>
                                 <th>Pregunta 5</th>
                                 <th>Pregunta 6</th>
+                                <th>Motivo de Rechazo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -172,7 +173,11 @@ $stmt_doc_once->close();
                                 <td><?php echo htmlspecialchars($opcion_cuatro ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($opcion_cinco ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($opcion_seis ?? '-'); ?></td>
-
+                                <td class="text-center">
+                                    <?php echo !empty($motivo_rechazo)
+                                        ? htmlspecialchars($motivo_rechazo)
+                                        : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>
+                                </td>
                                 <!-- Estado con badge dinámico -->
                                 <td class="text-center">
                                     <?php
