@@ -2,7 +2,7 @@
 session_start();
 require '../../config/config.php';
 
-// 1. Validación de sesión
+// Validar sesión activa
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../../index.php");
     exit();
@@ -10,18 +10,16 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id_session = $_SESSION['usuario_id'];
 
-// 2. Recibir los datos del formulario
+// Recibir y limpiar los datos del formulario
 $usuario_id_form = intval($_POST['usuario_id'] ?? 0);
-
 $actividad_economica = trim($_POST['actividad_economica'] ?? '');
 $provincia = trim($_POST['provincia'] ?? '');
 $hora_inicio = trim($_POST['horario_practica_inicio'] ?? '');
 $hora_fin = trim($_POST['horario_practica_fin'] ?? '');
 $jornada_laboral = trim($_POST['jornada_laboral'] ?? '');
 $numero_practicas = trim($_POST['numero_practicas'] ?? '');
-$numero_institucional = trim($_POST['numero_institucional'] ?? '');
 
-// 3. Validaciones básicas
+// Validar campos requeridos
 if (
     empty($actividad_economica) ||
     empty($provincia) ||
@@ -34,51 +32,49 @@ if (
     exit();
 }
 
-
+// Verificar que el usuario sea el mismo
 if ($usuario_id_form !== $usuario_id_session) {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=invalid_user");
     exit();
 }
 
-// 5. Obtener el ID del último documento_seis de este usuario
-$sql_select = "SELECT id, actividad_economica, provincia, hora_inicio, hora_fin, jornada_laboral, numero_practicas, numero_institucional 
-FROM documento_seis 
-WHERE usuario_id = ? 
-ORDER BY id DESC 
-LIMIT 1";
+// Obtener el último documento_seis del usuario
+$sql_select = "SELECT id, actividad_economica, provincia, hora_inicio, hora_fin, jornada_laboral, numero_practicas
+               FROM documento_seis 
+               WHERE usuario_id = ? 
+               ORDER BY id DESC 
+               LIMIT 1";
 
 $stmt_select = $conn->prepare($sql_select);
 $stmt_select->bind_param("i", $usuario_id_session);
 $stmt_select->execute();
-$result_select = $stmt_select->get_result();
+$result = $stmt_select->get_result();
 
-if ($result_select->num_rows === 0) {
+if ($result->num_rows === 0) {
     header("Location: ../for-seis.php?status=not_found");
     exit();
 }
 
-$datos_actuales = $result_select->fetch_assoc();
-$id_documento_seis = $datos_actuales['id'];
+$datos = $result->fetch_assoc();
+$id_documento_seis = $datos['id'];
 $stmt_select->close();
 
-// 6. Comprobar si hubo cambios
+// Verificar si hay cambios reales
 $hubo_cambios = (
-    $actividad_economica !== $datos_actuales['actividad_economica'] ||
-    $provincia !== $datos_actuales['provincia'] ||
-    $hora_inicio !== $datos_actuales['hora_inicio'] ||
-    $hora_fin !== $datos_actuales['hora_fin'] ||
-    $jornada_laboral !== $datos_actuales['jornada_laboral'] ||
-    $numero_practicas !== $datos_actuales['numero_practicas'] ||
-    $numero_institucional !== $datos_actuales['numero_institucional']
+    $actividad_economica !== $datos['actividad_economica'] ||
+    $provincia !== $datos['provincia'] ||
+    $hora_inicio !== $datos['hora_inicio'] ||
+    $hora_fin !== $datos['hora_fin'] ||
+    $jornada_laboral !== $datos['jornada_laboral'] ||
+    $numero_practicas !== $datos['numero_practicas']
 );
 
-// 7. Si no hubo cambios, redirigir
 if (!$hubo_cambios) {
     header("Location: ../for-seis.php");
     exit();
 }
 
-// 8. Realizar el UPDATE sobre el registro exacto (por ID)
+// Actualizar el documento
 $sql_update = "UPDATE documento_seis SET 
     actividad_economica = ?, 
     provincia = ?, 
@@ -86,8 +82,8 @@ $sql_update = "UPDATE documento_seis SET
     hora_fin = ?, 
     jornada_laboral = ?, 
     numero_practicas = ?, 
-    numero_institucional = ?, 
-    estado = 'Pendiente' 
+    estado = 'Pendiente', 
+    motivo_rechazo = NULL
 WHERE id = ?";
 
 $stmt_update = $conn->prepare($sql_update);
@@ -98,25 +94,23 @@ if (!$stmt_update) {
 }
 
 $stmt_update->bind_param(
-    "sssssssi",
+    "ssssssi",
     $actividad_economica,
     $provincia,
     $hora_inicio,
     $hora_fin,
     $jornada_laboral,
     $numero_practicas,
-    $numero_institucional,
     $id_documento_seis
 );
 
 if ($stmt_update->execute()) {
     header("Location: ../for-seis.php?status=update");
-    exit();
 } else {
     header("Location: ../for-seis-edit.php?id=$usuario_id_form&status=db_error");
-    exit();
 }
 
 $stmt_update->close();
 $conn->close();
+exit();
 ?>

@@ -20,17 +20,18 @@ $sql_doc_seis = "SELECT
        d6.id,
        d6.actividad_economica,
        d6.provincia,
-        d6.hora_inicio,
-        d6.hora_fin,
+       d6.hora_inicio,
+       d6.hora_fin,
        d6.jornada_laboral,
        d6.numero_practicas,
-       d6.numero_institucional,
+       d5.numero_institucional,
        d6.estado,
        d3.nombres_tutor_receptor,
        d3.cargo_tutor_receptor,
        d3.numero_telefono_tutor_receptor
 FROM documento_seis d6
-LEFT JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+INNER JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+INNER JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
 WHERE d6.usuario_id = ?
 ORDER BY d6.id DESC
 LIMIT 1";
@@ -48,16 +49,14 @@ if ($row = $result_doc_seis->fetch_assoc()) {
     $hora_inicio = $row['hora_inicio'];
     $hora_fin = $row['hora_fin'];
     $jornada_laboral = $row['jornada_laboral'];
-    $nombres_tutor_receptor = $row['nombres_tutor_receptor'];
+    $nombres_tutor_receptor = $row['nombres_tutor_receptor']; 
     $cargo_tutor_receptor = $row['cargo_tutor_receptor'];
     $numero_practicas = $row['numero_practicas'];
     $numero_telefono = $row['numero_telefono_tutor_receptor'];
     $numero_institucional = $row['numero_institucional'];
 }
 
-
 $stmt_doc_seis->close();
-
 
 if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
@@ -132,14 +131,6 @@ if (!$conn) {
                                     </select>
                                 </div>
 
-                                <!-- Número institucional -->
-                                <div class="mb-2">
-                                    <label for="numero_institucional" class="form-label fw-bold">Número institucional (opcional):</label>
-                                    <input type="text" maxlength="10" oninput="validateInput(this)"
-                                        class="form-control" id="numero_institucional" name="numero_institucional"
-                                        placeholder="Ej: 0987654321"
-                                        value="<?php echo htmlspecialchars($numero_institucional ?? '', ENT_QUOTES); ?>">
-                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -153,13 +144,6 @@ if (!$conn) {
                                     </select>
                                 </div>
 
-                                <!-- Número de teléfono celular -->
-                                <div class="mb-2">
-                                    <label for="numero_telefono" class="form-label fw-bold">Número de teléfono tutor:</label>
-                                    <input type="text" class="form-control" id="numero_telefono" name="numero_telefono"
-                                        maxlength="10" placeholder="Ej: 0987654321" oninput="validateInput(this)" 
-                                        value="<?php echo htmlspecialchars($numero_telefono ?? '', ENT_QUOTES); ?>" disabled>
-                                </div>
                             </div>
 
                             <!-- Campo oculto para el usuario -->

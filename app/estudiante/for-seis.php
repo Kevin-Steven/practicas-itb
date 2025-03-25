@@ -24,13 +24,14 @@ $sql_doc_seis = "SELECT
        d6.hora_fin,
        d6.jornada_laboral,
        d6.numero_practicas,
-       d6.numero_institucional,
+       d5.numero_institucional,
        d6.estado,
        d3.nombres_tutor_receptor,
        d3.cargo_tutor_receptor,
        d3.numero_telefono_tutor_receptor
 FROM documento_seis d6
-INNER JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+LEFT JOIN documento_tres d3 ON d6.usuario_id = d3.usuario_id
+INNER JOIN documento_cinco d5 ON d6.usuario_id = d5.usuario_id
 WHERE d6.usuario_id = ?
 ORDER BY d6.id DESC
 LIMIT 1";
@@ -211,10 +212,6 @@ if (!$conn) {
                                             <option value="Completa">Completa</option>
                                         </select>
                                     </div>
-                                    <div class="mb-2">
-                                        <label for="numero_institucional" class="form-label fw-bold">Número institucional (opcional):</label>
-                                        <input type="text" maxlength="10" oninput="validateInput(this)" class="form-control" id="numero_institucional" name="numero_institucional" placeholder="Ej: 0987654321">
-                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -225,10 +222,6 @@ if (!$conn) {
                                             <option value="" disabled selected>Seleccionar</option>
                                             <option value="Primera-Segunda-Tercera">Primera-Segunda-Tercera</option>
                                         </select>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="numero_telefono" class="form-label fw-bold">Número de teléfono tutor:</label>
-                                        <input type="text" class="form-control" id="numero_telefono" name="numero_telefono" maxlength="10" placeholder="Ej: 0987654321" oninput="validateInput(this)" value="<?php echo $numero_telefono; ?>" disabled>
                                     </div>
                                 </div>
                                 <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">

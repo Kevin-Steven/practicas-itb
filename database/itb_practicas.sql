@@ -144,7 +144,6 @@ CREATE TABLE documento_seis (
   provincia VARCHAR(255) NOT NULL,
   jornada_laboral VARCHAR(255) NOT NULL,
   numero_practicas VARCHAR(255) NOT NULL,
-  numero_institucional VARCHAR(20) DEFAULT 'NO APLICA',
   hora_inicio TIME NOT NULL,
   hora_fin TIME NOT NULL,
   motivo_rechazo TEXT NULL,	
@@ -266,6 +265,17 @@ CREATE TABLE documento_nueve (
 	FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+  
+CREATE TABLE documento_trece (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id int(11) NOT NULL,
+  nombre_doc VARCHAR(250) NOT NULL DEFAULT '13 CERTIFICACIÓN DE REALIZACIÓN DE PRÁCTICAS LABORALES',
+  motivo_rechazo TEXT NULL,
+  estado ENUM('Pendiente', 'Corregir', 'Aprobado')DEFAULT 'Pendiente',
+  fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+  );
+
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');
 INSERT INTO carrera (carrera) VALUES ('Tecnología Superior en Desarrollo de software');
   
@@ -291,7 +301,17 @@ BEGIN
 			NULL,'Pendiente', NOW() );
 END$$
 DELIMITER ;
-documento_uno
+
+DELIMITER $$
+CREATE TRIGGER after_insert_documento_seis
+AFTER INSERT ON documento_seis
+FOR EACH ROW
+BEGIN
+    INSERT INTO documento_trece (usuario_id, nombre_doc, motivo_rechazo, estado,fecha_subida)
+    VALUES (NEW.usuario_id, '13 CERTIFICACIÓN DE REALIZACIÓN DE PRÁCTICAS LABORALES',
+			NULL,'Pendiente', NOW() );
+END$$
+DELIMITER ;
   
 DELIMITER $$
 CREATE TRIGGER after_user_insert
