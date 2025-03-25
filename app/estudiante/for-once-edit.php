@@ -79,9 +79,7 @@ $stmt_doc_once->close();
         <div class="container">
             <h1 class="mb-2 text-center fw-bold">Supervisión de la Práctica Laboral al Estudiante</h1>
 
-            <?php if ($estado === 'Corregir' || $estado === null): ?>
-
-                <form action="../estudiante/logic/documento-once.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                <form action="../estudiante/logic/documento-once-actualizar.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
 
                     <p class="text-center">
                         Indique con una “X” la evaluación que usted considere adecuada, en el momento de la supervisión durante la Práctica Pre-profesional laboral, teniendo en cuenta el cumplimiento de los siguientes indicadores:
@@ -109,33 +107,33 @@ $stmt_doc_once->close();
                                 <!-- DISCIPLINA -->
                                 <tr>
                                     <td class="text-start">El estudiante se encuentra en el área de trabajo asignada. </td>
-                                    <td><input type="radio" name="pregunta1" value="1" required></td>
-                                    <td><input type="radio" name="pregunta1" value="0"></td>
+                                    <td><input type="radio" name="pregunta1" value="1" required <?php echo $opcion_uno == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta1" value="0" <?php echo $opcion_uno == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                                 <tr>
                                     <td class="text-start">El estudiante se observa con la vestimenta adecuada según el área de trabajo.</td>
-                                    <td><input type="radio" name="pregunta2" value="1" required></td>
-                                    <td><input type="radio" name="pregunta2" value="0"></td>
+                                    <td><input type="radio" name="pregunta2" value="1" required <?php echo $opcion_dos == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta2" value="0" <?php echo $opcion_dos == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                                 <tr>
                                     <td class="text-start">El estudiante cuenta con los recursos necesarios para realizar sus prácticas.</td>
-                                    <td><input type="radio" name="pregunta3" value="1" required></td>
-                                    <td><input type="radio" name="pregunta3" value="0"></td>
+                                    <td><input type="radio" name="pregunta3" value="1" required <?php echo $opcion_tres == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta3" value="0" <?php echo $opcion_tres == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                                 <tr>
                                     <td class="text-start">Existencia del docente que asigne y controle las actividades del estudiante.</td>
-                                    <td><input type="radio" name="pregunta4" value="1" required></td>
-                                    <td><input type="radio" name="pregunta4" value="0"></td>
+                                    <td><input type="radio" name="pregunta4" value="1" required <?php echo $opcion_cuatro == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta4" value="0" <?php echo $opcion_cuatro == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                                 <tr>
                                     <td class="text-start">Los formatos de la carpeta de prácticas pre-profesionales laborales se han ido completando adecuadamente.</td>
-                                    <td><input type="radio" name="pregunta5" value="1" required></td>
-                                    <td><input type="radio" name="pregunta5" value="0"></td>
+                                    <td><input type="radio" name="pregunta5" value="1" required <?php echo $opcion_cinco == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta5" value="0" <?php echo $opcion_cinco == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                                 <tr>
                                     <td class="text-start">Las actividades que realiza el estudiante están relacionadas con el objeto de la profesión.</td>
-                                    <td><input type="radio" name="pregunta6" value="1" required></td>
-                                    <td><input type="radio" name="pregunta6" value="0"></td>
+                                    <td><input type="radio" name="pregunta6" value="1" required <?php echo $opcion_seis == 1 ? 'checked' : ''; ?>></td>
+                                    <td><input type="radio" name="pregunta6" value="0" <?php echo $opcion_seis == 0 ? 'checked' : ''; ?>></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -147,92 +145,6 @@ $stmt_doc_once->close();
                     </div>
 
                 </form>
-            <?php else: ?>
-                <h3 class="text-center mt-2 mb-3">Estado del Formulario</h3>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered shadow-lg text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Pregunta 1</th>
-                                <th>Pregunta 2</th>
-                                <th>Pregunta 3</th>
-                                <th>Pregunta 4</th>
-                                <th>Pregunta 5</th>
-                                <th>Pregunta 6</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><?php echo htmlspecialchars($opcion_uno ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($opcion_dos ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($opcion_tres ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($opcion_cuatro ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($opcion_cinco ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($opcion_seis ?? '-'); ?></td>
-
-                                <!-- Estado con badge dinámico -->
-                                <td class="text-center">
-                                    <?php
-                                    $badgeClass = '';
-
-                                    if ($estado === 'Pendiente') {
-                                        $badgeClass = 'badge bg-warning text-dark';
-                                    } elseif ($estado === 'Corregir') {
-                                        $badgeClass = 'badge bg-danger';
-                                    } elseif ($estado === 'Aprobado') {
-                                        $badgeClass = 'badge bg-success';
-                                    } else {
-                                        $badgeClass = 'badge bg-secondary';
-                                    }
-                                    ?>
-                                    <span class="<?php echo $badgeClass; ?>">
-                                        <?php echo htmlspecialchars($estado); ?>
-                                    </span>
-                                </td>
-
-                                <!-- Acciones -->
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-once-edit.php?id=<?php echo $id; ?>'">
-                                            <i class='bx bx-edit-alt'></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $id; ?>">
-                                            <i class='bx bxs-file-pdf'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- ✅ Modal fuera de la tabla -->
-                <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form action="../estudiante/pdf/software/doc-once-pdf.php" method="GET" target="_blank">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Se generará un documento en formato PDF.</p>
-                                    <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
         </div>
     </div>
 
@@ -241,7 +153,7 @@ $stmt_doc_once->close();
         <?php
         $status = $_GET['status'];
 
-        // Icono y título del encabezado
+        // Icono + Título según el estado
         if ($status === 'success') {
             $icon = "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
             $title = "Formulario enviado";
@@ -256,7 +168,7 @@ $stmt_doc_once->close();
             $title = "Campos incompletos";
         } elseif ($status === 'db_error') {
             $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
-            $title = "Error en la Base de Datos";
+            $title = "Error de Base de Datos";
         } else {
             $icon = "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
             $title = "Error";
@@ -264,12 +176,12 @@ $stmt_doc_once->close();
 
         // Mensaje del cuerpo del toast
         $message = match ($status) {
-            'success'      => "Supervisión académica enviada correctamente.",
-            'deleted'      => "El documento se ha eliminado correctamente.",
-            'update'       => "La supervisión ha sido actualizada exitosamente.",
-            'missing_data' => "Por favor, responde todas las preguntas antes de enviar.",
-            'db_error'     => "Hubo un problema al guardar los datos. Intenta nuevamente.",
-            default        => "Ocurrió un error inesperado."
+            'success' => "Evaluación final enviada correctamente.",
+            'deleted' => "El documento se ha eliminado correctamente.",
+            'update' => "El documento se ha actualizado correctamente.",
+            'missing_data' => "Debes responder todas las preguntas antes de enviar.",
+            'db_error' => "Hubo un error al guardar los datos en la base de datos.",
+            default => "Ocurrió un error inesperado."
         };
         ?>
 
@@ -279,7 +191,7 @@ $stmt_doc_once->close();
                     <?= $icon ?>
                     <strong class="me-auto"><?= $title ?></strong>
                     <small>Justo ahora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
                     <?= $message ?>
@@ -287,7 +199,6 @@ $stmt_doc_once->close();
             </div>
         </div>
     <?php endif; ?>
-
 
 
     <?php renderFooterAdmin(); ?>

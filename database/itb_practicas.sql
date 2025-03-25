@@ -229,6 +229,22 @@ CREATE TABLE documento_nueve (
 	fecha_subida timestamp NOT NULL DEFAULT current_timestamp(),
 	FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
   );
+  
+  CREATE TABLE documento_once (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	usuario_id INT(11) NOT NULL,
+	nombre_doc VARCHAR(250) NOT NULL DEFAULT '11 SUPERVISIÓN DE LA PRÁCTICA LABORAL AL ESTUDIANTE (SUPERVISOR ACADÉMICO)',
+	opcion_uno TINYINT(1) NOT NULL,
+	opcion_dos TINYINT(1) NOT NULL,
+	opcion_tres TINYINT(1) NOT NULL,
+	opcion_cuatro TINYINT(1) NOT NULL,
+	opcion_cinco TINYINT(1) NOT NULL,
+	opcion_seis TINYINT(1) NOT NULL,
+	motivo_rechazo TEXT NULL,
+	estado ENUM('Pendiente', 'Corregir', 'Aprobado') DEFAULT 'Pendiente',
+	fecha_subida TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
 
 INSERT INTO cursos (paralelo) VALUES ('DH4-DL-A01C');
 INSERT INTO carrera (carrera) VALUES ('Tecnología Superior en Desarrollo de software');
