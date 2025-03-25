@@ -1,9 +1,9 @@
 <?php 
-    $host = '137.184.138.191';
-    $usuario = 'itb_practicas';
-    $clave = '753159456Ab*';
+    $host = 'localhost';
+    $usuario = 'root';
+    $clave = '';
     $baseDeDatos = 'itb_practicas';
-    $puerto = '3306';
+    $puerto = '3308';
 
     $conn = new mysqli($host, $usuario ,$clave, $baseDeDatos, $puerto);
 
