@@ -166,8 +166,8 @@ class CustomPDF extends TCPDF
 
 // Inicializar TCPDF
 $pdf = new CustomPDF();
-$pdf->SetMargins(23, 35, 23);
 $pdf->AddPage();
+$pdf->SetMargins(23, 35, 23);
 $pdf->SetY(62);
 
 $pdf->Image('../../../uploads/logo-entidad/' . $logo_entidad_receptora, 85, 20, 40, 40, '');

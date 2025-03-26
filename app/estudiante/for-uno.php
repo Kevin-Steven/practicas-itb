@@ -325,7 +325,7 @@ $motivo_rechazo = $usuario_info['motivo_rechazo'] ?? null;
                                             <td class="text-center" rowspan="<?= max(1, count($experiencia_laboral)) ?>">
                                                 <?php echo htmlspecialchars($motivo_rechazo ?? 'No aplica'); ?>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center" rowspan="<?= max(1, count($experiencia_laboral)) ?>">
                                                 <?php echo !empty($row['motivo_rechazo'])
                                                     ? htmlspecialchars($row['motivo_rechazo'])
                                                     : '<span class="text-muted">No hay motivo de rechazo</span>'; ?>

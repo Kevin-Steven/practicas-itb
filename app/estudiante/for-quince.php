@@ -18,7 +18,7 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-$sql_doc_doce = "SELECT 
+$sql_doc_quince = "SELECT 
        dq.id,
        dq.img_estudiante_area_trabajo,
        dq.img_estudiante_area_trabajo_herramientas,
@@ -30,31 +30,23 @@ WHERE dq.usuario_id = ?
 ORDER BY dq.id DESC
 LIMIT 1";
 
-$stmt_doc_doce = $conn->prepare($sql_doc_doce);
-$stmt_doc_doce->bind_param("i", $usuario_id);
-$stmt_doc_doce->execute();
-$result_doc_doce = $stmt_doc_doce->get_result();
+$stmt_doc_quince = $conn->prepare($sql_doc_quince);
+$stmt_doc_quince->bind_param("i", $usuario_id);
+$stmt_doc_quince->execute();
+$result_doc_quince = $stmt_doc_quince->get_result();
 
 $estado = null;
 
-if ($row = $result_doc_doce->fetch_assoc()) {
+if ($row = $result_doc_quince->fetch_assoc()) {
     $id = $row['id'];
     $estado = $row['estado'] ?? null;
     $motivo_rechazo = $row['motivo_rechazo'] ?? null;
-    // Puntajes de cada pregunta
-    $opcion_uno = $row['opcion_uno'];
-    $opcion_dos = $row['opcion_dos'];
-    $opcion_tres = $row['opcion_tres'];
-    $opcion_cuatro = $row['opcion_cuatro'];
-    $opcion_cinco = $row['opcion_cinco'];
-    $opcion_seis = $row['opcion_seis'];
-    $img_practicas_puesto_trabajo = $row['img_practicas_puesto_trabajo'];
-    $img_puesto_trabajo = $row['img_puesto_trabajo'];
-    $img_estudiante_tutor_entidad = $row['img_estudiante_tutor_entidad'];
-    $img_cierre_practicas = $row['img_cierre_practicas'];
+    $img_estudiante_area_trabajo = $row['img_estudiante_area_trabajo'];
+    $img_estudiante_area_trabajo_herramientas = $row['img_estudiante_area_trabajo_herramientas'];
+    $img_estudiante_supervisor_entidad = $row['img_estudiante_supervisor_entidad'];
 }
 
-$stmt_doc_doce->close();
+$stmt_doc_quince->close();
 ?>
 
 <!doctype html>
@@ -163,7 +155,7 @@ $stmt_doc_doce->close();
                                 <!-- Acciones -->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-doce-edit.php?id=<?php echo $id; ?>'">
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='for-quince-edit.php?id=<?php echo $id; ?>'">
                                             <i class='bx bx-edit-alt'></i>
                                         </button>
 
@@ -181,7 +173,7 @@ $stmt_doc_doce->close();
                 <div class="modal fade" id="modalImprimir<?php echo $id; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $id; ?>" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form action="../estudiante/pdf/software/doc-doce-pdf.php" method="GET" target="_blank">
+                            <form action="../estudiante/pdf/software/doc-quince-pdf.php" method="GET" target="_blank">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="modalImprimirLabel<?php echo $id; ?>">¿Desea generar el documento?</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

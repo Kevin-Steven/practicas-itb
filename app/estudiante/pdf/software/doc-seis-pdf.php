@@ -266,8 +266,8 @@ class CustomPDF extends TCPDF
 
 // Inicializar TCPDF
 $pdf = new CustomPDF();
-$pdf->SetMargins(23, 35, 23);
 $pdf->AddPage();
+$pdf->SetMargins(23, 35, 23);
 $pdf->SetY(35);
 
 $pdf->SetFont('times', 'B', 12);

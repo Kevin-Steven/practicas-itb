@@ -27,7 +27,7 @@ $p5 = intval($_POST['pregunta5']);
 $p6 = intval($_POST['pregunta6']);
 
 // Directorio donde se subirán las imágenes
-$uploadDir = '../../uploads/evidencias/';
+$uploadDir = '../../uploads/evidencias/for-doce/';
 if (!file_exists($uploadDir)) {
     mkdir($uploadDir, 0777, true);
 }
@@ -39,7 +39,7 @@ function subirImagen($inputName, $uploadDir) {
         $rutaDestino = $uploadDir . $nombreArchivo;
 
         if (move_uploaded_file($_FILES[$inputName]['tmp_name'], $rutaDestino)) {
-            return '../uploads/evidencias/' . $nombreArchivo; // Ruta relativa para la DB
+            return '../uploads/evidencias/for-doce/' . $nombreArchivo; // Ruta relativa para la DB
         }
     }
     return null;

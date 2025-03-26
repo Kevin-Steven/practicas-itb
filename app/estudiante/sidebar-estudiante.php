@@ -24,7 +24,7 @@ function renderSidebarEstudiante($primer_nombre, $primer_apellido, $foto_perfil)
         'for-trece.php' => 'Certificado Prácticas',
         'for-catorce.php' => 'Base Legal',
         'for-quince.php' => 'Evidencia de Prácticas',
-        'for-diecis.php' => 'Plan de Rotación',
+        'for-dieciseis.php' => 'Plan de Rotación',
     ];
 
     // Detectar si está en una página de Fase 1 o Fase 2 para abrir el collapse
